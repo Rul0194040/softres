@@ -4,6 +4,15 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ConfigKeys } from './common/enums/configKeys.enum';
+import { UserModule } from './user/user.module';
+import { InsumoModule } from './insumo/insumo.module';
+import { CategoriaModule } from './categoria/categoria.module';
+import { RecetaModule } from './receta/receta.module';
+import { MenuModule } from './menu/menu.module';
+import { AlmacenModule } from './almacen/almacen.module';
+import { ComprasModule } from './compras/compras.module';
+import { AuthModule } from './common/auth/auth.module';
+import { VentasModule } from './ventas/ventas.module';
 
 @Module({
   imports: [
@@ -25,6 +34,15 @@ import { ConfigKeys } from './common/enums/configKeys.enum';
       }),
     }),
     ConfigModule.forRoot(),
+    UserModule,
+    InsumoModule,
+    CategoriaModule,
+    RecetaModule,
+    MenuModule,
+    AlmacenModule,
+    ComprasModule,
+    AuthModule,
+    VentasModule,
   ],
   controllers: [AppController],
   providers: [AppService],
