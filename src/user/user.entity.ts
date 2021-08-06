@@ -20,10 +20,23 @@ export class UserEntity extends CommonEntity {
 
   @Column({
     type: 'varchar',
+    length: 250,
+    nullable: true,
+  })
+  picUrl?: string;
+
+  @Column({
+    type: 'varchar',
     length: 50,
     nullable: false,
   })
   profile: string;
+
+  @Column({
+    type: 'simple-array',
+    nullable: true,
+  })
+  rules?: string[];
 
   @Column({
     type: 'varchar',
@@ -55,6 +68,9 @@ export class UserEntity extends CommonEntity {
     select: false,
   })
   password: string;
+
+  @Column({ type: 'text', default: null })
+  jwt: string;
 
   @Column({
     type: 'varchar',
