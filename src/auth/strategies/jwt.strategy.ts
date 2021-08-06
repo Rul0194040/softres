@@ -3,16 +3,20 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { UserService } from '@softres/user/user.service';
-import { jwtSecret } from '../constants';
 import { UserEntity } from '@softres/user/user.entity';
+import { ConfigService } from '@nestjs/config';
+import { ConfigKeys } from '@softres/common/enums/configKeys.enum';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly userService: UserService) {
+  constructor(
+    private readonly userService: UserService,
+    private readonly _configService: ConfigService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: jwtSecret,
+      secretOrKey: 'changeme',
     });
   }
 

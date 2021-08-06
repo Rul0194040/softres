@@ -11,7 +11,6 @@ import { RecetaModule } from './receta/receta.module';
 import { MenuModule } from './menu/menu.module';
 import { AlmacenModule } from './almacen/almacen.module';
 import { ComprasModule } from './compras/compras.module';
-import { AuthModule } from './common/auth/auth.module';
 import { VentasModule } from './ventas/ventas.module';
 import { AuthModule } from './auth/auth.module';
 
