@@ -1,4 +1,5 @@
-import Joi from 'joi';
+import * as Joi from '@hapi/joi';
+import { MorganTypes } from './common/enums/morganTypes.enum';
 export const AppConfig = {
   validationSchema: Joi.object({
     ENABLE_SYSLOG: Joi.boolean().default(true),
@@ -9,6 +10,7 @@ export const AppConfig = {
     API_ROUTE: Joi.string().default('api/v1'),
     API_SWAGGER: Joi.string().default('swagger'),
     PX_API_KEY: Joi.string().default('110719fd-de8c-4fae-a799-d00da4b52b32'),
+    MORGAN_TYPE: Joi.string().default(MorganTypes.COMBINED),
 
     //jwt
     JWT_SECRET: Joi.string().default('changeme!'),

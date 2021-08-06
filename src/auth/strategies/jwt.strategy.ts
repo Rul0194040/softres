@@ -11,12 +11,12 @@ import { ConfigKeys } from '@softres/common/enums/configKeys.enum';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private readonly userService: UserService,
-    private readonly _configService: ConfigService,
+    private readonly configService: ConfigService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: 'changeme',
+      secretOrKey: configService.get<string>(ConfigKeys.JWT_SECRET),
     });
   }
 

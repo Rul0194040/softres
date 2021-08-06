@@ -24,6 +24,7 @@
     "mig:run": "ts-node -r ./tsconfig-paths-bootstrap.ts ./node_modules/typeorm/cli.js migration:run --config orm.config.json"
   },
   "dependencies": {
+    "@hapi/joi": "^17.1.1",
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^1.0.1",
     "@nestjs/core": "^8.0.0",
@@ -38,6 +39,7 @@
     "class-validator": "^0.13.1",
     "joi": "^17.4.2",
     "module-alias": "^2.2.2",
+    "morgan": "^1.10.0",
     "mysql": "^2.18.1",
     "nestjs-rate-limiter": "^2.7.4",
     "passport": "^0.4.1",
@@ -46,6 +48,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
+    "swagger-ui-express": "^4.1.6",
     "typeorm": "^0.2.36"
   },
   "devDependencies": {
