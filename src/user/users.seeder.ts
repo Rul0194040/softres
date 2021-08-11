@@ -3,6 +3,7 @@ import { UserEntity } from '@softres/user/user.entity';
 import { Seeder } from 'nestjs-seeder';
 import { getRepository } from 'typeorm';
 import { usersToCreate } from './user.collection';
+import { genSalt, hash } from 'bcryptjs';
 
 /**
  * @ignore
@@ -13,13 +14,12 @@ export class UsersSeeder implements Seeder {
    * @ignore
    */
   async seed(): Promise<any> {
-    //TODO terminar de implementar el seeder de usuarios
-    // let usersCreated: UserEntity[];
-    // for (const user of usersToCreate) {
-    //   const record: UserEntity = user;
-    //   userCreated = await getRepository(UserEntity).save(record);
-    // }
-    // return usersCreated;
+    for (const user of usersToCreate) {
+      const record: UserEntity = user;
+      const theHash = await hash(record.password, await genSalt(10));
+      record.password = theHash;
+      await getRepository(UserEntity).save(record);
+    }
   }
   /**
    * @ignore

@@ -1,5 +1,3 @@
-import { ConfigService } from '@nestjs/config';
-import { ConfigKeys } from '@softres/common/enums/configKeys.enum';
 import { createUserDTO } from './DTO/createUser.dto';
 import { ProfileTypes } from './profileTypes.enum';
 import { AlmacenGeneralRules } from './rules/almacenGeneral-rules.collection';
