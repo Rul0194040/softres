@@ -70,7 +70,7 @@ export class UserEntity extends CommonEntity {
   password: string;
 
   @Column({ type: 'text', default: null })
-  jwt: string;
+  jwt?: string;
 
   @Column({
     type: 'varchar',
