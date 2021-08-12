@@ -4,8 +4,11 @@ import { AlmacenGeneralRules } from './rules/almacenGeneral-rules.collection';
 import { ComprasRules } from './rules/compras.rules.collection';
 import { DirectivosRules } from './rules/directivos.rules.collection';
 import { SysAdminRules } from './rules/sysAdmin-rules.collection';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const domain = 'xst.mx';
+
 /**
  * usuario unico a crear en el sistema, se crea en app service con password
  * default de .env
@@ -17,7 +20,7 @@ export const usersToCreate: createUserDTO[] = [
     lastName: 'Admin',
     email: 'super@' + domain,
     profile: ProfileTypes.SUPER,
-    password: 'password',
+    password: process.env.FIRST_PASSWORD,
   },
   {
     firstName: 'Admin',
@@ -25,7 +28,7 @@ export const usersToCreate: createUserDTO[] = [
     email: 'admin@' + domain,
     rules: SysAdminRules.map((r) => r.value),
     profile: ProfileTypes.SYSADMIN,
-    password: 'password',
+    password: process.env.FIRST_PASSWORD,
   },
   {
     firstName: 'Almacenista',
@@ -33,7 +36,7 @@ export const usersToCreate: createUserDTO[] = [
     email: 'almacengeneral@' + domain,
     rules: AlmacenGeneralRules.map((r) => r.value),
     profile: ProfileTypes.ALMACEN_GENERAL,
-    password: 'password',
+    password: process.env.FIRST_PASSWORD,
   },
   {
     firstName: 'Compras',
@@ -41,7 +44,7 @@ export const usersToCreate: createUserDTO[] = [
     email: 'compras@' + domain,
     rules: ComprasRules.map((r) => r.value),
     profile: ProfileTypes.COMPRAS,
-    password: 'password',
+    password: process.env.FIRST_PASSWORD,
   },
   {
     firstName: 'Directivos',
@@ -49,6 +52,6 @@ export const usersToCreate: createUserDTO[] = [
     email: 'directivos@' + domain,
     rules: DirectivosRules.map((r) => r.value),
     profile: ProfileTypes.DIRECTIVO,
-    password: 'password',
+    password: process.env.FIRST_PASSWORD,
   },
 ];
