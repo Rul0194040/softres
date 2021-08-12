@@ -2,18 +2,30 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ConfigKeys } from '@softres/common/enums/configKeys.enum';
 import { createUserDTO } from './DTO/createUser.dto';
-import { UserEntity as User, UserEntity } from './user.entity';
 import { genSalt, hash } from 'bcryptjs';
 import { getRepository } from 'typeorm';
+import { ProfileTypes } from './profileTypes.enum';
+import { UserEntity } from './user.entity';
 
 @Injectable()
 export class UserService {
   constructor(private readonly configService: ConfigService) {}
 
-  private users: User[] = [];
-
-  public getUserByEmail(email: string): User | undefined {
-    return this.users.find((user) => user.email === email);
+  /**
+   * Obtiene un usuario por su email
+   *
+   * @param email del usuario a obtener
+   */
+  async getByEmail(email: string, profile?: ProfileTypes): Promise<UserEntity> {
+    const isUser = getRepository(UserEntity)
+      .createQueryBuilder('user')
+      .select(['user'])
+      .where('user.email = :email', { email })
+      .addSelect('user.password');
+    if (profile) {
+      isUser.andWhere('user.profile = :prof', { prof: profile });
+    }
+    return isUser.getOne();
   }
 
   /**

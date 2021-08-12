@@ -1,3 +1,4 @@
+import { UserEntity } from '@softres/user/user.entity';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -38,9 +39,7 @@ import { AppConfig } from './app.config';
         username: configService.get<string>(ConfigKeys.MYSQL_USER),
         password: configService.get<string>(ConfigKeys.MYSQL_PASSWORD),
         database: configService.get<string>(ConfigKeys.MYSQL_DB),
-        entities: [
-          //aqui van las entidades que se vayan creando
-        ],
+        entities: [UserEntity],
         synchronize: false,
       }),
     }),

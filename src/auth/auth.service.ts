@@ -5,6 +5,7 @@ import { ConfigKeys } from '@softres/common/enums/configKeys.enum';
 import { UserEntity } from '@softres/user/user.entity';
 import { UserService } from '@softres/user/user.service';
 import { getRepository } from 'typeorm';
+import { compare } from 'bcryptjs';
 import { LoginIdentityDTO } from './DTOs/loginIdentity.dto';
 import { LoginResponseDTO } from './DTOs/loginResponse.dto';
 
@@ -16,13 +17,18 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  validate(email: string, password: string): UserEntity | null {
-    const user = this.userService.getUserByEmail(email);
+  async validate(email: string, password: string): Promise<UserEntity> {
+    console.log('entramos al validate');
+
+    const user = await this.userService.getByEmail(email);
+
     if (!user) {
       return null;
     }
-    const passwordIsValid = password === user.password;
-    return passwordIsValid ? user : null;
+
+    if (await compare(password, user.password)) {
+      return user;
+    }
   }
 
   async login(
@@ -32,6 +38,8 @@ export class AuthService {
     const userRecord = await getRepository(UserEntity).findOne({
       where: { id: user.id },
     });
+
+    console.log(userRecord, 'user_record');
 
     if (!userRecord) {
       throw new HttpException(
@@ -78,12 +86,12 @@ export class AuthService {
     return response;
   }
 
-  verify(token: string): UserEntity {
+  verify(token: string): Promise<UserEntity> {
     const decoded = this.jwtService.verify(token, {
       secret: this.configService.get(ConfigKeys.JWT_SECRET),
     });
 
-    const user = this.userService.getUserByEmail(decoded.email);
+    const user = this.userService.getByEmail(decoded.email);
     if (!user) {
       throw new Error('Error al obtener el token del decodificado');
     }
