@@ -13,6 +13,8 @@ import {
 import { CreateInsumoDTO } from './DTO/create-insumo.dto';
 import { UpdateInsumoDTO } from './DTO/update-insumo.dto';
 import { InsumoService } from './insumo.service';
+import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
+import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
 
 @Controller('insumo')
 export class InsumoController {
@@ -39,5 +41,18 @@ export class InsumoController {
   @Delete(':id')
   deleteInsumo(@Param('id') id: number): Promise<DeleteResult> {
     return this.insumoService.delete(id);
+  }
+
+  /**
+   * Paginate
+   *
+   * @param options opciones de paginacion
+   * @returns {PaginationPrimeNgResult}
+   */
+  @Post('paginate')
+  paginate(
+    @Body() options: PaginationOptions,
+  ): Promise<PaginationPrimeNgResult> {
+    return this.insumoService.paginate(options);
   }
 }
