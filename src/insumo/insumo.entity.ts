@@ -1,5 +1,6 @@
+import { CategoriaEntity } from '@softres/categoria/categoria.entity';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 import { MedidasTypes } from './enums/medidasTypes.enum';
 import { UnidadesTypes } from './enums/unidadesTypes.enum';
 
@@ -43,4 +44,18 @@ export class InsumoEntity extends CommonEntity {
     nullable: false,
   })
   precioUnitario: number;
+
+  @ManyToMany(() => CategoriaEntity)
+  @JoinTable({
+    name: 'insumos_categories',
+    joinColumn: {
+      name: 'insumo',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'categoria',
+      referencedColumnName: 'id',
+    },
+  })
+  insumo: CategoriaEntity;
 }
