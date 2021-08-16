@@ -1,7 +1,6 @@
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
-import { CompraEntity } from '@softres/compras/compra.entity';
-import { VentaEntity } from '@softres/ventas/venta.entity';
-import { Entity, ManyToOne, Column, OneToOne } from 'typeorm';
+import { Entity, ManyToOne, Column } from 'typeorm';
+import { Deptos } from '../enums/deptos.enum';
 import { AlmacenEntity } from './almacen.entity';
 
 @Entity('almacen-Detalle')
@@ -15,23 +14,12 @@ export class AlmacenDetalle extends CommonEntity {
   })
   almacenId: number;
 
-  @OneToOne(() => VentaEntity, { nullable: true })
-  venta?: VentaEntity;
-
   @Column({
-    type: 'int',
-    nullable: true,
+    type: 'enum',
+    enum: Deptos,
+    nullable: false,
   })
-  ventaId?: number;
-
-  @OneToOne(() => CompraEntity, { nullable: true })
-  compra?: CompraEntity;
-
-  @Column({
-    type: 'int',
-    nullable: true,
-  })
-  compraId?: number;
+  depto: Deptos;
 
   @Column({
     type: 'date',
@@ -75,7 +63,7 @@ export class AlmacenDetalle extends CommonEntity {
     type: 'decimal',
     precision: 10,
     scale: 2,
-    default: 0,
+    nullable: false,
   })
   precioUnitario: number;
 
@@ -107,7 +95,7 @@ export class AlmacenDetalle extends CommonEntity {
     type: 'decimal',
     precision: 10,
     scale: 2,
-    default: 0,
+    nullable: false,
   })
   saldo: number;
 }

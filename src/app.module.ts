@@ -16,6 +16,7 @@ import { VentasModule } from './ventas/ventas.module';
 import { AuthModule } from './auth/auth.module';
 import { RateLimiterModule } from 'nestjs-rate-limiter';
 import { AppConfig } from './app.config';
+import { InsumoEntity } from './insumo/insumo.entity';
 
 @Module({
   imports: [
@@ -39,7 +40,7 @@ import { AppConfig } from './app.config';
         username: configService.get<string>(ConfigKeys.MYSQL_USER),
         password: configService.get<string>(ConfigKeys.MYSQL_PASSWORD),
         database: configService.get<string>(ConfigKeys.MYSQL_DB),
-        entities: [UserEntity],
+        entities: [UserEntity, InsumoEntity],
         synchronize: false,
       }),
     }),
