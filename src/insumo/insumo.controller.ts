@@ -15,8 +15,10 @@ import { UpdateInsumoDTO } from './DTO/update-insumo.dto';
 import { InsumoService } from './insumo.service';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('insumo')
+@ApiTags('insumo')
 export class InsumoController {
   constructor(private readonly insumoService: InsumoService) {}
 
