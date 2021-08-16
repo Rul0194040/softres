@@ -12,7 +12,6 @@ import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgR
 export class InsumoService {
   async create(insumo: CreateInsumoDTO): Promise<InsumoEntity> {
     const insumoToCreate = plainToClass(InsumoEntity, insumo);
-    console.log(insumoToCreate);
     const created = await getRepository(InsumoEntity).save(insumoToCreate);
     return created;
   }
