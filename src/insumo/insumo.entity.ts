@@ -1,6 +1,7 @@
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { Column, Entity } from 'typeorm';
-import { TypesUnides } from './typesUnidades.enum';
+import { MedidasTypes } from './enums/medidasTypes.enum';
+import { UnidadesTypes } from './enums/unidadesTypes.enum';
 
 @Entity('insumos')
 export class InsumoEntity extends CommonEntity {
@@ -13,12 +14,20 @@ export class InsumoEntity extends CommonEntity {
   nombre: string;
 
   @Column({
-    type: 'varchar',
-    name: 'unidad',
-    length: 100,
+    type: 'enum',
+    name: 'medida',
+    enum: MedidasTypes,
     nullable: false,
   })
-  unidad: TypesUnides;
+  medida: MedidasTypes;
+
+  @Column({
+    type: 'enum',
+    name: 'unidad',
+    enum: UnidadesTypes,
+    nullable: false,
+  })
+  unidad: UnidadesTypes;
 
   @Column({
     type: 'varchar',
@@ -27,4 +36,11 @@ export class InsumoEntity extends CommonEntity {
     nullable: false,
   })
   marca: string;
+
+  @Column({
+    type: 'mediumint',
+    name: 'precioUnitario',
+    nullable: false,
+  })
+  precioUnitario: number;
 }

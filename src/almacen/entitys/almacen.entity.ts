@@ -1,7 +1,7 @@
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { Column, Entity, OneToOne } from 'typeorm';
-import { AlmacenType } from '../almacenTypes.enum';
+import { AlmacenType } from '../enums/almacenTypes.enum';
 
 @Entity('almacen')
 export class AlmacenEntity extends CommonEntity {
@@ -12,16 +12,25 @@ export class AlmacenEntity extends CommonEntity {
   })
   type: AlmacenType;
 
-  @Column({
-    type: 'varchar',
-    length: 25,
-    nullable: false,
-  })
-  unidad: string;
-
   @OneToOne(() => InsumoEntity, { nullable: false })
   insumo: InsumoEntity;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'mediumint', nullable: true })
   insumoId: number;
+
+  @Column({ type: 'mediumint', nullable: true })
+  precioVenta: number;
+
+  @Column({
+    type: 'decimal',
+    default: 0,
+  })
+  factor: number;
+
+  @Column({
+    type: 'mediumint',
+    name: 'total',
+    nullable: false,
+  })
+  total: number;
 }

@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { TypesUnides } from '../typesUnidades.enum';
+import { UnidadesTypes } from '../enums/unidadesTypes.enum';
 
 export class CreateInsumoDTO {
   @ApiProperty()
   nombre: string;
   @ApiProperty()
-  unidad: TypesUnides;
+  unidad: UnidadesTypes;
   @ApiProperty()
   marca: string;
 }

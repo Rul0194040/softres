@@ -1,4 +1,4 @@
-import { DeleteResult, getRepository, UpdateResult } from 'typeorm';
+import { DeleteResult, UpdateResult } from 'typeorm';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import {
   Body,
@@ -10,7 +10,6 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { plainToClass } from 'class-transformer';
 import { CreateInsumoDTO } from './DTO/create-insumo.dto';
 import { UpdateInsumoDTO } from './DTO/update-insumo.dto';
 import { InsumoService } from './insumo.service';
@@ -20,30 +19,25 @@ export class InsumoController {
   constructor(private readonly insumoService: InsumoService) {}
 
   @Post()
-  async createInsumo(@Body() insumo: CreateInsumoDTO): Promise<InsumoEntity> {
-    const insumoToCreate = plainToClass(InsumoEntity, insumo);
-    console.log(insumoToCreate);
-    const created = await getRepository(InsumoEntity).save(insumoToCreate);
-    return created;
+  createInsumo(@Body() insumo: CreateInsumoDTO): Promise<InsumoEntity> {
+    return this.insumoService.create(insumo);
   }
 
   @Get(':id')
-  async GetInsumoById(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<InsumoEntity> {
-    return await getRepository(InsumoEntity).findOne(id);
+  GetInsumoById(@Param('id', ParseIntPipe) id: number): Promise<InsumoEntity> {
+    return this.insumoService.getByid(id);
   }
 
   @Put(':id')
-  async updateInsumo(
+  updateInsumo(
     @Param('id', ParseIntPipe) id: number,
     @Body() insumo: UpdateInsumoDTO,
   ): Promise<UpdateResult> {
-    return await getRepository(InsumoEntity).update(id, insumo);
+    return this.insumoService.update(id, insumo);
   }
 
   @Delete(':id')
-  async deleteInsumo(@Param('id') id: number): Promise<DeleteResult> {
-    return await getRepository(InsumoEntity).delete(id);
+  deleteInsumo(@Param('id') id: number): Promise<DeleteResult> {
+    return this.insumoService.delete(id);
   }
 }
