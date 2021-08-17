@@ -10,4 +10,6 @@ export class CreateInsumoDTO {
   marca: string;
   @ApiProperty()
   precioUnitario: number;
+  @ApiProperty()
+  categorias: number[];
 }

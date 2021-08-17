@@ -1,3 +1,4 @@
+import { CategoriaEntity } from '@softres/categoria/categoria.entity';
 import { UserEntity } from '@softres/user/user.entity';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
@@ -40,7 +41,7 @@ import { InsumoEntity } from './insumo/insumo.entity';
         username: configService.get<string>(ConfigKeys.MYSQL_USER),
         password: configService.get<string>(ConfigKeys.MYSQL_PASSWORD),
         database: configService.get<string>(ConfigKeys.MYSQL_DB),
-        entities: [UserEntity, InsumoEntity],
+        entities: [UserEntity, InsumoEntity, CategoriaEntity],
         synchronize: false,
       }),
     }),
