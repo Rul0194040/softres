@@ -22,14 +22,26 @@ export class InsumoService {
   }
 
   async getByid(insumoId: number): Promise<InsumoEntity> {
-    return await getRepository(InsumoEntity).findOne(insumoId);
+    return await getRepository(InsumoEntity)
+      .createQueryBuilder('insumo')
+      .leftJoin('insumo.categoria', 'categoria')
+      .select(['insumo', 'categoria.id', 'categoria.nombre'])
+      .where('insumo.id=:id', { id: insumoId })
+      .getOne();
   }
 
   async update(
     insumoId: number,
     insumo: UpdateInsumoDTO,
-  ): Promise<UpdateResult> {
-    return await getRepository(InsumoEntity).update(insumoId, insumo);
+  ): Promise<InsumoEntity> {
+    await getRepository(InsumoEntity).update(insumoId, insumo);
+
+    return await getRepository(InsumoEntity)
+      .createQueryBuilder('insumo')
+      .leftJoin('insumo.categoria', 'categoria')
+      .select(['insumo', 'categoria.id', 'categoria.nombre'])
+      .where('insumo.id=:id', { id: insumoId })
+      .getOne();
   }
 
   async delete(insumoId: number): Promise<DeleteResult> {

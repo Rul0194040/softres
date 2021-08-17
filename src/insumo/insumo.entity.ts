@@ -1,6 +1,6 @@
 import { CategoriaEntity } from '@softres/categoria/categoria.entity';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
-import { Column, Entity, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { MedidasTypes } from './enums/medidasTypes.enum';
 import { UnidadesTypes } from './enums/unidadesTypes.enum';
 
@@ -46,6 +46,7 @@ export class InsumoEntity extends CommonEntity {
   precioUnitario: number;
 
   @OneToOne(() => CategoriaEntity, { nullable: true })
+  @JoinColumn()
   categoria: CategoriaEntity;
 
   @Column({

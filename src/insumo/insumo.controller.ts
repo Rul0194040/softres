@@ -36,7 +36,7 @@ export class InsumoController {
   updateInsumo(
     @Param('id', ParseIntPipe) id: number,
     @Body() insumo: UpdateInsumoDTO,
-  ): Promise<UpdateResult> {
+  ): Promise<InsumoEntity> {
     return this.insumoService.update(id, insumo);
   }
 
