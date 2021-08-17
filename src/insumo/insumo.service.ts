@@ -49,18 +49,21 @@ export class InsumoService {
   }
 
   async paginate(options: PaginationOptions): Promise<PaginationPrimeNgResult> {
-    const dataQuery = getRepository(InsumoEntity).createQueryBuilder();
+    const dataQuery = getRepository(InsumoEntity)
+      .createQueryBuilder('insumo')
+      .leftJoin('insumo.categoria', 'categoria')
+      .select(['insumo', 'categoria.id', 'categoria.nombre']);
 
     forIn(options.filters, (value, key) => {
-      if (key === 'nombre') {
-        dataQuery.andWhere('( nombre LIKE :term )', {
-          term: `%${value.split(' ').join('%')}%`,
+      if (key === 'categoria') {
+        dataQuery.andWhere('( categoria.id = :term )', {
+          term: value,
         });
       }
     });
 
     if (options.sort === undefined || !Object.keys(options.sort).length) {
-      options.sort = 'createdAt';
+      options.sort = 'insumo.createdAt';
     }
 
     const count = await dataQuery.getCount();
