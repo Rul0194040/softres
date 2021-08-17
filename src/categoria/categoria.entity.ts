@@ -1,6 +1,5 @@
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
-import { InsumoEntity } from '@softres/insumo/insumo.entity';
-import { Column, Entity, ManyToMany } from 'typeorm';
+import { Entity, Column } from 'typeorm';
 
 @Entity('categoria')
 export class CategoriaEntity extends CommonEntity {
@@ -11,7 +10,4 @@ export class CategoriaEntity extends CommonEntity {
     nullable: false,
   })
   nombre: string;
-
-  @ManyToMany(() => InsumoEntity)
-  insumo: InsumoEntity[];
 }

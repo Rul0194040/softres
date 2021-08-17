@@ -11,5 +11,5 @@ export class CreateInsumoDTO {
   @ApiProperty()
   precioUnitario: number;
   @ApiProperty()
-  categorias: number[];
+  categoriaId: number;
 }
