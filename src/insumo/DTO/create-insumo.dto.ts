@@ -8,4 +8,6 @@ export class CreateInsumoDTO {
   unidad: UnidadesTypes;
   @ApiProperty()
   marca: string;
+  @ApiProperty()
+  categorias: number[];
 }

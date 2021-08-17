@@ -1,3 +1,4 @@
+import { UpdateCatDTO } from './../categoria/DTOs/update-categoria.dto';
 import { UpdateInsumoDTO } from './DTO/update-insumo.dto';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { CreateInsumoDTO } from './DTO/create-insumo.dto';
@@ -7,12 +8,19 @@ import { getRepository, UpdateResult, DeleteResult } from 'typeorm';
 import { forIn } from 'lodash';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
+import { CategoriaEntity } from '@softres/categoria/categoria.entity';
 
 @Injectable()
 export class InsumoService {
   async create(insumo: CreateInsumoDTO): Promise<InsumoEntity> {
+    const categorias = await getRepository(CategoriaEntity)
+      .createQueryBuilder('categorias')
+      .whereInIds(insumo.categorias)
+      .getMany();
+
     const insumoToCreate = plainToClass(InsumoEntity, insumo);
-    console.log(insumoToCreate);
+    insumoToCreate.categorias = categorias;
+
     const created = await getRepository(InsumoEntity).save(insumoToCreate);
     return created;
   }
@@ -25,7 +33,49 @@ export class InsumoService {
     insumoId: number,
     insumo: UpdateInsumoDTO,
   ): Promise<UpdateResult> {
-    return await getRepository(InsumoEntity).update(insumoId, insumo);
+    const searchInsumo = await getRepository(InsumoEntity).findOne(insumoId);
+
+    const categoriasAnteriores = await getRepository(InsumoEntity)
+      .createQueryBuilder()
+      .relation(InsumoEntity, 'categorias')
+      .of(searchInsumo)
+      .loadMany();
+
+    //hay categorias en el array?
+    if (insumo.categorias.length) {
+      //vamos por las categorias nuevas que vienen en el array.
+      const categoriasNuevos = await getRepository(CategoriaEntity)
+        .createQueryBuilder()
+        .where('id IN (:...ids)', {
+          ids: insumo.categorias,
+        })
+        .getMany();
+      //editar las relaciones, quitar las anteriores y poner las nuevas
+      await getRepository(InsumoEntity)
+        .createQueryBuilder()
+        .relation(InsumoEntity, 'categorias')
+        .of(searchInsumo)
+        .addAndRemove(categoriasNuevos, categoriasAnteriores);
+
+      return await getRepository(InsumoEntity).update(searchInsumo.id, {
+        nombre: insumo.nombre,
+        unidad: insumo.unidad,
+        marca: insumo.marca,
+      });
+    } else {
+      //remover las relaciones de categorias
+      await getRepository(InsumoEntity)
+        .createQueryBuilder()
+        .relation(InsumoEntity, 'categorias')
+        .of(searchInsumo)
+        .remove(categoriasAnteriores);
+
+      return await getRepository(InsumoEntity).update(searchInsumo.id, {
+        nombre: insumo.nombre,
+        unidad: insumo.unidad,
+        marca: insumo.marca,
+      });
+    }
   }
 
   async delete(insumoId: number): Promise<DeleteResult> {

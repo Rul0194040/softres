@@ -15,8 +15,10 @@ import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { DeleteResult, UpdateResult } from 'typeorm';
 import { CreateCatDTO } from './DTOs/create-categoria.dto';
 import { UpdateCatDTO } from './DTOs/update-categoria.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('categoria')
+@ApiTags('categoria')
 export class CategoriaController {
   constructor(private readonly categoriaService: CategoriaService) {}
 

@@ -13,5 +13,5 @@ export class CategoriaEntity extends CommonEntity {
   nombre: string;
 
   @ManyToMany(() => InsumoEntity)
-  insumo: InsumoEntity;
+  insumo: InsumoEntity[];
 }

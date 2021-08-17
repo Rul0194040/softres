@@ -57,5 +57,5 @@ export class InsumoEntity extends CommonEntity {
       referencedColumnName: 'id',
     },
   })
-  insumo: CategoriaEntity;
+  categorias: CategoriaEntity[];
 }
