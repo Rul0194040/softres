@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { ConfigKeys } from './common/enums/configKeys.enum';
 import { UsersSeeder } from './user/users.seeder';
+import { CategoriaEntity } from './categoria/categoria.entity';
+import { CategoriaSeeder } from './categoria/categorias.seeder';
 
 seeder({
   imports: [
@@ -32,9 +34,9 @@ seeder({
         username: _configService.get<string>(ConfigKeys.MYSQL_USER),
         password: _configService.get<string>(ConfigKeys.MYSQL_PASSWORD),
         database: _configService.get<string>(ConfigKeys.MYSQL_DB),
-        entities: [UserEntity],
+        entities: [UserEntity, CategoriaEntity],
         synchronize: false,
       }),
     }),
   ],
-}).run([UsersSeeder]);
+}).run([UsersSeeder, CategoriaSeeder]);
