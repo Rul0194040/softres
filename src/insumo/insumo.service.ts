@@ -3,7 +3,7 @@ import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { CreateInsumoDTO } from './DTO/create-insumo.dto';
 import { Injectable } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
-import { getRepository, UpdateResult, DeleteResult } from 'typeorm';
+import { getRepository, DeleteResult } from 'typeorm';
 import { forIn } from 'lodash';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
@@ -24,8 +24,6 @@ export class InsumoService {
   async getByid(insumoId: number): Promise<InsumoEntity> {
     return await getRepository(InsumoEntity)
       .createQueryBuilder('insumo')
-      .leftJoin('insumo.categoria', 'categoria')
-      .select(['insumo', 'categoria.id', 'categoria.nombre'])
       .where('insumo.id=:id', { id: insumoId })
       .getOne();
   }

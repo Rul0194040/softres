@@ -1,11 +1,13 @@
 import { CategoriaEntity } from '@softres/categoria/categoria.entity';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
-import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+import { Column, Entity, Index, ManyToOne } from 'typeorm';
 import { MedidasTypes } from './enums/medidasTypes.enum';
 import { UnidadesTypes } from './enums/unidadesTypes.enum';
 
 @Entity('insumos')
+@Index(['categoriaId', 'nombre'], { unique: true })
 export class InsumoEntity extends CommonEntity {
+  @Index({ fulltext: true })
   @Column({
     type: 'varchar',
     name: 'nombre',
@@ -45,13 +47,9 @@ export class InsumoEntity extends CommonEntity {
   })
   precioUnitario: number;
 
-  @OneToOne(() => CategoriaEntity, { nullable: true })
-  @JoinColumn()
-  categoria: CategoriaEntity;
+  @ManyToOne(() => CategoriaEntity, { nullable: true })
+  categoria?: CategoriaEntity;
 
-  @Column({
-    type: 'int',
-    nullable: false,
-  })
-  categoriaId: number;
+  @Column({ type: 'int', nullable: true })
+  categoriaId?: number;
 }
