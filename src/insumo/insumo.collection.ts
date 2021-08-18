@@ -524,14 +524,6 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     categoriaId: 12,
   },
   {
-    nombre: 'Levadura seca ',
-    unidad: UnidadesTypes.PAQUETE,
-    medida: MedidasTypes.KILOS,
-    marca: 'Magidely',
-    precioUnitario: 93.33,
-    categoriaId: 25,
-  },
-  {
     nombre: 'Chipotles adobados',
     unidad: UnidadesTypes.LATA,
     medida: MedidasTypes.KILOS,

@@ -5,7 +5,7 @@ import { MedidasTypes } from './enums/medidasTypes.enum';
 import { UnidadesTypes } from './enums/unidadesTypes.enum';
 
 @Entity('insumos')
-@Index(['categoriaId', 'nombre'], { unique: true })
+@Index(['nombre', 'marca'], { unique: true })
 export class InsumoEntity extends CommonEntity {
   @Index({ fulltext: true })
   @Column({
