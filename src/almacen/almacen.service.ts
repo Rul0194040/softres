@@ -21,6 +21,8 @@ export class AlmacenService {
       type: almacen.type,
       factor: almacen.factor,
       insumo,
+      cantidad: almacen.cantidad,
+      capacidad: almacen.capacidad,
     };
     const createdAlmacen = await getRepository(AlmacenEntity).save(
       almacenToCreate,
@@ -35,7 +37,6 @@ export class AlmacenService {
           almacen.detalles[idx].entradas != null
             ? `E-${moment(createdAlmacen.createdAt).format('DDMMYYYY')}`
             : `S-${moment(createdAlmacen.createdAt).format('DDMMYYYY')}`,
-        existencias: almacen.detalles[idx].existencias,
         precioUnitario: almacen.detalles[idx].precioUnitario,
       };
       createdDetalle[idx] = await getRepository(AlmacenDetalle).save(detalle);

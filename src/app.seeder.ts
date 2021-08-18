@@ -1,3 +1,6 @@
+import { InsumoEntity } from '@softres/insumo/insumo.entity';
+import { InsumosSeeder } from './insumo/insumo.seeder';
+import { InsumoService } from './insumo/insumo.service';
 import { UserEntity } from '@softres/user/user.entity';
 import { seeder } from 'nestjs-seeder';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -34,9 +37,9 @@ seeder({
         username: _configService.get<string>(ConfigKeys.MYSQL_USER),
         password: _configService.get<string>(ConfigKeys.MYSQL_PASSWORD),
         database: _configService.get<string>(ConfigKeys.MYSQL_DB),
-        entities: [UserEntity, CategoriaEntity],
+        entities: [UserEntity, CategoriaEntity, InsumoEntity],
         synchronize: false,
       }),
     }),
   ],
-}).run([UsersSeeder, CategoriaSeeder]);
+}).run([UsersSeeder, CategoriaSeeder, InsumosSeeder]);

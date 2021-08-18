@@ -13,9 +13,6 @@ export class CreateDetalleDTO {
   referencia: string;
 
   @ApiProperty()
-  existencias: number;
-
-  @ApiProperty()
   precioUnitario: number;
 
   @ApiProperty()

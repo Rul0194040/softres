@@ -1,11 +1,12 @@
 export enum UnidadesTypes {
-  BIDON = 'bidon',
-  GARRAFA = 'garrafa',
-  BOLSA = 'bolsa',
-  FRASCO = 'frasco',
   BOTELLA = 'botella',
-  CAJA = 'caja',
-  LATA = 'lata',
+  BOLSA = 'bolsa',
+  COSTAL = 'costal',
   CUBETA = 'cubeta',
   PAQUETE = 'paquete',
+  LATA = 'lata',
+  CAJA = 'caja',
+  FRASCO = 'frasco',
+  BIDON = 'bidon',
+  GARRAFA = 'garrafa',
 }

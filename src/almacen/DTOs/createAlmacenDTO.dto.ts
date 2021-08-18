@@ -15,6 +15,10 @@ export class CreateAlmacenDTO {
   @ApiProperty()
   factor: number;
   @ApiProperty()
+  capacidad: number;
+  @ApiProperty()
+  cantidad: number;
+  @ApiProperty()
   @IsOptional()
   precioVenta?: number;
   @ApiProperty()
