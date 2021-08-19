@@ -143,14 +143,14 @@ export class AlmacenService {
 
     forIn(options.filters, (value, key) => {
       if (key === 'nombre') {
-        dataQuery.andWhere('( nombre LIKE :term )', {
+        dataQuery.andWhere('( insumo.nombre LIKE :term )', {
           term: `%${value.split(' ').join('%')}%`,
         });
       }
     });
 
     if (options.sort === undefined || !Object.keys(options.sort).length) {
-      options.sort = 'createdAt';
+      options.sort = 'almacen.createdAt';
     }
 
     const count = await dataQuery.getCount();
@@ -199,7 +199,7 @@ export class AlmacenService {
     });
 
     if (options.sort === undefined || !Object.keys(options.sort).length) {
-      options.sort = 'createdAt';
+      options.sort = 'almacenDet.createdAt';
     }
 
     const count = await dataQuery.getCount();
