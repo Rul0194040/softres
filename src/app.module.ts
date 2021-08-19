@@ -18,6 +18,8 @@ import { AuthModule } from './auth/auth.module';
 import { RateLimiterModule } from 'nestjs-rate-limiter';
 import { AppConfig } from './app.config';
 import { InsumoEntity } from './insumo/insumo.entity';
+import { AlmacenEntity } from './almacen/entitys/almacen.entity';
+import { almacenDetalleEntity } from './almacen/entitys/almacenDetalle.entity';
 
 @Module({
   imports: [
@@ -41,7 +43,13 @@ import { InsumoEntity } from './insumo/insumo.entity';
         username: configService.get<string>(ConfigKeys.MYSQL_USER),
         password: configService.get<string>(ConfigKeys.MYSQL_PASSWORD),
         database: configService.get<string>(ConfigKeys.MYSQL_DB),
-        entities: [UserEntity, InsumoEntity, CategoriaEntity],
+        entities: [
+          UserEntity,
+          InsumoEntity,
+          CategoriaEntity,
+          AlmacenEntity,
+          almacenDetalleEntity,
+        ],
         synchronize: false,
       }),
     }),
