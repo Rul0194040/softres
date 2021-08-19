@@ -192,7 +192,7 @@ export class AlmacenService {
 
     forIn(options.filters, (value, key) => {
       if (key === 'nombre') {
-        dataQuery.andWhere('( nombre LIKE :term )', {
+        dataQuery.andWhere('( insumo.nombre LIKE :term )', {
           term: `%${value.split(' ').join('%')}%`,
         });
       }
