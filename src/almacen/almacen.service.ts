@@ -133,6 +133,7 @@ export class AlmacenService {
         'almacen.depto',
         'almacen.type',
         'almacen.total',
+        'almacen.createdAt',
         'insumo.id',
         'insumo.nombre',
         'insumo.medida',
