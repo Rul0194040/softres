@@ -59,16 +59,29 @@ export class AlmacenController {
   }
 
   /**
-   * Paginate
+   * Paginate fisico
    *
    * @param options opciones de paginacion
    * @returns {PaginationPrimeNgResult}
    */
-  @Post('paginate/:insumoId')
+  @Post('paginate')
   paginate(
+    @Body() options: PaginationOptions,
+  ): Promise<PaginationPrimeNgResult> {
+    return this.almacenService.paginate(options);
+  }
+
+  /**
+   * Paginate contable
+   *
+   * @param options opciones de paginacion
+   * @returns {PaginationPrimeNgResult}
+   */
+  @Post('paginate/contable/:insumoId')
+  paginateContable(
     @Param('insumoId', ParseIntPipe) insumoId: number,
     @Body() options: PaginationOptions,
   ): Promise<PaginationPrimeNgResult> {
-    return this.almacenService.paginate(insumoId, options);
+    return this.almacenService.paginateContable(insumoId, options);
   }
 }

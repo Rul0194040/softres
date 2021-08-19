@@ -122,10 +122,7 @@ export class AlmacenService {
     return await getRepository(AlmacenEntity).delete(almacenId);
   }
 
-  async paginate(
-    insumoId: number,
-    options: PaginationOptions,
-  ): Promise<PaginationPrimeNgResult> {
+  async paginate(options: PaginationOptions): Promise<PaginationPrimeNgResult> {
     const dataQuery = getRepository(AlmacenEntity)
       .createQueryBuilder('almacen')
       .leftJoin('almacen.insumo', 'insumo')
@@ -159,7 +156,6 @@ export class AlmacenService {
     const count = await dataQuery.getCount();
 
     const data = await dataQuery
-      .where('insumo.id =:id', { id: insumoId })
       .skip(options.skip)
       .take(options.take)
       .orderBy(options.sort, 'DESC')
@@ -173,6 +169,7 @@ export class AlmacenService {
   }
 
   async paginateContable(
+    insumoId: number,
     options: PaginationOptions,
   ): Promise<PaginationPrimeNgResult> {
     const dataQuery = getRepository(almacenDetalleEntity)
@@ -208,6 +205,7 @@ export class AlmacenService {
     const count = await dataQuery.getCount();
 
     const data = await dataQuery
+      .where('insumo.id =:id', { id: insumoId })
       .skip(options.skip)
       .take(options.take)
       .orderBy(options.sort, 'DESC')
