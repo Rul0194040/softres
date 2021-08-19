@@ -64,10 +64,11 @@ export class AlmacenController {
    * @param options opciones de paginacion
    * @returns {PaginationPrimeNgResult}
    */
-  @Post('paginate')
+  @Post('paginate/:insumoId')
   paginate(
+    @Param('insumoId', ParseIntPipe) insumoId: number,
     @Body() options: PaginationOptions,
   ): Promise<PaginationPrimeNgResult> {
-    return this.almacenService.paginate(options);
+    return this.almacenService.paginate(insumoId, options);
   }
 }
