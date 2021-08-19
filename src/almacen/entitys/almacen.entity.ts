@@ -20,7 +20,7 @@ export class AlmacenEntity extends CommonEntity {
   @Column({
     type: 'enum',
     enum: Deptos,
-    nullable: true,
+    default: Deptos.COCINA,
   })
   depto: Deptos;
 

@@ -1,4 +1,3 @@
-import { AlmacenDetalle } from './entitys/almacenDetalle.entity';
 import { CreateDetalleDTO } from './DTOs/createDetalleDTO.dto';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { CreateAlmacenDTO } from './DTOs/createAlmacenDTO.dto';
@@ -11,6 +10,7 @@ import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgR
 import { forIn } from 'lodash';
 import * as moment from 'moment';
 import { AlmacenInformeDTO } from './DTOs/almacenInforneDTO.dto';
+import { almacenDetalleEntity } from './entitys/almacenDetalle.entity';
 
 @Injectable()
 export class AlmacenService {
@@ -21,6 +21,8 @@ export class AlmacenService {
     const total = almacen.capacidad * almacen.cantidad;
 
     const almacenToCreate: CreateAlmacenDTO = {
+      depto: almacen.depto,
+      type: almacen.type,
       insumo,
       insumoId: almacen.insumoId,
       cantidad: almacen.cantidad,
@@ -32,7 +34,7 @@ export class AlmacenService {
     );
 
     if (almacen.detalles) {
-      const createdDetalle: AlmacenDetalle[] = [];
+      const createdDetalle: almacenDetalleEntity[] = [];
       for (let idx = 0; idx < almacen.detalles.length; idx++) {
         const detalle: CreateDetalleDTO = {
           almacenId: createdAlmacen.id,
@@ -55,7 +57,9 @@ export class AlmacenService {
           abono: almacen.detalles[idx].abono ? almacen.detalles[idx].abono : 0,
           saldo: almacen.detalles[idx].saldo ? almacen.detalles[idx].saldo : 0,
         };
-        createdDetalle[idx] = await getRepository(AlmacenDetalle).save(detalle);
+        createdDetalle[idx] = await getRepository(almacenDetalleEntity).save(
+          detalle,
+        );
       }
       const result: AlmacenInformeDTO = {
         almacen: createdAlmacen,
@@ -71,8 +75,8 @@ export class AlmacenService {
   async createDetalle(
     almacenId: number,
     almacenDetalle: CreateDetalleDTO[],
-  ): Promise<AlmacenDetalle[]> {
-    const createdDetalle: AlmacenDetalle[] = [];
+  ): Promise<almacenDetalleEntity[]> {
+    const createdDetalle: almacenDetalleEntity[] = [];
     const almacenParent = await getRepository(AlmacenEntity).findOne(almacenId);
 
     for (let idx = 0; idx < almacenDetalle.length; idx++) {
@@ -95,7 +99,9 @@ export class AlmacenService {
         abono: almacenDetalle[idx].abono ? almacenDetalle[idx].abono : 0,
         saldo: almacenDetalle[idx].saldo ? almacenDetalle[idx].saldo : 0,
       };
-      createdDetalle[idx] = await getRepository(AlmacenDetalle).save(detalle);
+      createdDetalle[idx] = await getRepository(almacenDetalleEntity).save(
+        detalle,
+      );
     }
 
     return createdDetalle;
@@ -117,7 +123,71 @@ export class AlmacenService {
   }
 
   async paginate(options: PaginationOptions): Promise<PaginationPrimeNgResult> {
-    const dataQuery = getRepository(AlmacenEntity).createQueryBuilder();
+    const dataQuery = getRepository(AlmacenEntity)
+      .createQueryBuilder('almacen')
+      .leftJoin('almacen.insumo', 'insumo')
+      .select([
+        'almacen.id',
+        'almacen.cantidad',
+        'almacen.capacidad',
+        'almacen.depto',
+        'almacen.type',
+        'almacen.total',
+        'insumo.id',
+        'insumo.nombre',
+        'insumo.medida',
+        'insumo.unidad',
+        'insumo.precioUnitario',
+        'insumo.marca',
+      ]);
+
+    forIn(options.filters, (value, key) => {
+      if (key === 'nombre') {
+        dataQuery.andWhere('( nombre LIKE :term )', {
+          term: `%${value.split(' ').join('%')}%`,
+        });
+      }
+    });
+
+    if (options.sort === undefined || !Object.keys(options.sort).length) {
+      options.sort = 'createdAt';
+    }
+
+    const count = await dataQuery.getCount();
+
+    const data = await dataQuery
+      .skip(options.skip)
+      .take(options.take)
+      .orderBy(options.sort, 'DESC')
+      .getMany();
+
+    return {
+      data: data,
+      skip: options.skip,
+      totalItems: count,
+    };
+  }
+
+  async paginateContable(
+    options: PaginationOptions,
+  ): Promise<PaginationPrimeNgResult> {
+    const dataQuery = getRepository(almacenDetalleEntity)
+      .createQueryBuilder('almacenDet')
+      .leftJoin('almacenDet.insumo', 'insumo')
+      .select([
+        'almacenDet.id',
+        'almacenDet.cantidad',
+        'almacenDet.capacidad',
+        'almacenDet.depto',
+        'almacenDet.type',
+        'almacenDet.total',
+        'insumo.id',
+        'insumo.nombre',
+        'insumo.medida',
+        'insumo.unidad',
+        'insumo.precioUnitario',
+        'insumo.marca',
+      ]);
 
     forIn(options.filters, (value, key) => {
       if (key === 'nombre') {
