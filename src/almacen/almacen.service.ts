@@ -182,6 +182,7 @@ export class AlmacenService {
   }
 
   async paginateContable(
+    insumoId: number,
     options: PaginationOptions,
   ): Promise<PaginationPrimeNgResult> {
     const dataQuery = getRepository(almacenDetalleEntity)
@@ -204,19 +205,20 @@ export class AlmacenService {
 
     forIn(options.filters, (value, key) => {
       if (key === 'nombre') {
-        dataQuery.andWhere('( nombre LIKE :term )', {
+        dataQuery.andWhere('( insumo.nombre LIKE :term )', {
           term: `%${value.split(' ').join('%')}%`,
         });
       }
     });
 
     if (options.sort === undefined || !Object.keys(options.sort).length) {
-      options.sort = 'createdAt';
+      options.sort = 'almacenDet.createdAt';
     }
 
     const count = await dataQuery.getCount();
 
     const data = await dataQuery
+      .where('insumo.id =:id', { id: insumoId })
       .skip(options.skip)
       .take(options.take)
       .orderBy(options.sort, 'DESC')
