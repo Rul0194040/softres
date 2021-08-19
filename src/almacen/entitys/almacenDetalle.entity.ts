@@ -1,6 +1,5 @@
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { Entity, ManyToOne, Column } from 'typeorm';
-import { Deptos } from '../enums/deptos.enum';
 import { AlmacenEntity } from './almacen.entity';
 
 @Entity('almacen-Detalle')
@@ -13,13 +12,6 @@ export class AlmacenDetalle extends CommonEntity {
     nullable: false,
   })
   almacenId: number;
-
-  @Column({
-    type: 'enum',
-    enum: Deptos,
-    nullable: false,
-  })
-  depto: Deptos;
 
   @Column({
     type: 'date',

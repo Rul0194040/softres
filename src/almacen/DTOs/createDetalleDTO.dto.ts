@@ -4,9 +4,6 @@ import { Deptos } from '../enums/deptos.enum';
 
 export class CreateDetalleDTO {
   @ApiProperty()
-  depto: Deptos;
-
-  @ApiProperty()
   fecha: Date;
 
   @ApiProperty()
@@ -24,8 +21,7 @@ export class CreateDetalleDTO {
   salidas?: number;
 
   @ApiProperty()
-  @IsOptional()
-  almacenId?: number;
+  almacenId: number;
 
   @ApiProperty()
   @IsOptional()

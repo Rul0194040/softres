@@ -3,6 +3,7 @@ import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { AlmacenType } from '../enums/almacenTypes.enum';
+import { Deptos } from '../enums/deptos.enum';
 
 @Entity('almacen')
 export class AlmacenEntity extends CommonEntity {
@@ -15,6 +16,13 @@ export class AlmacenEntity extends CommonEntity {
 
   @OneToMany(() => AlmacenDetalle, (detalle) => detalle.almacen)
   detalle: AlmacenDetalle;
+
+  @Column({
+    type: 'enum',
+    enum: Deptos,
+    nullable: false,
+  })
+  depto: Deptos;
 
   @OneToOne(() => InsumoEntity, { nullable: false })
   insumo: InsumoEntity;

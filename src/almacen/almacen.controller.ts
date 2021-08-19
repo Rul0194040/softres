@@ -22,7 +22,9 @@ export class AlmacenController {
   constructor(private readonly almacenService: AlmacenService) {}
 
   @Post()
-  createAlmacen(@Body() almacen: CreateAlmacenDTO): Promise<AlmacenInformeDTO> {
+  createAlmacen(
+    @Body() almacen: CreateAlmacenDTO,
+  ): Promise<AlmacenInformeDTO | AlmacenEntity> {
     return this.almacenService.create(almacen);
   }
 
