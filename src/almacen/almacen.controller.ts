@@ -1,3 +1,4 @@
+import { CreateDetalleDTO } from './DTOs/createDetalleDTO.dto';
 import { AlmacenInformeDTO } from './DTOs/almacenInforneDTO.dto';
 import { AlmacenService } from './almacen.service';
 import { AlmacenEntity } from './entitys/almacen.entity';
@@ -16,6 +17,7 @@ import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgR
 import { UpdateResult, DeleteResult } from 'typeorm';
 import { CreateAlmacenDTO } from './DTOs/createAlmacenDTO.dto';
 import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
+import { AlmacenDetalle } from './entitys/almacenDetalle.entity';
 
 @Controller('almacen')
 export class AlmacenController {
@@ -26,6 +28,14 @@ export class AlmacenController {
     @Body() almacen: CreateAlmacenDTO,
   ): Promise<AlmacenInformeDTO | AlmacenEntity> {
     return this.almacenService.create(almacen);
+  }
+
+  @Post('createDetalle/:almacenId')
+  createDetAlmacen(
+    @Param('almacenId', ParseIntPipe) almacenId: number,
+    @Body() almacen: CreateDetalleDTO[],
+  ): Promise<AlmacenDetalle[]> {
+    return this.almacenService.createDetalle(almacenId, almacen);
   }
 
   @Get(':id')
