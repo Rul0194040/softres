@@ -20,14 +20,14 @@ export class AlmacenEntity extends CommonEntity {
   @Column({
     type: 'enum',
     enum: Deptos,
-    nullable: false,
+    nullable: true,
   })
   depto: Deptos;
 
   @OneToOne(() => InsumoEntity, { nullable: false })
   insumo: InsumoEntity;
 
-  @Column({ type: 'mediumint', nullable: true })
+  @Column({ type: 'mediumint', nullable: false })
   insumoId: number;
 
   @Column({
@@ -46,12 +46,6 @@ export class AlmacenEntity extends CommonEntity {
 
   @Column({ type: 'mediumint', nullable: true })
   precioVenta: number;
-
-  @Column({
-    type: 'decimal',
-    default: 0,
-  })
-  factor: number;
 
   @Column({
     type: 'mediumint',

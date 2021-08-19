@@ -18,13 +18,14 @@ export class AlmacenService {
     almacen: CreateAlmacenDTO,
   ): Promise<AlmacenInformeDTO | AlmacenEntity> {
     const insumo = await getRepository(InsumoEntity).findOne(almacen.insumoId);
+    const total = almacen.capacidad * almacen.cantidad;
 
     const almacenToCreate: CreateAlmacenDTO = {
-      type: almacen.type,
-      factor: almacen.factor,
       insumo,
+      insumoId: almacen.insumoId,
       cantidad: almacen.cantidad,
       capacidad: almacen.capacidad,
+      total,
     };
     const createdAlmacen = await getRepository(AlmacenEntity).save(
       almacenToCreate,

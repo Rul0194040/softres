@@ -1,3 +1,4 @@
+import { Deptos } from './../enums/deptos.enum';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
@@ -6,24 +7,25 @@ import { CreateDetalleDTO } from './createDetalleDTO.dto';
 
 export class CreateAlmacenDTO {
   @ApiProperty()
-  type: AlmacenType;
-  @ApiProperty()
-  insumo: InsumoEntity;
-  @ApiProperty()
-  @IsOptional()
-  insumoId?: number;
-  @ApiProperty()
-  factor: number;
+  insumoId: number;
   @ApiProperty()
   capacidad: number;
   @ApiProperty()
   cantidad: number;
   @ApiProperty()
-  @IsOptional()
-  precioVenta?: number;
+  total: number;
   @ApiProperty()
   @IsOptional()
-  total?: number;
+  depto?: Deptos;
+  @ApiProperty()
+  @IsOptional()
+  type?: AlmacenType;
+  @ApiProperty()
+  @IsOptional()
+  insumo?: InsumoEntity;
+  @ApiProperty()
+  @IsOptional()
+  precioVenta?: number;
   @ApiProperty()
   @IsOptional()
   detalles?: CreateDetalleDTO[];

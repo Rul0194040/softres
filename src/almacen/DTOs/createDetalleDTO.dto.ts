@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
-import { Deptos } from '../enums/deptos.enum';
 
 export class CreateDetalleDTO {
   @ApiProperty()
-  fecha: Date;
+  @IsOptional()
+  fecha?: Date;
 
   @ApiProperty()
   referencia: string;
