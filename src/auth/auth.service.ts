@@ -18,8 +18,6 @@ export class AuthService {
   ) {}
 
   async validate(email: string, password: string): Promise<UserEntity> {
-    console.log('entramos al validate');
-
     const user = await this.userService.getByEmail(email);
 
     if (!user) {
@@ -38,8 +36,6 @@ export class AuthService {
     const userRecord = await getRepository(UserEntity).findOne({
       where: { id: user.id },
     });
-
-    console.log(userRecord, 'user_record');
 
     if (!userRecord) {
       throw new HttpException(
