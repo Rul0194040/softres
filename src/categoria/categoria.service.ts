@@ -12,7 +12,6 @@ import { UpdateCatDTO } from './DTOs/update-categoria.dto';
 export class CategoriaService {
   async create(categoria: CreateCatDTO): Promise<CategoriaEntity> {
     const categoriaToCreate = plainToClass(CategoriaEntity, categoria);
-    console.log(categoriaToCreate);
     const created = await getRepository(CategoriaEntity).save(
       categoriaToCreate,
     );

@@ -1,4 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { AlmacenType } from '@softres/almacen/enums/almacenTypes.enum';
+import { Deptos } from '@softres/almacen/enums/deptos.enum';
 import { IsIn, IsOptional } from 'class-validator';
 
 export class PaginationOptions {
@@ -35,5 +37,7 @@ export class PaginationOptions {
   @ApiProperty()
   filters: {
     buscar?: string;
+    depto?: Deptos;
+    type?: AlmacenType;
   };
 }

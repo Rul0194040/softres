@@ -29,8 +29,6 @@ export class AuthController {
     @Body() body: LoginDTO,
     @Request() req,
   ): Promise<LoginResponseDTO> {
-    console.log(req.user, '-------------------------');
-
     return this.authService.login(req.user, body.rememberme);
   }
 }

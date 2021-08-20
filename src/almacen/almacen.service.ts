@@ -131,13 +131,13 @@ export class AlmacenService {
       .createQueryBuilder('almacen')
       .leftJoin('almacen.insumo', 'insumo')
       .select([
+        'almacen.createdAt',
         'almacen.id',
         'almacen.cantidad',
         'almacen.capacidad',
         'almacen.depto',
         'almacen.type',
         'almacen.total',
-        'almacen.createdAt',
         'insumo.id',
         'insumo.nombre',
         'insumo.medida',
@@ -147,9 +147,21 @@ export class AlmacenService {
       ]);
 
     forIn(options.filters, (value, key) => {
-      if (key === 'nombre') {
-        dataQuery.andWhere('( insumo.nombre LIKE :term )', {
+      if (key === 'buscar') {
+        dataQuery.andWhere('( nombre LIKE :term )', {
           term: `%${value.split(' ').join('%')}%`,
+        });
+      }
+
+      if (key === 'depto') {
+        dataQuery.andWhere('( depto = :term )', {
+          term: value,
+        });
+      }
+
+      if (key === 'type') {
+        dataQuery.andWhere('( type = :term )', {
+          term: value,
         });
       }
     });
@@ -163,7 +175,7 @@ export class AlmacenService {
     const data = await dataQuery
       .skip(options.skip)
       .take(options.take)
-      .orderBy(options.sort, 'DESC')
+      .orderBy(options.sort, options.direction)
       .getMany();
 
     return {
