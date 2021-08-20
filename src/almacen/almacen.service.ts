@@ -191,7 +191,8 @@ export class AlmacenService {
   ): Promise<PaginationPrimeNgResult> {
     const dataQuery = getRepository(almacenDetalleEntity)
       .createQueryBuilder('almacenDet')
-      .leftJoin('almacenDet.insumo', 'insumo')
+      .leftJoin('almacenDet.almacen', 'almacen')
+      .leftJoin('almacen.insumo', 'insumo')
       .select([
         'almacenDet.id',
         'almacenDet.cantidad',
@@ -199,6 +200,8 @@ export class AlmacenService {
         'almacenDet.depto',
         'almacenDet.type',
         'almacenDet.total',
+        'almacenDet.createdAt',
+        'almacen.id',
         'insumo.id',
         'insumo.nombre',
         'insumo.medida',
