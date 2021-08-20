@@ -130,6 +130,7 @@ export class AlmacenService {
     const dataQuery = getRepository(AlmacenEntity)
       .createQueryBuilder('almacen')
       .leftJoin('almacen.insumo', 'insumo')
+      .leftJoin('almacen.categoria', 'categoria')
       .select([
         'almacen.createdAt',
         'almacen.id',
@@ -144,11 +145,13 @@ export class AlmacenService {
         'insumo.unidad',
         'insumo.precioUnitario',
         'insumo.marca',
+        'categoria.id',
+        'categoria.nombre',
       ]);
 
     forIn(options.filters, (value, key) => {
-      if (key === 'buscar') {
-        dataQuery.andWhere('( nombre LIKE :term )', {
+      if (key === 'nombre') {
+        dataQuery.andWhere('( categoria.nombre LIKE :term )', {
           term: `%${value.split(' ').join('%')}%`,
         });
       }
