@@ -108,7 +108,11 @@ export class AlmacenService {
   }
 
   async getByid(almacenId: number): Promise<AlmacenEntity> {
-    return await getRepository(AlmacenEntity).findOne(almacenId);
+    return await getRepository(AlmacenEntity)
+      .createQueryBuilder('almacen')
+      .leftJoinAndSelect('almacen.insumo', 'insumo')
+      .where('almacen.id = :term', { term: almacenId })
+      .getOne();
   }
 
   async update(
