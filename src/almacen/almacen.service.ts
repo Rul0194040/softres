@@ -130,7 +130,7 @@ export class AlmacenService {
     const dataQuery = getRepository(AlmacenEntity)
       .createQueryBuilder('almacen')
       .leftJoin('almacen.insumo', 'insumo')
-      .leftJoin('almacen.categoria', 'categoria')
+      .leftJoin('insumo.categoria', 'categoria')
       .select([
         'almacen.createdAt',
         'almacen.id',
@@ -180,7 +180,7 @@ export class AlmacenService {
       .take(options.take)
       .orderBy(options.sort, options.direction)
       .getMany();
-
+    console.log(data)
     return {
       data: data,
       skip: options.skip,
