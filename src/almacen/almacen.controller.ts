@@ -8,6 +8,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseArrayPipe,
   ParseIntPipe,
   Post,
   Put,
@@ -17,7 +18,7 @@ import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgR
 import { UpdateResult, DeleteResult } from 'typeorm';
 import { CreateAlmacenDTO } from './DTOs/createAlmacenDTO.dto';
 import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
-import { almacenDetalleEntity } from './entitys/almacenDetalle.entity';
+import { AlmacenDetalleEntity } from './entitys/almacenDetalle.entity';
 
 @Controller('almacen')
 export class AlmacenController {
@@ -33,8 +34,9 @@ export class AlmacenController {
   @Post('createDetalle/:almacenId')
   createDetAlmacen(
     @Param('almacenId', ParseIntPipe) almacenId: number,
-    @Body() almacen: CreateDetalleDTO[],
-  ): Promise<almacenDetalleEntity[]> {
+    @Body(new ParseArrayPipe({ items: CreateDetalleDTO }))
+    almacen: CreateDetalleDTO[],
+  ): Promise<AlmacenDetalleEntity[]> {
     return this.almacenService.createDetalle(almacenId, almacen);
   }
 

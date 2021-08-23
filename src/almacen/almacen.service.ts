@@ -10,7 +10,7 @@ import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgR
 import { forIn } from 'lodash';
 import * as moment from 'moment';
 import { AlmacenInformeDTO } from './DTOs/almacenInforneDTO.dto';
-import { almacenDetalleEntity } from './entitys/almacenDetalle.entity';
+import { AlmacenDetalleEntity } from './entitys/almacenDetalle.entity';
 
 @Injectable()
 export class AlmacenService {
@@ -34,7 +34,7 @@ export class AlmacenService {
     );
 
     if (almacen.detalles) {
-      const createdDetalle: almacenDetalleEntity[] = [];
+      const createdDetalle: AlmacenDetalleEntity[] = [];
       for (let idx = 0; idx < almacen.detalles.length; idx++) {
         const detalle: CreateDetalleDTO = {
           almacenId: createdAlmacen.id,
@@ -57,7 +57,7 @@ export class AlmacenService {
           abono: almacen.detalles[idx].abono ? almacen.detalles[idx].abono : 0,
           saldo: almacen.detalles[idx].saldo ? almacen.detalles[idx].saldo : 0,
         };
-        createdDetalle[idx] = await getRepository(almacenDetalleEntity).save(
+        createdDetalle[idx] = await getRepository(AlmacenDetalleEntity).save(
           detalle,
         );
       }
@@ -75,8 +75,8 @@ export class AlmacenService {
   async createDetalle(
     almacenId: number,
     almacenDetalle: CreateDetalleDTO[],
-  ): Promise<almacenDetalleEntity[]> {
-    const createdDetalle: almacenDetalleEntity[] = [];
+  ): Promise<AlmacenDetalleEntity[]> {
+    const createdDetalle: AlmacenDetalleEntity[] = [];
     const almacenParent = await getRepository(AlmacenEntity).findOne(almacenId);
 
     for (let idx = 0; idx < almacenDetalle.length; idx++) {
@@ -99,7 +99,7 @@ export class AlmacenService {
         abono: almacenDetalle[idx].abono ? almacenDetalle[idx].abono : 0,
         saldo: almacenDetalle[idx].saldo ? almacenDetalle[idx].saldo : 0,
       };
-      createdDetalle[idx] = await getRepository(almacenDetalleEntity).save(
+      createdDetalle[idx] = await getRepository(AlmacenDetalleEntity).save(
         detalle,
       );
     }
@@ -192,7 +192,7 @@ export class AlmacenService {
     insumoId: number,
     options: PaginationOptions,
   ): Promise<PaginationPrimeNgResult> {
-    const dataQuery = getRepository(almacenDetalleEntity)
+    const dataQuery = getRepository(AlmacenDetalleEntity)
       .createQueryBuilder('almacenDet')
       .leftJoin('almacenDet.almacen', 'almacen')
       .leftJoin('almacen.insumo', 'insumo')

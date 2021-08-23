@@ -3,7 +3,7 @@ import { Entity, ManyToOne, Column } from 'typeorm';
 import { AlmacenEntity } from './almacen.entity';
 
 @Entity('almacen-Detalle')
-export class almacenDetalleEntity extends CommonEntity {
+export class AlmacenDetalleEntity extends CommonEntity {
   @ManyToOne(() => AlmacenEntity, { nullable: false })
   almacen: AlmacenEntity;
 
