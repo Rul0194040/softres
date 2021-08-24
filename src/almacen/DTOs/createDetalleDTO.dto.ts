@@ -21,6 +21,10 @@ export class CreateDetalleDTO {
   salidas?: number;
 
   @ApiProperty()
+  @IsOptional()
+  existencias?: number;
+
+  @ApiProperty()
   almacenId: number;
 
   @ApiProperty()

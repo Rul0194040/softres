@@ -1,3 +1,4 @@
+import { IsNumber } from 'class-validator';
 import { CreateDetalleDTO } from './DTOs/createDetalleDTO.dto';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { CreateAlmacenDTO } from './DTOs/createAlmacenDTO.dto';
@@ -244,13 +245,39 @@ export class AlmacenService {
     };
   }
 
-  async masiveAlmacen(file: string): Promise<any> {
+  async masiveAlmacen(file: string, almacenId: number): Promise<any> {
+    let response: CreateDetalleDTO[];
     const workbook = new Excel.Workbook();
     const data = await workbook.xlsx.readFile(file);
-    data
-      .getWorksheet('carga-masiva')
-      .eachRow({ includeEmpty: true }, (row, idx) => {
-        console.log(JSON.stringify(row.values));
-      });
+    data.getWorksheet('carga-masiva').eachRow((row, idx) => {
+      const record: CreateDetalleDTO = {
+        entradas: row.getCell(`A${idx}`).value
+          ? Number(row.getCell(`A${idx}`).value)
+          : 0,
+        salidas: row.getCell(`A${idx}`).value
+          ? Number(row.getCell(`B${idx}`).value)
+          : 0,
+        existencias: row.getCell(`A${idx}`).value
+          ? Number(row.getCell(`C${idx}`).value)
+          : 0,
+        precioUnitario: row.getCell(`E${idx}`).value
+          ? Number(row.getCell(`E${idx}`).value)
+          : 0,
+        precioMedio: row.getCell(`D${idx}`).value
+          ? Number(row.getCell(`D${idx}`).value)
+          : 0,
+        cargo: row.getCell(`F${idx}`).value
+          ? Number(row.getCell(`F${idx}`).value)
+          : 0,
+        abono: row.getCell(`G${idx}`).value
+          ? Number(row.getCell(`G${idx}`).value)
+          : 0,
+        saldo: row.getCell(`H${idx}`).value
+          ? Number(row.getCell(`H${idx}`).value)
+          : 0,
+      };
+      response.push(record);
+    });
+    return response;
   }
 }
