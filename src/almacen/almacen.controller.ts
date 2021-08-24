@@ -11,6 +11,8 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
@@ -18,6 +20,9 @@ import { UpdateResult, DeleteResult } from 'typeorm';
 import { CreateAlmacenDTO } from './DTOs/createAlmacenDTO.dto';
 import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
 import { almacenDetalleEntity } from './entitys/almacenDetalle.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { existsSync, mkdirSync } from 'fs';
 
 @Controller('almacen')
 export class AlmacenController {
@@ -83,5 +88,42 @@ export class AlmacenController {
     @Body() options: PaginationOptions,
   ): Promise<PaginationPrimeNgResult> {
     return this.almacenService.paginateContable(insumoId, options);
+  }
+
+  @Post('carga-masiva')
+  @UseInterceptors(
+    FileInterceptor('carga', {
+      fileFilter: (req, file, cb) => {
+        const allowedTypes = [
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'application/vnd.ms-excel',
+        ];
+        if (
+          allowedTypes.indexOf(file.mimetype) > -1 &&
+          (file.originalname.split('.').reverse()[0] === 'xls' ||
+            file.originalname.split('.').reverse()[0] === 'xlsx')
+        ) {
+          return cb(null, true);
+        }
+        return cb(
+          new Error(
+            'Tipo de archivo no aceptado, se aceptan solamente xlsx y xls',
+          ),
+          false,
+        );
+      },
+      storage: diskStorage({
+        destination: (req, file, cb) => {
+          const dirPath = './uploads/xls';
+          if (!existsSync(`${dirPath}`)) {
+            mkdirSync(`${dirPath}`, { recursive: true });
+          }
+          cb(null, dirPath);
+        },
+      }),
+    }),
+  )
+  async cargaMasiva(@UploadedFile() file: any): Promise<any> {
+    return await this.almacenService.masiveAlmacen(file);
   }
 }

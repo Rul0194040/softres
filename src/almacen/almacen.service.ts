@@ -11,6 +11,7 @@ import { forIn } from 'lodash';
 import * as moment from 'moment';
 import { AlmacenInformeDTO } from './DTOs/almacenInforneDTO.dto';
 import { almacenDetalleEntity } from './entitys/almacenDetalle.entity';
+import { FileOptions } from '@softres/common/DTOs/fileOptions.dto';
 
 @Injectable()
 export class AlmacenService {
@@ -180,7 +181,7 @@ export class AlmacenService {
       .take(options.take)
       .orderBy(options.sort, options.direction)
       .getMany();
-    console.log(data)
+
     return {
       data: data,
       skip: options.skip,
@@ -242,5 +243,9 @@ export class AlmacenService {
       skip: options.skip,
       totalItems: count,
     };
+  }
+
+  async masiveAlmacen(file: string): Promise<any> {
+    return file;
   }
 }
