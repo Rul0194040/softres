@@ -124,6 +124,6 @@ export class AlmacenController {
     }),
   )
   async cargaMasiva(@UploadedFile() file: any): Promise<any> {
-    return await this.almacenService.masiveAlmacen(file);
+    return await this.almacenService.masiveAlmacen(file.path);
   }
 }

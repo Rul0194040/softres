@@ -11,8 +11,7 @@ import { forIn } from 'lodash';
 import * as moment from 'moment';
 import { AlmacenInformeDTO } from './DTOs/almacenInforneDTO.dto';
 import { almacenDetalleEntity } from './entitys/almacenDetalle.entity';
-import { FileOptions } from '@softres/common/DTOs/fileOptions.dto';
-
+import * as Excel from 'exceljs';
 @Injectable()
 export class AlmacenService {
   async create(
@@ -246,6 +245,12 @@ export class AlmacenService {
   }
 
   async masiveAlmacen(file: string): Promise<any> {
-    return file;
+    const workbook = new Excel.Workbook();
+    const data = await workbook.xlsx.readFile(file);
+    data
+      .getWorksheet('carga-masiva')
+      .eachRow({ includeEmpty: true }, (row, idx) => {
+        console.log(JSON.stringify(row.values));
+      });
   }
 }
