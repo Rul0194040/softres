@@ -57,7 +57,7 @@ export const usersToCreate: createUserDTO[] = [
   {
     firstName: 'Chef en Jefe',
     lastName: 'Encargado de Cocina',
-    email: 'directivos@' + domain,
+    email: 'cocinas@' + domain,
     rules: DirectivosRules.map((r) => r.value),
     profile: ProfileTypes.DIRECTIVO,
     password: process.env.FIRST_PASSWORD,
@@ -65,7 +65,7 @@ export const usersToCreate: createUserDTO[] = [
   {
     firstName: 'Mixologo en Jefe',
     lastName: 'Encargado de Barra',
-    email: 'directivos@' + domain,
+    email: 'barra@' + domain,
     rules: DirectivosRules.map((r) => r.value),
     profile: ProfileTypes.DIRECTIVO,
     password: process.env.FIRST_PASSWORD,
