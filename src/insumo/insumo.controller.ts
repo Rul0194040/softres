@@ -18,7 +18,7 @@ import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgR
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('insumo')
-@ApiTags('insumo')
+@ApiTags('Insumo')
 export class InsumoController {
   constructor(private readonly insumoService: InsumoService) {}
 
