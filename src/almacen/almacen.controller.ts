@@ -19,8 +19,10 @@ import { UpdateResult, DeleteResult } from 'typeorm';
 import { CreateAlmacenDTO } from './DTOs/createAlmacenDTO.dto';
 import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
 import { AlmacenDetalleEntity } from './entitys/almacenDetalle.entity';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('almacen')
+@ApiTags('Almacén')
 export class AlmacenController {
   constructor(private readonly almacenService: AlmacenService) {}
 
@@ -85,5 +87,17 @@ export class AlmacenController {
     @Body() options: PaginationOptions,
   ): Promise<PaginationPrimeNgResult> {
     return this.almacenService.paginateContable(insumoId, options);
+  }
+
+  /**
+   *
+   * @param detalleId ID del detalle desde donde se va a empezar a actualizar la tabla
+   * @returns Confirmación de la actualización del costo de venta del almacén
+   */
+  @Put('updatePrecios/:detalleId')
+  updatePrecios(
+    @Param('detalleId', ParseIntPipe) detalleId: number,
+  ): Promise<UpdateResult> {
+    return this.almacenService.updatePrecios(detalleId);
   }
 }

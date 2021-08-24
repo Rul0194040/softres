@@ -46,7 +46,7 @@ export class AlmacenEntity extends CommonEntity {
   cantidad: number;
 
   @Column({ type: 'mediumint', nullable: true })
-  precioVenta: number;
+  costoVenta: number;
 
   @Column({
     type: 'mediumint',

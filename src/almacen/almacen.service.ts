@@ -12,6 +12,8 @@ import * as moment from 'moment';
 import { AlmacenInformeDTO } from './DTOs/almacenInforneDTO.dto';
 import { AlmacenDetalleEntity } from './entitys/almacenDetalle.entity';
 
+const toFloat = (num): number => parseFloat(num + '');
+
 @Injectable()
 export class AlmacenService {
   async create(
@@ -180,7 +182,7 @@ export class AlmacenService {
       .take(options.take)
       .orderBy(options.sort, options.direction)
       .getMany();
-    console.log(data)
+    console.log(data);
     return {
       data: data,
       skip: options.skip,
@@ -242,5 +244,48 @@ export class AlmacenService {
       skip: options.skip,
       totalItems: count,
     };
+  }
+
+  async updatePrecios(detalleId: number): Promise<UpdateResult> {
+    const mainDetalle: AlmacenDetalleEntity = await getRepository(
+      AlmacenDetalleEntity,
+    ).findOne({ id: detalleId });
+    const detalleArray: AlmacenDetalleEntity[] = await getRepository(
+      AlmacenDetalleEntity,
+    )
+      .createQueryBuilder('detalle')
+      .where('detalle.almacenId = :term', { term: mainDetalle.almacenId })
+      .getMany();
+
+    let preSaldo = toFloat(0.0);
+    let stock = toFloat(0.0);
+    let costoVenta = toFloat(0.0);
+
+    detalleArray.forEach(async (detalle) => {
+      if (detalle.createdAt >= mainDetalle.createdAt) {
+        if (toFloat(detalle.entradas) !== 0) {
+          detalle.cargo =
+            toFloat(detalle.entradas) * toFloat(detalle.precioUnitario);
+        } else {
+          detalle.abono =
+            toFloat(detalle.salidas) * toFloat(detalle.precioUnitario);
+        }
+        detalle.saldo =
+          toFloat(preSaldo) + toFloat(detalle.cargo) - toFloat(detalle.abono);
+        detalle.precioMedio = preSaldo / (stock || 1 * 1.0);
+
+        stock += toFloat(detalle.entradas) - toFloat(detalle.salidas);
+        costoVenta += toFloat(detalle.abono);
+        preSaldo = toFloat(detalle.saldo);
+        await getRepository(AlmacenDetalleEntity).update(detalle.id, detalle);
+      }
+      stock += toFloat(detalle.entradas) - toFloat(detalle.salidas);
+      costoVenta += toFloat(detalle.precioMedio);
+      preSaldo = toFloat(detalle.saldo);
+    });
+
+    return await getRepository(AlmacenEntity).update(mainDetalle.almacenId, {
+      costoVenta: costoVenta,
+    });
   }
 }

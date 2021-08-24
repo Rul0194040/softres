@@ -25,7 +25,7 @@ export class CreateAlmacenDTO {
   insumo?: InsumoEntity;
   @ApiProperty()
   @IsOptional()
-  precioVenta?: number;
+  costoVenta?: number;
   @ApiProperty()
   @IsOptional()
   detalles?: CreateDetalleDTO[];

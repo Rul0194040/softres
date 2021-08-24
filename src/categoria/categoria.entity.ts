@@ -1,7 +1,7 @@
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { Entity, Column } from 'typeorm';
 
-@Entity('categoria')
+@Entity('categorias')
 export class CategoriaEntity extends CommonEntity {
   @Column({
     type: 'varchar',
