@@ -22,6 +22,10 @@
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config ./src/ormconfig.ts",
     "mig:gen": "ts-node -r ./tsconfig-paths-bootstrap.ts ./node_modules/typeorm/cli.js migration:generate --config orm.config.json --name",
     "mig:run": "ts-node -r ./tsconfig-paths-bootstrap.ts ./node_modules/typeorm/cli.js migration:run --config orm.config.json",
+    "truncate": "bash truncate-tables.sh",
+    "drop": "bash drop-tables.sh",
+    "X": "npm run drop && npm run mig:run && npm run test",
+    "Xdev": "npm run drop && npm run mig:run && npm run start:dev",
     "seed": "node_modules/.bin/ts-node -r ./tsconfig-paths-bootstrap.ts src/app.seeder.ts",
     "seed:refresh": "node_modules/.bin/ts-node -r ./tsconfig-paths-bootstrap.ts src/app.seeder --refresh"
   },
