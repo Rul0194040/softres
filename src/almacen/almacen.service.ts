@@ -246,8 +246,8 @@ export class AlmacenService {
   }
 
   async masiveAlmacen(
-    file: string,
     almacenId: number,
+    file: string,
   ): Promise<CreateDetalleDTO[]> {
     const response: CreateDetalleDTO[] = [];
     const workbook = new Excel.Workbook();
@@ -272,6 +272,6 @@ export class AlmacenService {
       };
       response.push(record);
     });
-    return response;
+    return this.createDetalle(almacenId, response);
   }
 }

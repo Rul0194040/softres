@@ -142,8 +142,9 @@ export class AlmacenController {
     }),
   )
   async cargaMasiva(
+    @Body() almacenId: number,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<CreateDetalleDTO[]> {
-    return await this.almacenService.masiveAlmacen(file.path, 1);
+    return await this.almacenService.masiveAlmacen(almacenId, file.path);
   }
 }
