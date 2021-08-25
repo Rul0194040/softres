@@ -22,7 +22,7 @@ import { CreateAlmacenDTO } from './DTOs/createAlmacenDTO.dto';
 import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
 import { AlmacenDetalleEntity } from './entitys/almacenDetalle.entity';
 import { ApiTags } from '@nestjs/swagger';
-import { FileInterceptor, MulterModule } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { existsSync, mkdirSync } from 'fs';
 import { extname } from 'path';

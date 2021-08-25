@@ -1,4 +1,3 @@
-import { IsNumber } from 'class-validator';
 import { CreateDetalleDTO } from './DTOs/createDetalleDTO.dto';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { CreateAlmacenDTO } from './DTOs/createAlmacenDTO.dto';
