@@ -1,3 +1,4 @@
+import { IsNumber } from 'class-validator';
 import { CreateDetalleDTO } from './DTOs/createDetalleDTO.dto';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { CreateAlmacenDTO } from './DTOs/createAlmacenDTO.dto';
@@ -11,7 +12,7 @@ import { forIn } from 'lodash';
 import * as moment from 'moment';
 import { AlmacenInformeDTO } from './DTOs/almacenInforneDTO.dto';
 import { almacenDetalleEntity } from './entitys/almacenDetalle.entity';
-
+import * as Excel from 'exceljs';
 @Injectable()
 export class AlmacenService {
   async create(
@@ -180,7 +181,7 @@ export class AlmacenService {
       .take(options.take)
       .orderBy(options.sort, options.direction)
       .getMany();
-    console.log(data)
+
     return {
       data: data,
       skip: options.skip,
@@ -242,5 +243,35 @@ export class AlmacenService {
       skip: options.skip,
       totalItems: count,
     };
+  }
+
+  async masiveAlmacen(
+    almacenId: number,
+    file: string,
+  ): Promise<CreateDetalleDTO[]> {
+    const response: CreateDetalleDTO[] = [];
+    const workbook = new Excel.Workbook();
+    const data = await workbook.xlsx.readFile(file);
+    data.getWorksheet('carga-masiva').eachRow((row) => {
+      const record: CreateDetalleDTO = {
+        almacenId: almacenId,
+        referencia: row.getCell('A').value
+          ? row.getCell('A').value.toString()
+          : '',
+        entradas: row.getCell('B').value ? Number(row.getCell('B').value) : 0,
+        salidas: row.getCell('C').value ? Number(row.getCell('C').value) : 0,
+        precioUnitario: row.getCell('D').value
+          ? Number(row.getCell('D').value)
+          : 0,
+        precioMedio: row.getCell('E').value
+          ? Number(row.getCell('E').value)
+          : 0,
+        cargo: row.getCell('F').value ? Number(row.getCell('F').value) : 0,
+        abono: row.getCell('G').value ? Number(row.getCell('G').value) : 0,
+        saldo: row.getCell('H').value ? Number(row.getCell('H').value) : 0,
+      };
+      response.push(record);
+    });
+    return this.createDetalle(almacenId, response);
   }
 }

@@ -20,9 +20,9 @@ export class InsumoEntity extends CommonEntity {
     type: 'enum',
     name: 'medida',
     enum: MedidasTypes,
-    nullable: false,
+    nullable: true,
   })
-  medida: MedidasTypes;
+  medida?: MedidasTypes;
 
   @Column({
     type: 'enum',
