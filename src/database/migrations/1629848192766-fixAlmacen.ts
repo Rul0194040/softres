@@ -10,6 +10,9 @@ export class fixAlmacen1629848192766 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE \`softres\`.\`almacen\` CHANGE \`precioVenta\` \`costoVenta\` mediumint`,
     );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`almacen-Detalle\` DROP \`fecha\``,
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

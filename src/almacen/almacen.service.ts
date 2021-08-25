@@ -40,7 +40,6 @@ export class AlmacenService {
       for (let idx = 0; idx < almacen.detalles.length; idx++) {
         const detalle: CreateDetalleDTO = {
           almacenId: createdAlmacen.id,
-          fecha: createdAlmacen.createdAt,
           referencia:
             almacen.detalles[idx].entradas != null
               ? `E-${moment(createdAlmacen.createdAt).format('DDMMYYYY')}`
@@ -80,58 +79,45 @@ export class AlmacenService {
   ): Promise<AlmacenDetalleEntity[]> {
     const createdDetalle: AlmacenDetalleEntity[] = [];
     const almacenParent = await getRepository(AlmacenEntity).findOne(almacenId);
-
-    const preDetalles: AlmacenDetalleEntity[] = await getRepository(
-      AlmacenDetalleEntity,
-    )
-      .createQueryBuilder('detalle')
-      .where('detalle.almacenId = : term', { term: almacenParent.id })
-      .getMany();
-
-    let preSaldo,
-      stock = 0.0;
-    preDetalles.forEach((detalle) => {
-      stock += detalle.entradas - detalle.salidas;
-      preSaldo += detalle.cargo - detalle.abono;
-    });
+    let firstDetalleId = 0;
 
     for (let idx = 0; idx < almacenDetalle.length; idx++) {
-      let entradas,
-        salidas,
-        cargo,
-        abono = 0;
-      let referencia = '';
-      const precioUnitario = almacenDetalle[idx].precioUnitario;
+      let entradas = 0.0,
+        salidas = 0.0;
+      let referencia = almacenDetalle[idx].referencia
+        ? almacenDetalle[idx].referencia
+        : '';
 
-      if (almacenDetalle[idx].entradas != null) {
+      if (
+        almacenDetalle[idx].entradas !== null &&
+        almacenDetalle[idx].entradas !== undefined &&
+        almacenDetalle[idx].entradas !== 0
+      ) {
         entradas = almacenDetalle[idx].entradas;
-        cargo = entradas * precioUnitario;
-        referencia = `E-${moment(almacenParent.createdAt).format('DDMMYYYY')}`;
+        referencia =
+          referencia === '' ? `E-${moment().format('DDMMYYYY')}` : referencia;
       } else {
         salidas = almacenDetalle[idx].salidas;
-        abono = salidas * precioUnitario;
-        referencia = `S-${moment(almacenParent.createdAt).format('DDMMYYYY')}`;
+        referencia =
+          referencia === '' ? `S-${moment().format('DDMMYYYY')}` : referencia;
       }
 
       const detalle: CreateDetalleDTO = {
         almacenId: almacenParent.id,
         referencia,
-        precioUnitario,
+        precioUnitario: almacenDetalle[idx].precioUnitario,
         entradas,
         salidas,
-        precioMedio: almacenDetalle[idx].precioMedio
-          ? almacenDetalle[idx].precioMedio
-          : preSaldo / (stock || 1.0 * 1.0),
-        cargo,
-        abono,
-        saldo: almacenDetalle[idx].saldo
-          ? almacenDetalle[idx].saldo
-          : preSaldo + cargo - abono,
+        saldo: almacenDetalle[idx].saldo ? almacenDetalle[idx].saldo : 0,
       };
       createdDetalle[idx] = await getRepository(AlmacenDetalleEntity).save(
         detalle,
       );
+
+      if (firstDetalleId === 0) firstDetalleId = createdDetalle[idx].id;
     }
+
+    this.updatePrecios(firstDetalleId);
 
     return createdDetalle;
   }

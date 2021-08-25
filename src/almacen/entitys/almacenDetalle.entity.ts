@@ -14,13 +14,6 @@ export class AlmacenDetalleEntity extends CommonEntity {
   almacenId: number;
 
   @Column({
-    type: 'date',
-    nullable: true,
-    default: null,
-  })
-  fecha: Date;
-
-  @Column({
     type: 'varchar',
     length: 25,
     nullable: false,
