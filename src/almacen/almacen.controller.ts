@@ -20,9 +20,10 @@ import { UpdateResult, DeleteResult } from 'typeorm';
 import { CreateAlmacenDTO } from './DTOs/createAlmacenDTO.dto';
 import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
 import { almacenDetalleEntity } from './entitys/almacenDetalle.entity';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { existsSync, mkdirSync } from 'fs';
+import { extname } from 'path';
 
 @Controller('almacen')
 export class AlmacenController {
@@ -92,27 +93,37 @@ export class AlmacenController {
 
   @Post('carga-masiva')
   @UseInterceptors(
-    FileInterceptor('carga', {
-      fileFilter: (req, file, cb) => {
-        const allowedTypes = [
-          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          'application/vnd.ms-excel',
-        ];
-        if (
-          allowedTypes.indexOf(file.mimetype) > -1 &&
-          (file.originalname.split('.').reverse()[0] === 'xls' ||
-            file.originalname.split('.').reverse()[0] === 'xlsx')
-        ) {
-          return cb(null, true);
-        }
-        return cb(
-          new Error(
-            'Tipo de archivo no aceptado, se aceptan solamente xlsx y xls',
-          ),
-          false,
-        );
-      },
+    FileInterceptor('file', {
+      // fileFilter: (req, file, cb) => {
+      //   const allowedTypes = [
+      //     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      //     'application/vnd.ms-excel',
+      //   ];
+      //   if (
+      //     allowedTypes.indexOf(file.mimetype) > -1 &&
+      //     (file.originalname.split('.').reverse()[0] === 'xls' ||
+      //       file.originalname.split('.').reverse()[0] === 'xlsx')
+      //   ) {
+      //     return cb(null, true);
+      //   }
+      //   return cb(
+      //     new Error(
+      //       'Tipo de archivo no aceptado, se aceptan solamente xlsx y xls',
+      //     ),
+      //     false,
+      //   );
+      // },
+      // storage: diskStorage({
+      //   destination: (req, file, cb) => {
+      //     const dirPath = './uploads/xls';
+      //     if (!existsSync(`${dirPath}`)) {
+      //       mkdirSync(`${dirPath}`, { recursive: true });
+      //     }
+      //     cb(null, dirPath);
+      //   },
+      // }),
       storage: diskStorage({
+        //destination: './uploads/xls',
         destination: (req, file, cb) => {
           const dirPath = './uploads/xls';
           if (!existsSync(`${dirPath}`)) {
@@ -120,11 +131,19 @@ export class AlmacenController {
           }
           cb(null, dirPath);
         },
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          cb(null, `${randomName}${extname(file.originalname)}`);
+        },
       }),
     }),
   )
-  async cargaMasiva(@UploadedFile() file: any): Promise<any> {
-    console.log(file);
-    return await this.almacenService.masiveAlmacen(file.path);
+  async cargaMasiva(
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<CreateDetalleDTO[]> {
+    return await this.almacenService.masiveAlmacen(file.path, 1);
   }
 }

@@ -245,36 +245,30 @@ export class AlmacenService {
     };
   }
 
-  async masiveAlmacen(file: string, almacenId: number): Promise<any> {
-    let response: CreateDetalleDTO[];
+  async masiveAlmacen(
+    file: string,
+    almacenId: number,
+  ): Promise<CreateDetalleDTO[]> {
+    const response: CreateDetalleDTO[] = [];
     const workbook = new Excel.Workbook();
     const data = await workbook.xlsx.readFile(file);
-    data.getWorksheet('carga-masiva').eachRow((row, idx) => {
+    data.getWorksheet('carga-masiva').eachRow((row) => {
       const record: CreateDetalleDTO = {
-        entradas: row.getCell(`A${idx}`).value
-          ? Number(row.getCell(`A${idx}`).value)
+        almacenId: almacenId,
+        referencia: row.getCell('A').value
+          ? row.getCell('A').value.toString()
+          : '',
+        entradas: row.getCell('B').value ? Number(row.getCell('B').value) : 0,
+        salidas: row.getCell('C').value ? Number(row.getCell('C').value) : 0,
+        precioUnitario: row.getCell('D').value
+          ? Number(row.getCell('D').value)
           : 0,
-        salidas: row.getCell(`A${idx}`).value
-          ? Number(row.getCell(`B${idx}`).value)
+        precioMedio: row.getCell('E').value
+          ? Number(row.getCell('E').value)
           : 0,
-        existencias: row.getCell(`A${idx}`).value
-          ? Number(row.getCell(`C${idx}`).value)
-          : 0,
-        precioUnitario: row.getCell(`E${idx}`).value
-          ? Number(row.getCell(`E${idx}`).value)
-          : 0,
-        precioMedio: row.getCell(`D${idx}`).value
-          ? Number(row.getCell(`D${idx}`).value)
-          : 0,
-        cargo: row.getCell(`F${idx}`).value
-          ? Number(row.getCell(`F${idx}`).value)
-          : 0,
-        abono: row.getCell(`G${idx}`).value
-          ? Number(row.getCell(`G${idx}`).value)
-          : 0,
-        saldo: row.getCell(`H${idx}`).value
-          ? Number(row.getCell(`H${idx}`).value)
-          : 0,
+        cargo: row.getCell('F').value ? Number(row.getCell('F').value) : 0,
+        abono: row.getCell('G').value ? Number(row.getCell('G').value) : 0,
+        saldo: row.getCell('H').value ? Number(row.getCell('H').value) : 0,
       };
       response.push(record);
     });
