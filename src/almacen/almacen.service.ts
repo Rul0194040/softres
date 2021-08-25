@@ -81,25 +81,52 @@ export class AlmacenService {
     const createdDetalle: AlmacenDetalleEntity[] = [];
     const almacenParent = await getRepository(AlmacenEntity).findOne(almacenId);
 
+    const preDetalles: AlmacenDetalleEntity[] = await getRepository(
+      AlmacenDetalleEntity,
+    )
+      .createQueryBuilder('detalle')
+      .where('detalle.almacenId = : term', { term: almacenParent.id })
+      .getMany();
+
+    let preSaldo,
+      stock = 0.0;
+    preDetalles.forEach((detalle) => {
+      stock += detalle.entradas - detalle.salidas;
+      preSaldo += detalle.cargo - detalle.abono;
+    });
+
     for (let idx = 0; idx < almacenDetalle.length; idx++) {
+      let entradas,
+        salidas,
+        cargo,
+        abono = 0;
+      let referencia = '';
+      const precioUnitario = almacenDetalle[idx].precioUnitario;
+
+      if (almacenDetalle[idx].entradas != null) {
+        entradas = almacenDetalle[idx].entradas;
+        cargo = entradas * precioUnitario;
+        referencia = `E-${moment(almacenParent.createdAt).format('DDMMYYYY')}`;
+      } else {
+        salidas = almacenDetalle[idx].salidas;
+        abono = salidas * precioUnitario;
+        referencia = `S-${moment(almacenParent.createdAt).format('DDMMYYYY')}`;
+      }
+
       const detalle: CreateDetalleDTO = {
         almacenId: almacenParent.id,
-        fecha: almacenParent.createdAt,
-        referencia:
-          almacenDetalle[idx].entradas != null
-            ? `E-${moment(almacenParent.createdAt).format('DDMMYYYY')}`
-            : `S-${moment(almacenParent.createdAt).format('DDMMYYYY')}`,
-        precioUnitario: almacenDetalle[idx].precioUnitario,
-        entradas: almacenDetalle[idx].entradas
-          ? almacenDetalle[idx].entradas
-          : 0,
-        salidas: almacenDetalle[idx].salidas ? almacenDetalle[idx].salidas : 0,
+        referencia,
+        precioUnitario,
+        entradas,
+        salidas,
         precioMedio: almacenDetalle[idx].precioMedio
           ? almacenDetalle[idx].precioMedio
-          : 0,
-        cargo: almacenDetalle[idx].cargo ? almacenDetalle[idx].cargo : 0,
-        abono: almacenDetalle[idx].abono ? almacenDetalle[idx].abono : 0,
-        saldo: almacenDetalle[idx].saldo ? almacenDetalle[idx].saldo : 0,
+          : preSaldo / (stock || 1.0 * 1.0),
+        cargo,
+        abono,
+        saldo: almacenDetalle[idx].saldo
+          ? almacenDetalle[idx].saldo
+          : preSaldo + cargo - abono,
       };
       createdDetalle[idx] = await getRepository(AlmacenDetalleEntity).save(
         detalle,
