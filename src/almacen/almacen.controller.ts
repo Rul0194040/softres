@@ -12,6 +12,8 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
@@ -20,6 +22,10 @@ import { CreateAlmacenDTO } from './DTOs/createAlmacenDTO.dto';
 import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
 import { AlmacenDetalleEntity } from './entitys/almacenDetalle.entity';
 import { ApiTags } from '@nestjs/swagger';
+import { FileInterceptor, MulterModule } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { existsSync, mkdirSync } from 'fs';
+import { extname } from 'path';
 
 @Controller('almacen')
 @ApiTags('Almacén')
@@ -99,5 +105,33 @@ export class AlmacenController {
     @Param('detalleId', ParseIntPipe) detalleId: number,
   ): Promise<UpdateResult> {
     return this.almacenService.updatePrecios(detalleId);
+  }
+
+  @Post('carga-masiva')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: (req, file, cb) => {
+          const dirPath = './uploads/xls';
+          if (!existsSync(`${dirPath}`)) {
+            mkdirSync(`${dirPath}`, { recursive: true });
+          }
+          cb(null, dirPath);
+        },
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          cb(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
+  async cargaMasiva(
+    @Body() almacenId: number,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<CreateDetalleDTO[]> {
+    return await this.almacenService.masiveAlmacen(almacenId, file.path);
   }
 }
