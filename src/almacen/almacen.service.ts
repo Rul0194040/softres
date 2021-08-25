@@ -1,4 +1,3 @@
-import { IsNumber } from 'class-validator';
 import { CreateDetalleDTO } from './DTOs/createDetalleDTO.dto';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { CreateAlmacenDTO } from './DTOs/createAlmacenDTO.dto';
@@ -11,8 +10,11 @@ import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgR
 import { forIn } from 'lodash';
 import * as moment from 'moment';
 import { AlmacenInformeDTO } from './DTOs/almacenInforneDTO.dto';
-import { almacenDetalleEntity } from './entitys/almacenDetalle.entity';
+import { AlmacenDetalleEntity } from './entitys/almacenDetalle.entity';
 import * as Excel from 'exceljs';
+
+const toFloat = (num): number => parseFloat(num + '');
+
 @Injectable()
 export class AlmacenService {
   async create(
@@ -35,11 +37,10 @@ export class AlmacenService {
     );
 
     if (almacen.detalles) {
-      const createdDetalle: almacenDetalleEntity[] = [];
+      const createdDetalle: AlmacenDetalleEntity[] = [];
       for (let idx = 0; idx < almacen.detalles.length; idx++) {
         const detalle: CreateDetalleDTO = {
           almacenId: createdAlmacen.id,
-          fecha: createdAlmacen.createdAt,
           referencia:
             almacen.detalles[idx].entradas != null
               ? `E-${moment(createdAlmacen.createdAt).format('DDMMYYYY')}`
@@ -58,7 +59,7 @@ export class AlmacenService {
           abono: almacen.detalles[idx].abono ? almacen.detalles[idx].abono : 0,
           saldo: almacen.detalles[idx].saldo ? almacen.detalles[idx].saldo : 0,
         };
-        createdDetalle[idx] = await getRepository(almacenDetalleEntity).save(
+        createdDetalle[idx] = await getRepository(AlmacenDetalleEntity).save(
           detalle,
         );
       }
@@ -76,34 +77,48 @@ export class AlmacenService {
   async createDetalle(
     almacenId: number,
     almacenDetalle: CreateDetalleDTO[],
-  ): Promise<almacenDetalleEntity[]> {
-    const createdDetalle: almacenDetalleEntity[] = [];
+  ): Promise<AlmacenDetalleEntity[]> {
+    const createdDetalle: AlmacenDetalleEntity[] = [];
     const almacenParent = await getRepository(AlmacenEntity).findOne(almacenId);
+    let firstDetalleId = 0;
 
     for (let idx = 0; idx < almacenDetalle.length; idx++) {
+      let entradas = 0.0,
+        salidas = 0.0;
+      let referencia = almacenDetalle[idx].referencia
+        ? almacenDetalle[idx].referencia
+        : '';
+
+      if (
+        almacenDetalle[idx].entradas !== null &&
+        almacenDetalle[idx].entradas !== undefined &&
+        almacenDetalle[idx].entradas !== 0
+      ) {
+        entradas = almacenDetalle[idx].entradas;
+        referencia =
+          referencia === '' ? `E-${moment().format('DDMMYYYY')}` : referencia;
+      } else {
+        salidas = almacenDetalle[idx].salidas;
+        referencia =
+          referencia === '' ? `S-${moment().format('DDMMYYYY')}` : referencia;
+      }
+
       const detalle: CreateDetalleDTO = {
         almacenId: almacenParent.id,
-        fecha: almacenParent.createdAt,
-        referencia:
-          almacenDetalle[idx].entradas != null
-            ? `E-${moment(almacenParent.createdAt).format('DDMMYYYY')}`
-            : `S-${moment(almacenParent.createdAt).format('DDMMYYYY')}`,
+        referencia,
         precioUnitario: almacenDetalle[idx].precioUnitario,
-        entradas: almacenDetalle[idx].entradas
-          ? almacenDetalle[idx].entradas
-          : 0,
-        salidas: almacenDetalle[idx].salidas ? almacenDetalle[idx].salidas : 0,
-        precioMedio: almacenDetalle[idx].precioMedio
-          ? almacenDetalle[idx].precioMedio
-          : 0,
-        cargo: almacenDetalle[idx].cargo ? almacenDetalle[idx].cargo : 0,
-        abono: almacenDetalle[idx].abono ? almacenDetalle[idx].abono : 0,
+        entradas,
+        salidas,
         saldo: almacenDetalle[idx].saldo ? almacenDetalle[idx].saldo : 0,
       };
-      createdDetalle[idx] = await getRepository(almacenDetalleEntity).save(
+      createdDetalle[idx] = await getRepository(AlmacenDetalleEntity).save(
         detalle,
       );
+
+      if (firstDetalleId === 0) firstDetalleId = createdDetalle[idx].id;
     }
+
+    this.updatePrecios(firstDetalleId);
 
     return createdDetalle;
   }
@@ -181,7 +196,6 @@ export class AlmacenService {
       .take(options.take)
       .orderBy(options.sort, options.direction)
       .getMany();
-
     return {
       data: data,
       skip: options.skip,
@@ -193,7 +207,7 @@ export class AlmacenService {
     insumoId: number,
     options: PaginationOptions,
   ): Promise<PaginationPrimeNgResult> {
-    const dataQuery = getRepository(almacenDetalleEntity)
+    const dataQuery = getRepository(AlmacenDetalleEntity)
       .createQueryBuilder('almacenDet')
       .leftJoin('almacenDet.almacen', 'almacen')
       .leftJoin('almacen.insumo', 'insumo')
@@ -245,6 +259,48 @@ export class AlmacenService {
     };
   }
 
+  async updatePrecios(detalleId: number): Promise<UpdateResult> {
+    const mainDetalle: AlmacenDetalleEntity = await getRepository(
+      AlmacenDetalleEntity,
+    ).findOne({ id: detalleId });
+    const detalleArray: AlmacenDetalleEntity[] = await getRepository(
+      AlmacenDetalleEntity,
+    )
+      .createQueryBuilder('detalle')
+      .where('detalle.almacenId = :term', { term: mainDetalle.almacenId })
+      .getMany();
+
+    let preSaldo = toFloat(0.0);
+    let stock = toFloat(0.0);
+    let costoVenta = toFloat(0.0);
+
+    detalleArray.forEach(async (detalle) => {
+      if (detalle.createdAt >= mainDetalle.createdAt) {
+        if (toFloat(detalle.entradas) !== 0) {
+          detalle.cargo =
+            toFloat(detalle.entradas) * toFloat(detalle.precioUnitario);
+        } else {
+          detalle.abono =
+            toFloat(detalle.salidas) * toFloat(detalle.precioUnitario);
+        }
+        detalle.saldo =
+          toFloat(preSaldo) + toFloat(detalle.cargo) - toFloat(detalle.abono);
+        detalle.precioMedio = preSaldo / (stock || 1 * 1.0);
+
+        stock += toFloat(detalle.entradas) - toFloat(detalle.salidas);
+        costoVenta += toFloat(detalle.abono);
+        preSaldo = toFloat(detalle.saldo);
+        await getRepository(AlmacenDetalleEntity).update(detalle.id, detalle);
+      }
+      stock += toFloat(detalle.entradas) - toFloat(detalle.salidas);
+      costoVenta += toFloat(detalle.precioMedio);
+      preSaldo = toFloat(detalle.saldo);
+    });
+
+    return await getRepository(AlmacenEntity).update(mainDetalle.almacenId, {
+      costoVenta: costoVenta,
+    });
+  }
   async masiveAlmacen(
     almacenId: number,
     file: string,

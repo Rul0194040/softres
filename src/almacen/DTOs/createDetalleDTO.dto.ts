@@ -3,10 +3,6 @@ import { IsOptional } from 'class-validator';
 
 export class CreateDetalleDTO {
   @ApiProperty()
-  @IsOptional()
-  fecha?: Date;
-
-  @ApiProperty()
   referencia: string;
 
   @ApiProperty()

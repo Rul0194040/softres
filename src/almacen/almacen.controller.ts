@@ -8,6 +8,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseArrayPipe,
   ParseIntPipe,
   Post,
   Put,
@@ -19,13 +20,15 @@ import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgR
 import { UpdateResult, DeleteResult } from 'typeorm';
 import { CreateAlmacenDTO } from './DTOs/createAlmacenDTO.dto';
 import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
-import { almacenDetalleEntity } from './entitys/almacenDetalle.entity';
-import { FileInterceptor, MulterModule } from '@nestjs/platform-express';
+import { AlmacenDetalleEntity } from './entitys/almacenDetalle.entity';
+import { ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { existsSync, mkdirSync } from 'fs';
 import { extname } from 'path';
 
 @Controller('almacen')
+@ApiTags('Almacén')
 export class AlmacenController {
   constructor(private readonly almacenService: AlmacenService) {}
 
@@ -39,8 +42,9 @@ export class AlmacenController {
   @Post('createDetalle/:almacenId')
   createDetAlmacen(
     @Param('almacenId', ParseIntPipe) almacenId: number,
-    @Body() almacen: CreateDetalleDTO[],
-  ): Promise<almacenDetalleEntity[]> {
+    @Body(new ParseArrayPipe({ items: CreateDetalleDTO }))
+    almacen: CreateDetalleDTO[],
+  ): Promise<AlmacenDetalleEntity[]> {
     return this.almacenService.createDetalle(almacenId, almacen);
   }
 
@@ -91,39 +95,22 @@ export class AlmacenController {
     return this.almacenService.paginateContable(insumoId, options);
   }
 
+  /**
+   *
+   * @param detalleId ID del detalle desde donde se va a empezar a actualizar la tabla
+   * @returns Confirmación de la actualización del costo de venta del almacén
+   */
+  @Put('updatePrecios/:detalleId')
+  updatePrecios(
+    @Param('detalleId', ParseIntPipe) detalleId: number,
+  ): Promise<UpdateResult> {
+    return this.almacenService.updatePrecios(detalleId);
+  }
+
   @Post('carga-masiva')
   @UseInterceptors(
     FileInterceptor('file', {
-      // fileFilter: (req, file, cb) => {
-      //   const allowedTypes = [
-      //     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      //     'application/vnd.ms-excel',
-      //   ];
-      //   if (
-      //     allowedTypes.indexOf(file.mimetype) > -1 &&
-      //     (file.originalname.split('.').reverse()[0] === 'xls' ||
-      //       file.originalname.split('.').reverse()[0] === 'xlsx')
-      //   ) {
-      //     return cb(null, true);
-      //   }
-      //   return cb(
-      //     new Error(
-      //       'Tipo de archivo no aceptado, se aceptan solamente xlsx y xls',
-      //     ),
-      //     false,
-      //   );
-      // },
-      // storage: diskStorage({
-      //   destination: (req, file, cb) => {
-      //     const dirPath = './uploads/xls';
-      //     if (!existsSync(`${dirPath}`)) {
-      //       mkdirSync(`${dirPath}`, { recursive: true });
-      //     }
-      //     cb(null, dirPath);
-      //   },
-      // }),
       storage: diskStorage({
-        //destination: './uploads/xls',
         destination: (req, file, cb) => {
           const dirPath = './uploads/xls';
           if (!existsSync(`${dirPath}`)) {

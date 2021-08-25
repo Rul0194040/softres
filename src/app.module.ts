@@ -19,7 +19,7 @@ import { RateLimiterModule } from 'nestjs-rate-limiter';
 import { AppConfig } from './app.config';
 import { InsumoEntity } from './insumo/insumo.entity';
 import { AlmacenEntity } from './almacen/entitys/almacen.entity';
-import { almacenDetalleEntity } from './almacen/entitys/almacenDetalle.entity';
+import { AlmacenDetalleEntity } from './almacen/entitys/almacenDetalle.entity';
 
 @Module({
   imports: [
@@ -48,7 +48,7 @@ import { almacenDetalleEntity } from './almacen/entitys/almacenDetalle.entity';
           InsumoEntity,
           CategoriaEntity,
           AlmacenEntity,
-          almacenDetalleEntity,
+          AlmacenDetalleEntity,
         ],
         synchronize: false,
       }),
