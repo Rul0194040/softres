@@ -118,8 +118,8 @@ export class AlmacenController {
         ];
         if (
           allowedTypes.indexOf(file.mimetype) > -1 &&
-          (extname(file.originalname) === 'xls' ||
-            extname(file.originalname) === 'xlsx')
+          (file.originalname.split('.').reverse()[0] === 'xls' ||
+            file.originalname.split('.').reverse()[0] === 'xlsx')
         ) {
           return cb(null, true);
         }
