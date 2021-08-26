@@ -107,9 +107,28 @@ export class AlmacenController {
     return this.almacenService.updatePrecios(detalleId);
   }
 
-  @Post('carga-masiva')
+  @Post('carga-masiva/:almacenId')
   @UseInterceptors(
-    FileInterceptor('file', {
+    FileInterceptor('carga', {
+      fileFilter: (req, file, cb) => {
+        const allowedTypes = [
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'application/vnd.ms-excel',
+        ];
+        if (
+          allowedTypes.indexOf(file.mimetype) > -1 &&
+          (file.originalname.split('.').reverse()[0] === 'xls' ||
+            file.originalname.split('.').reverse()[0] === 'xlsx')
+        ) {
+          return cb(null, true);
+        }
+        return cb(
+          new Error(
+            'Tipo de archivo no aceptado, se aceptan solamente xlsx y xls',
+          ),
+          false,
+        );
+      },
       storage: diskStorage({
         destination: (req, file, cb) => {
           const dirPath = './uploads/xls';
@@ -129,7 +148,7 @@ export class AlmacenController {
     }),
   )
   async cargaMasiva(
-    @Body() almacenId: number,
+    @Param('almacenId', ParseIntPipe) almacenId: number,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<CreateDetalleDTO[]> {
     return await this.almacenService.masiveAlmacen(almacenId, file.path);
