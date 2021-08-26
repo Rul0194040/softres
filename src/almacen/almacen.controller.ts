@@ -118,8 +118,8 @@ export class AlmacenController {
         ];
         if (
           allowedTypes.indexOf(file.mimetype) > -1 &&
-          (file.originalname.split('.').reverse()[0] === 'xls' ||
-            file.originalname.split('.').reverse()[0] === 'xlsx')
+          (extname(file.originalname) === 'xls' ||
+            extname(file.originalname) === 'xlsx')
         ) {
           return cb(null, true);
         }
@@ -139,8 +139,8 @@ export class AlmacenController {
           cb(null, dirPath);
         },
         filename: (req, file, cb) => {
-          const randomName = req.params['almacenId'];
-          cb(null, `cargaMasiva-${randomName}${extname(file.originalname)}`);
+          const idPlace = req.params['almacenId'];
+          cb(null, `cargaMasiva-${idPlace}${extname(file.originalname)}`);
         },
       }),
     }),

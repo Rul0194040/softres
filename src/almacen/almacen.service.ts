@@ -83,11 +83,10 @@ export class AlmacenService {
     let firstDetalleId = 0;
 
     for (let idx = 0; idx < almacenDetalle.length; idx++) {
-      let entradas = 0.0,
-        salidas = 0.0;
-      let referencia = almacenDetalle[idx].referencia
-        ? almacenDetalle[idx].referencia
-        : '';
+      let entradas: number,
+        salidas: number,
+        referencia: string,
+        currentExistencia: number;
 
       if (
         almacenDetalle[idx].entradas !== null &&
@@ -95,20 +94,21 @@ export class AlmacenService {
         almacenDetalle[idx].entradas !== 0
       ) {
         entradas = almacenDetalle[idx].entradas;
-        referencia =
-          referencia === '' ? `E-${moment().format('DDMMYYYY')}` : referencia;
+        referencia = `E-${moment().format('DDMMYYYY')}`;
+        currentExistencia = almacenDetalle[idx].existencias + entradas;
       } else {
         salidas = almacenDetalle[idx].salidas;
-        referencia =
-          referencia === '' ? `S-${moment().format('DDMMYYYY')}` : referencia;
+        referencia = `S-${moment().format('DDMMYYYY')}`;
+        currentExistencia = almacenDetalle[idx].existencias - salidas;
       }
 
       const detalle: CreateDetalleDTO = {
         almacenId: almacenParent.id,
         referencia,
-        precioUnitario: almacenDetalle[idx].precioUnitario,
         entradas,
         salidas,
+        existencias: currentExistencia,
+        precioUnitario: almacenDetalle[idx].precioUnitario,
         saldo: almacenDetalle[idx].saldo ? almacenDetalle[idx].saldo : 0,
       };
       createdDetalle[idx] = await getRepository(AlmacenDetalleEntity).save(
@@ -308,23 +308,25 @@ export class AlmacenService {
     const response: CreateDetalleDTO[] = [];
     const workbook = new Excel.Workbook();
     const data = await workbook.xlsx.readFile(file);
-    data.getWorksheet('carga-masiva').eachRow((row) => {
+    data.getWorksheet('carga-masiva').eachRow((row, idx) => {
+      console.log(idx);
       const record: CreateDetalleDTO = {
         almacenId: almacenId,
-        referencia: row.getCell('A').value
-          ? row.getCell('A').value.toString()
-          : '',
+        referencia: '',
         entradas: row.getCell('B').value ? Number(row.getCell('B').value) : 0,
         salidas: row.getCell('C').value ? Number(row.getCell('C').value) : 0,
-        precioUnitario: row.getCell('D').value
+        existencias: row.getCell('D').value
           ? Number(row.getCell('D').value)
           : 0,
-        precioMedio: row.getCell('E').value
+        precioUnitario: row.getCell('E').value
           ? Number(row.getCell('E').value)
           : 0,
-        cargo: row.getCell('F').value ? Number(row.getCell('F').value) : 0,
-        abono: row.getCell('G').value ? Number(row.getCell('G').value) : 0,
-        saldo: row.getCell('H').value ? Number(row.getCell('H').value) : 0,
+        precioMedio: row.getCell('F').value
+          ? Number(row.getCell('F').value)
+          : 0,
+        cargo: row.getCell('G').value ? Number(row.getCell('G').value) : 0,
+        abono: row.getCell('H').value ? Number(row.getCell('H').value) : 0,
+        saldo: row.getCell('I').value ? Number(row.getCell('I').value) : 0,
       };
       response.push(record);
     });

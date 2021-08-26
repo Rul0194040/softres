@@ -40,6 +40,14 @@ export class AlmacenDetalleEntity extends CommonEntity {
     type: 'decimal',
     precision: 10,
     scale: 2,
+    default: 0,
+  })
+  existencias: number;
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
     nullable: false,
   })
   precioUnitario: number;
