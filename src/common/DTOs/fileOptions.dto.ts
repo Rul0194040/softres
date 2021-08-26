@@ -1,3 +1,5 @@
+import { Readable } from 'stream';
+
 export class FileOptions {
   /** Name of the form field associated with this file. */
   fieldname: string;
@@ -17,6 +19,8 @@ export class FileOptions {
    * A readable stream of this file. Only available to the `_handleFile`
    * callback for custom `StorageEngine`s.
    */
+  stream: Readable;
+  /** `DiskStorage` only: Directory to which this file has been uploaded. */
   destination: string;
   /** `DiskStorage` only: Name of this file within `destination`. */
   filename: string;

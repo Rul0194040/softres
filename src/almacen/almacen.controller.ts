@@ -1,3 +1,4 @@
+import { FileOptions } from './../common/DTOs/fileOptions.dto';
 import { CreateDetalleDTO } from './DTOs/createDetalleDTO.dto';
 import { AlmacenInformeDTO } from './DTOs/almacenInforneDTO.dto';
 import { AlmacenService } from './almacen.service';
@@ -138,18 +139,15 @@ export class AlmacenController {
           cb(null, dirPath);
         },
         filename: (req, file, cb) => {
-          const randomName = Array(32)
-            .fill(null)
-            .map(() => Math.round(Math.random() * 16).toString(16))
-            .join('');
-          cb(null, `${randomName}${extname(file.originalname)}`);
+          const randomName = req.params['almacenId'];
+          cb(null, `cargaMasiva-${randomName}${extname(file.originalname)}`);
         },
       }),
     }),
   )
   async cargaMasiva(
     @Param('almacenId', ParseIntPipe) almacenId: number,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: FileOptions,
   ): Promise<CreateDetalleDTO[]> {
     return await this.almacenService.masiveAlmacen(almacenId, file.path);
   }
