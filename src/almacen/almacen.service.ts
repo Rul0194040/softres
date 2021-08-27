@@ -223,6 +223,7 @@ export class AlmacenService {
         'almacenDet.abono',
         'almacenDet.saldo',
         'almacenDet.existencias',
+        'almacenDet.fecha',
         'almacen.id',
         'insumo.id',
         'insumo.nombre',
