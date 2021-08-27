@@ -3,10 +3,14 @@ import { IsOptional } from 'class-validator';
 
 export class CreateDetalleDTO {
   @ApiProperty()
-  referencia: string;
+  @IsOptional()
+  fecha?: Date;
 
   @ApiProperty()
-  precioUnitario: number;
+  referencia?: string;
+
+  @ApiProperty()
+  precioUnitario?: number;
 
   @ApiProperty()
   @IsOptional()

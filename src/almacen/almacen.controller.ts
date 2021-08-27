@@ -98,19 +98,21 @@ export class AlmacenController {
 
   /**
    *
-   * @param detalleId ID del detalle desde donde se va a empezar a actualizar la tabla
-   * @returns Confirmación de la actualización del costo de venta del almacén
+   * @param detalleId Id del detalle ha actualizar
+   * @param detalle Acepta solo los campos: entradas, salidas y precioUnitario
+   * @returns Confirmación de actualización de costo de venta en la tabla de Almacén
    */
-  @Put('updatePrecios/:detalleId')
-  updatePrecios(
+  @Put('updateAlmacenDetalle/:detalleId')
+  updateAlmacenDetalle(
     @Param('detalleId', ParseIntPipe) detalleId: number,
+    @Body() detalle: CreateDetalleDTO,
   ): Promise<UpdateResult> {
-    return this.almacenService.updatePrecios(detalleId);
+    return this.almacenService.updateAlmacenDetalle(detalleId, detalle);
   }
 
   @Post('carga-masiva/:almacenId')
   @UseInterceptors(
-    FileInterceptor('carga', {
+    FileInterceptor('file', {
       fileFilter: (req, file, cb) => {
         const allowedTypes = [
           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

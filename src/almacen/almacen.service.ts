@@ -83,10 +83,11 @@ export class AlmacenService {
     let firstDetalleId = 0;
 
     for (let idx = 0; idx < almacenDetalle.length; idx++) {
-      let entradas: number,
-        salidas: number,
-        referencia: string,
-        currentExistencia: number;
+      let entradas: number, salidas: number, referencia: string;
+
+      const fecha: Date = almacenDetalle[idx].fecha
+        ? almacenDetalle[idx].fecha
+        : moment().toDate();
 
       if (
         almacenDetalle[idx].entradas !== null &&
@@ -94,20 +95,19 @@ export class AlmacenService {
         almacenDetalle[idx].entradas !== 0
       ) {
         entradas = almacenDetalle[idx].entradas;
-        referencia = `E-${moment().format('DDMMYYYY')}`;
-        currentExistencia = almacenDetalle[idx].existencias + entradas;
+        referencia = `E-${moment(fecha).format('DDMMYYYY')}`;
       } else {
         salidas = almacenDetalle[idx].salidas;
-        referencia = `S-${moment().format('DDMMYYYY')}`;
-        currentExistencia = almacenDetalle[idx].existencias - salidas;
+        referencia = `S-${moment(fecha).format('DDMMYYYY')}`;
       }
 
       const detalle: CreateDetalleDTO = {
         almacenId: almacenParent.id,
+        fecha,
         referencia,
         entradas,
         salidas,
-        existencias: currentExistencia,
+        existencias: 0,
         precioUnitario: almacenDetalle[idx].precioUnitario,
         saldo: almacenDetalle[idx].saldo ? almacenDetalle[idx].saldo : 0,
       };
@@ -118,7 +118,7 @@ export class AlmacenService {
       if (firstDetalleId === 0) firstDetalleId = createdDetalle[idx].id;
     }
 
-    this.updatePrecios(firstDetalleId);
+    this.updateTablaContable(firstDetalleId);
 
     return createdDetalle;
   }
@@ -260,7 +260,15 @@ export class AlmacenService {
     };
   }
 
-  async updatePrecios(detalleId: number): Promise<UpdateResult> {
+  async updateAlmacenDetalle(
+    detalleId: number,
+    detalle: CreateDetalleDTO,
+  ): Promise<UpdateResult> {
+    await getRepository(AlmacenDetalleEntity).update(detalleId, detalle);
+    return await this.updateTablaContable(detalleId);
+  }
+
+  async updateTablaContable(detalleId: number): Promise<UpdateResult> {
     const mainDetalle: AlmacenDetalleEntity = await getRepository(
       AlmacenDetalleEntity,
     ).findOne({ id: detalleId });
@@ -284,11 +292,13 @@ export class AlmacenService {
           detalle.abono =
             toFloat(detalle.salidas) * toFloat(detalle.precioUnitario);
         }
+        detalle.existencias =
+          toFloat(stock) + toFloat(detalle.entradas) - toFloat(detalle.salidas);
         detalle.saldo =
           toFloat(preSaldo) + toFloat(detalle.cargo) - toFloat(detalle.abono);
         detalle.precioMedio = preSaldo / (stock || 1 * 1.0);
 
-        stock += toFloat(detalle.entradas) - toFloat(detalle.salidas);
+        stock = detalle.existencias;
         costoVenta += toFloat(detalle.abono);
         preSaldo = toFloat(detalle.saldo);
         await getRepository(AlmacenDetalleEntity).update(detalle.id, detalle);
@@ -302,6 +312,7 @@ export class AlmacenService {
       costoVenta: costoVenta,
     });
   }
+
   async masiveAlmacen(
     almacenId: number,
     file: string,
@@ -310,10 +321,11 @@ export class AlmacenService {
     const workbook = new Excel.Workbook();
     const data = await workbook.xlsx.readFile(file);
     data.getWorksheet('carga-masiva').eachRow((row, idx) => {
-      console.log(idx);
+      if (idx === 1) return; //Titulos
+
       const record: CreateDetalleDTO = {
         almacenId: almacenId,
-        referencia: '',
+        fecha: new Date(row.getCell('A').value.toString()) ?? null,
         entradas: row.getCell('B').value ? Number(row.getCell('B').value) : 0,
         salidas: row.getCell('C').value ? Number(row.getCell('C').value) : 0,
         existencias: row.getCell('D').value
