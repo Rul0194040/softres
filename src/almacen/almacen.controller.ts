@@ -112,7 +112,7 @@ export class AlmacenController {
 
   @Post('carga-masiva/:almacenId')
   @UseInterceptors(
-    FileInterceptor('file', {
+    FileInterceptor('carga', {
       fileFilter: (req, file, cb) => {
         const allowedTypes = [
           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
