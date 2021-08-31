@@ -1,63 +1,57 @@
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
-import { InsumoEntity } from '@softres/insumo/insumo.entity';
-import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+import { Entity, Column } from 'typeorm';
+import { RecipeValues } from '../recipeValues.enum';
 
 @Entity('recetas')
 export class RecetaEntity extends CommonEntity {
   @Column({
     type: 'mediumint',
-    name: 'numPorciones',
-    nullable: false,
+    name: 'costoTotal',
+    nullable: true,
   })
-  numPorciones: number;
+  costoTotal?: number;
 
   @Column({
     type: 'mediumint',
-    name: 'numXporcion',
-    nullable: false,
+    name: 'merma',
+    nullable: true,
+    default: RecipeValues.DEFAULTMERMA,
   })
-  numXporcion: number;
-
-  @Column({
-    type: 'varchar',
-    name: 'nombre',
-    length: 100,
-    nullable: false,
-  })
-  nombre: string;
+  merma?: number;
 
   @Column({
     type: 'mediumint',
-    name: 'cantReceta',
-    nullable: false,
+    name: 'costoUnitarioReceta',
+    nullable: true,
   })
-  cantReceta: number;
+  costoUnitarioReceta?: number;
 
   @Column({
     type: 'mediumint',
-    name: 'cantReal',
-    nullable: false,
+    name: 'factorAlimentos',
+    nullable: true,
+    default: RecipeValues.FACTOR,
   })
-  cantReal: number;
+  factorAlimentos?: number;
 
   @Column({
     type: 'mediumint',
-    name: 'cantReal',
-    nullable: false,
+    name: 'costoIva',
+    nullable: true,
   })
-  precioMercado: number;
+  costoIva?: number;
 
   @Column({
     type: 'mediumint',
-    name: 'cantReal',
-    nullable: false,
+    name: 'costoSinIva',
+    nullable: true,
   })
-  merma: number;
+  costoSinIva?: number;
 
-  @OneToOne(() => InsumoEntity, { nullable: false })
-  @JoinColumn()
-  insumo: InsumoEntity;
-
-  @Column({ type: 'mediumint', nullable: false })
-  insumoId: number;
+  @Column({
+    type: 'mediumint',
+    name: 'precioSugeridoCarta',
+    nullable: true,
+  })
+  precioSugeridoCarta?: number;
 }
