@@ -16,5 +16,17 @@ export class CreateInsumoDTO {
   @ApiProperty()
   precioUnitario: number;
   @ApiProperty()
+  precioKilo: number;
+  @ApiProperty()
+  pesoNeto: number;
+  @ApiProperty()
+  @ApiProperty()
+  pesoDrenado?: number;
+  @ApiProperty()
+  @ApiProperty()
+  merma?: number;
+  @ApiProperty()
+  mermaPorcentaje: number;
+  @ApiProperty()
   categoriaId: number;
 }
