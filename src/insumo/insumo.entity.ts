@@ -57,23 +57,23 @@ export class InsumoEntity extends CommonEntity {
   @Column({
     type: 'mediumint',
     name: 'pesoDrenado',
-    nullable: false,
+    nullable: true,
   })
-  pesoDrenado: number;
+  pesoDrenado?: number;
 
   @Column({
     type: 'mediumint',
-    name: 'pesoKilo',
+    name: 'precioKilo',
     nullable: false,
   })
-  pesoKilo: number;
+  precioKilo: number;
 
   @Column({
     type: 'mediumint',
     name: 'merma',
-    nullable: false,
+    nullable: true,
   })
-  merma: number;
+  merma?: number;
 
   @Column({
     type: 'mediumint',

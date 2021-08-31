@@ -20,9 +20,11 @@ export class CreateInsumoDTO {
   @ApiProperty()
   pesoNeto: number;
   @ApiProperty()
-  pesoDrenado: number;
   @ApiProperty()
-  merma: number;
+  pesoDrenado?: number;
+  @ApiProperty()
+  @ApiProperty()
+  merma?: number;
   @ApiProperty()
   mermaPorcentaje: number;
   @ApiProperty()
