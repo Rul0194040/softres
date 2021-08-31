@@ -322,27 +322,29 @@ export class AlmacenService {
     const workbook = new Excel.Workbook();
     const data = await workbook.xlsx.readFile(file);
     data.getWorksheet('carga-masiva').eachRow((row, idx) => {
-      if (idx === 1) return; //Titulos
-
-      const record: CreateDetalleDTO = {
-        almacenId: almacenId,
-        fecha: new Date(row.getCell('A').value.toString()) ?? null,
-        entradas: row.getCell('B').value ? Number(row.getCell('B').value) : 0,
-        salidas: row.getCell('C').value ? Number(row.getCell('C').value) : 0,
-        existencias: row.getCell('D').value
-          ? Number(row.getCell('D').value)
-          : 0,
-        precioUnitario: row.getCell('E').value
-          ? Number(row.getCell('E').value)
-          : 0,
-        precioMedio: row.getCell('F').value
-          ? Number(row.getCell('F').value)
-          : 0,
-        cargo: row.getCell('G').value ? Number(row.getCell('G').value) : 0,
-        abono: row.getCell('H').value ? Number(row.getCell('H').value) : 0,
-        saldo: row.getCell('I').value ? Number(row.getCell('I').value) : 0,
-      };
-      response.push(record);
+      if (idx === 1) {
+        return;
+      } else {
+        const record: CreateDetalleDTO = {
+          almacenId: almacenId,
+          fecha: new Date(row.getCell('A').value.toString()) ?? null,
+          entradas: row.getCell('B').value ? Number(row.getCell('B').value) : 0,
+          salidas: row.getCell('C').value ? Number(row.getCell('C').value) : 0,
+          existencias: row.getCell('D').value
+            ? Number(row.getCell('D').value)
+            : 0,
+          precioUnitario: row.getCell('E').value
+            ? Number(row.getCell('E').value)
+            : 0,
+          precioMedio: row.getCell('F').value
+            ? Number(row.getCell('F').value)
+            : 0,
+          cargo: row.getCell('G').value ? Number(row.getCell('G').value) : 0,
+          abono: row.getCell('H').value ? Number(row.getCell('H').value) : 0,
+          saldo: row.getCell('I').value ? Number(row.getCell('I').value) : 0,
+        };
+        response.push(record);
+      } //Titulos
     });
     return this.createDetalle(almacenId, response);
   }

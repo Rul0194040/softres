@@ -2,7 +2,7 @@ import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { Entity, ManyToOne, Column } from 'typeorm';
 import { AlmacenEntity } from './almacen.entity';
 
-@Entity('almacen-Detalle')
+@Entity('almacenDetalle')
 export class AlmacenDetalleEntity extends CommonEntity {
   @ManyToOne(() => AlmacenEntity, { nullable: false })
   almacen: AlmacenEntity;
