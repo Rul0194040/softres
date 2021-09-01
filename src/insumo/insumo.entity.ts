@@ -93,4 +93,10 @@ export class InsumoEntity extends CommonEntity {
 
   @Column({ type: 'int', nullable: true })
   categoriaId?: number;
+
+  @ManyToOne(() => CategoriaEntity, { nullable: true })
+  subCategoria?: CategoriaEntity;
+
+  @Column({ type: 'int', nullable: true })
+  subCategoriaId?: number;
 }

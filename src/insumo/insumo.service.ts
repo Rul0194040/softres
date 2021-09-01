@@ -17,6 +17,12 @@ export class InsumoService {
       insumo.categoriaId,
     );
 
+    if (insumo.subCategoriaId) {
+      insumoToCreate.subCategoria = await getRepository(
+        CategoriaEntity,
+      ).findOne(insumo.subCategoriaId);
+    }
+
     const created = await getRepository(InsumoEntity).save(insumoToCreate);
     return created;
   }

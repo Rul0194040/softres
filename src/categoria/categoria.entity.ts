@@ -1,5 +1,5 @@
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, OneToOne, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity('categorias')
 export class CategoriaEntity extends CommonEntity {
@@ -10,4 +10,11 @@ export class CategoriaEntity extends CommonEntity {
     nullable: false,
   })
   nombre: string;
+
+  @ManyToOne(() => CategoriaEntity, { nullable: true })
+  @JoinColumn()
+  parentCat: CategoriaEntity;
+
+  @Column({ type: 'mediumint', nullable: true })
+  parentCatId: number;
 }

@@ -19,7 +19,7 @@ export class PaginationOptions {
    * @ignore
    */
   @ApiProperty({
-    description: 'Resultados que la paginacion se saltara',
+    description: 'Resultados que la paginación se saltará',
     default: 0,
   })
   skip: number;
@@ -27,7 +27,7 @@ export class PaginationOptions {
    * @ignore
    */
   @ApiProperty({
-    description: 'Resultados que la paginacion mostrara',
+    description: 'Resultados que la paginación mostrará',
     default: 10,
   })
   take: number;
