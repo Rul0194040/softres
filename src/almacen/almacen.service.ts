@@ -265,6 +265,19 @@ export class AlmacenService {
     detalleId: number,
     detalle: CreateDetalleDTO,
   ): Promise<any> {
+    if (
+      detalle.entradas !== null &&
+      detalle.entradas !== undefined &&
+      detalle.entradas !== 0
+    ) {
+      detalle.salidas = 0;
+      detalle.abono = 0;
+      detalle.referencia = `E-${moment(detalle.fecha).format('DDMMYYYY')}`;
+    } else {
+      detalle.entradas = 0;
+      detalle.cargo = 0;
+      detalle.referencia = `S-${moment(detalle.fecha).format('DDMMYYYY')}`;
+    }
     await getRepository(AlmacenDetalleEntity).update(detalleId, detalle);
     return await this.updateTablaContable(detalleId);
   }
