@@ -3,6 +3,7 @@ import { Seeder } from 'nestjs-seeder';
 import { getRepository } from 'typeorm';
 import { categoriasToCreate } from './categoria.collection';
 import { CategoriaEntity } from './categoria.entity';
+import { plainToClass } from 'class-transformer';
 
 /**
  * @ignore
@@ -14,7 +15,15 @@ export class CategoriaSeeder implements Seeder {
    */
   async seed(): Promise<any> {
     for (const cat of categoriasToCreate) {
-      const record: CategoriaEntity = cat;
+      const catToCreate = plainToClass(CategoriaEntity, cat);
+      if (cat.parentCatId) {
+        catToCreate.parentCat = await getRepository(CategoriaEntity).findOne(
+          cat.parentCatId,
+        );
+      } else {
+        catToCreate.parentCat = null;
+      }
+      const record: CategoriaEntity = catToCreate;
       await getRepository(CategoriaEntity).save(record);
     }
   }

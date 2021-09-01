@@ -21,6 +21,11 @@ export class InsumosSeeder implements Seeder {
       insumoToCreate.categoria = await getRepository(CategoriaEntity).findOne(
         insumo.categoriaId,
       );
+      if (insumo.subCategoriaId) {
+        insumoToCreate.subCategoria = await getRepository(
+          CategoriaEntity,
+        ).findOne(insumo.subCategoriaId);
+      }
 
       await getRepository(InsumoEntity).save(insumoToCreate);
     }

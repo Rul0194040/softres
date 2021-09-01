@@ -70,9 +70,9 @@ export class AlmacenController {
   }
 
   /**
-   * Paginate fisico
+   * Paginate físico
    *
-   * @param options opciones de paginacion
+   * @param options Opciones de paginación
    * @returns {PaginationPrimeNgResult}
    */
   @Post('paginate')
@@ -99,8 +99,8 @@ export class AlmacenController {
   /**
    *
    * @param detalleId Id del detalle ha actualizar
-   * @param detalle Acepta solo los campos: entradas, salidas y precioUnitario
-   * @returns Confirmación de actualización de costo de venta en la tabla de Almacén
+   * @param detalle Acepta solo los campos: fecha, entradas?, salidas? y precioUnitario?
+   * @returns Regresa stock actual y costo venta (suma de los abonos)
    */
   @Put('updateAlmacenDetalle/:detalleId')
   updateAlmacenDetalle(

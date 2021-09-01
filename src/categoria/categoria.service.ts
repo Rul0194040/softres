@@ -12,6 +12,11 @@ import { UpdateCatDTO } from './DTOs/update-categoria.dto';
 export class CategoriaService {
   async create(categoria: CreateCatDTO): Promise<CategoriaEntity> {
     const categoriaToCreate = plainToClass(CategoriaEntity, categoria);
+    if (categoria.parentCatId) {
+      categoriaToCreate.parentCat = await getRepository(
+        CategoriaEntity,
+      ).findOne(categoria.parentCatId);
+    }
     const created = await getRepository(CategoriaEntity).save(
       categoriaToCreate,
     );
@@ -61,5 +66,14 @@ export class CategoriaService {
       skip: options.skip,
       totalItems: count,
     };
+  }
+
+  async getSubcategorias(idCat: number): Promise<CategoriaEntity[]> {
+    return await getRepository(CategoriaEntity)
+      .createQueryBuilder('categoria')
+      .select(['categoria.id', 'categoria.nombre', 'categoria.parentCatId'])
+      .where('categoria.parentCatId = :term', { term: idCat })
+      .orderBy('categoria.nombre', 'ASC')
+      .getMany();
   }
 }

@@ -29,4 +29,7 @@ export class CreateInsumoDTO {
   mermaPorcentaje: number;
   @ApiProperty()
   categoriaId: number;
+  @ApiProperty()
+  @IsOptional()
+  subCategoriaId?: number;
 }

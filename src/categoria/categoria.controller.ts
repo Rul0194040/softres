@@ -50,7 +50,7 @@ export class CategoriaController {
   /**
    * Paginate
    *
-   * @param options opciones de paginacion
+   * @param options Opciones de paginación
    * @returns {PaginationPrimeNgResult}
    */
   @Post('paginate')
@@ -58,5 +58,17 @@ export class CategoriaController {
     @Body() options: PaginationOptions,
   ): Promise<PaginationPrimeNgResult> {
     return this.categoriaService.paginate(options);
+  }
+
+  /**
+   *
+   * @param id Id de categoría que se quiere buscar sus subcategorías
+   * @returns Array con las subcategorías
+   */
+  @Get('subcategorias/:id')
+  getSubcategorias(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<CategoriaEntity[]> {
+    return this.categoriaService.getSubcategorias(id);
   }
 }
