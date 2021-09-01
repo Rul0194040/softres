@@ -39,7 +39,9 @@ export class CategoriaService {
   }
 
   async paginate(options: PaginationOptions): Promise<PaginationPrimeNgResult> {
-    const dataQuery = getRepository(CategoriaEntity).createQueryBuilder();
+    const dataQuery = getRepository(CategoriaEntity)
+      .createQueryBuilder()
+      .where('parentCatId IS NULL');
 
     forIn(options.filters, (value, key) => {
       if (key === 'nombre') {
@@ -50,7 +52,7 @@ export class CategoriaService {
     });
 
     if (options.sort === undefined || !Object.keys(options.sort).length) {
-      options.sort = 'createdAt';
+      options.sort = 'nombre';
     }
 
     const count = await dataQuery.getCount();
@@ -58,7 +60,7 @@ export class CategoriaService {
     const data = await dataQuery
       .skip(options.skip)
       .take(options.take)
-      .orderBy(options.sort, 'DESC')
+      .orderBy(options.sort, options.direction)
       .getMany();
 
     return {

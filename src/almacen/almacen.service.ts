@@ -186,7 +186,7 @@ export class AlmacenService {
     });
 
     if (options.sort === undefined || !Object.keys(options.sort).length) {
-      options.sort = 'almacen.createdAt';
+      options.sort = 'insumo.nombre';
     }
 
     const count = await dataQuery.getCount();
@@ -242,7 +242,7 @@ export class AlmacenService {
     });
 
     if (options.sort === undefined || !Object.keys(options.sort).length) {
-      options.sort = 'almacenDet.createdAt';
+      options.sort = 'almacenDet.fecha';
     }
 
     const count = await dataQuery.getCount();
@@ -251,7 +251,7 @@ export class AlmacenService {
       .where('insumo.id =:id', { id: insumoId })
       .skip(options.skip)
       .take(options.take)
-      .orderBy(options.sort, 'DESC')
+      .orderBy(options.sort, options.direction)
       .getMany();
 
     return {
