@@ -1,9 +1,16 @@
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
-import { Entity, Column } from 'typeorm';
-import { RecipeValues } from '../recipeValues.enum';
+import { Entity, Column, OneToMany } from 'typeorm';
 
 @Entity('recetas')
 export class RecetaEntity extends CommonEntity {
+  @Column({
+    type: 'varchar',
+    name: 'nombre',
+    length: 100,
+    nullable: false,
+  })
+  nombre: string;
+
   @Column({
     type: 'mediumint',
     name: 'costoTotal',
@@ -13,26 +20,10 @@ export class RecetaEntity extends CommonEntity {
 
   @Column({
     type: 'mediumint',
-    name: 'merma',
-    nullable: true,
-    default: RecipeValues.DEFAULTMERMA,
-  })
-  merma?: number;
-
-  @Column({
-    type: 'mediumint',
     name: 'costoUnitarioReceta',
     nullable: true,
   })
   costoUnitarioReceta?: number;
-
-  @Column({
-    type: 'mediumint',
-    name: 'factorAlimentos',
-    nullable: true,
-    default: RecipeValues.FACTOR,
-  })
-  factorAlimentos?: number;
 
   @Column({
     type: 'mediumint',
@@ -54,4 +45,14 @@ export class RecetaEntity extends CommonEntity {
     nullable: true,
   })
   precioSugeridoCarta?: number;
+
+  @Column({
+    type: 'boolean',
+    name: 'haschildren',
+    nullable: true,
+  })
+  hasChildren?: boolean;
+
+  @OneToMany(() => RecetaEntity, (receta) => receta.id, { nullable: true })
+  children?: RecetaEntity[];
 }

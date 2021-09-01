@@ -26,14 +26,6 @@ export class RecetaDetalleEntity extends CommonEntity {
   numXporcion: number;
 
   @Column({
-    type: 'varchar',
-    name: 'nombre',
-    length: 100,
-    nullable: false,
-  })
-  nombre: string;
-
-  @Column({
     type: 'mediumint',
     name: 'cantReceta',
     nullable: false,
@@ -46,13 +38,6 @@ export class RecetaDetalleEntity extends CommonEntity {
     nullable: false,
   })
   cantReal: number;
-
-  @Column({
-    type: 'mediumint',
-    name: 'precioMercado',
-    nullable: false,
-  })
-  precioMercado: number;
 
   @OneToOne(() => InsumoEntity, { nullable: false })
   @JoinColumn()

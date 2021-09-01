@@ -239,6 +239,11 @@ export class AlmacenService {
           term: `%${value.split(' ').join('%')}%`,
         });
       }
+      if (key === 'fecha') {
+        dataQuery.andWhere('monthname("almacenDet.fecha")=:mes', {
+          mes: value,
+        });
+      }
     });
 
     if (options.sort === undefined || !Object.keys(options.sort).length) {
