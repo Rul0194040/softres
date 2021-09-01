@@ -30,6 +30,13 @@ export class AlmacenEntity extends CommonEntity {
 
   @Column({ type: 'mediumint', nullable: false })
   insumoId: number;
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+  })
+  capacidad: number;
 
   @Column({
     type: 'decimal',
@@ -38,9 +45,6 @@ export class AlmacenEntity extends CommonEntity {
     default: 0,
   })
   cantidad: number;
-
-  @Column({ type: 'mediumint', nullable: true })
-  costoVenta: number;
 
   @Column({
     type: 'mediumint',
