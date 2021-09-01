@@ -106,7 +106,7 @@ export class AlmacenController {
   updateAlmacenDetalle(
     @Param('detalleId', ParseIntPipe) detalleId: number,
     @Body() detalle: CreateDetalleDTO,
-  ): Promise<UpdateResult> {
+  ): Promise<any> {
     return this.almacenService.updateAlmacenDetalle(detalleId, detalle);
   }
 

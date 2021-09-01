@@ -21,7 +21,7 @@ export class AlmacenService {
     almacen: CreateAlmacenDTO,
   ): Promise<AlmacenInformeDTO | AlmacenEntity> {
     const insumo = await getRepository(InsumoEntity).findOne(almacen.insumoId);
-    const total = almacen.capacidad * almacen.cantidad;
+    const total = almacen.cantidad * insumo.pesoNeto;
 
     const almacenToCreate: CreateAlmacenDTO = {
       depto: almacen.depto,
@@ -264,12 +264,12 @@ export class AlmacenService {
   async updateAlmacenDetalle(
     detalleId: number,
     detalle: CreateDetalleDTO,
-  ): Promise<UpdateResult> {
+  ): Promise<any> {
     await getRepository(AlmacenDetalleEntity).update(detalleId, detalle);
     return await this.updateTablaContable(detalleId);
   }
 
-  async updateTablaContable(detalleId: number): Promise<UpdateResult> {
+  async updateTablaContable(detalleId: number): Promise<any> {
     const mainDetalle: AlmacenDetalleEntity = await getRepository(
       AlmacenDetalleEntity,
     ).findOne({ id: detalleId });
@@ -309,9 +309,10 @@ export class AlmacenService {
       preSaldo = toFloat(detalle.saldo);
     });
 
-    return await getRepository(AlmacenEntity).update(mainDetalle.almacenId, {
+    return {
       costoVenta: costoVenta,
-    });
+      stock: stock,
+    };
   }
 
   async masiveAlmacen(

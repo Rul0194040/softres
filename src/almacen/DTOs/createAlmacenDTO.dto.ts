@@ -13,7 +13,7 @@ export class CreateAlmacenDTO {
   @ApiProperty()
   cantidad: number;
   @ApiProperty()
-  total: number;
+  total?: number;
   @ApiProperty()
   @IsOptional()
   depto?: Deptos;
@@ -23,9 +23,6 @@ export class CreateAlmacenDTO {
   @ApiProperty()
   @IsOptional()
   insumo?: InsumoEntity;
-  @ApiProperty()
-  @IsOptional()
-  costoVenta?: number;
   @ApiProperty()
   @IsOptional()
   detalles?: CreateDetalleDTO[];
