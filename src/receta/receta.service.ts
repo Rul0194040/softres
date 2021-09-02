@@ -16,7 +16,8 @@ import { RecipeValues } from './enums/recipeValues.enum';
 export class RecetaService {
   async create(receta: CreateRecetaDTO): Promise<RecetaEntity> {
     const recetaTocreate = plainToClass(RecetaEntity, receta);
-    if (receta.children) {
+
+    if (receta.hasChildren && receta.children.length) {
       const children = await getRepository(RecetaEntity).findByIds(
         receta.children,
         {
@@ -33,27 +34,35 @@ export class RecetaService {
       recetaTocreate,
     );
 
-    if (receta.detalles) {
-      let rendimiento: number, totalCosto: number;
+    if (receta.detalles.length) {
+      let rendimiento = 0;
+      let totalCosto = 0;
+      let cantReal = 0;
+      let unitarioIngrediente = 0;
+
       for (let idx = 0; idx < receta.detalles.length; idx++) {
         const record = receta.detalles[idx];
         const insumo = await getRepository(InsumoEntity).findOne(
           record.insumoId,
         );
-        const cantReal =
-          (record.cantReal * 100) / (100 - insumo.mermaPorcentaje);
+
+        cantReal = (record.cantReceta * 100) / (100 - insumo.mermaPorcentaje);
+        unitarioIngrediente =
+          (cantReal * insumo.precioKilo) / RecipeValues.KILO;
+
         const recipeDetail: RecetaDetalleEntity = {
           cantReceta: record.cantReceta,
           insumo,
           insumoId: insumo.id,
-          cantReal,
-          costoUnitarioIngrediente:
-            (cantReal * insumo.precioKilo) / RecipeValues.KILO,
+          cantReal: Number(cantReal.toFixed(2)),
+          costoUnitarioIngrediente: Number(unitarioIngrediente.toFixed(2)),
           parent: CreatedReceta,
         };
 
         totalCosto += recipeDetail.costoUnitarioIngrediente;
         rendimiento += record.cantReceta;
+
+        await getRepository(RecetaDetalleEntity).save(recipeDetail);
       }
 
       const mermaReceta = totalCosto * RecipeValues.DEFAULTMERMA;
@@ -61,14 +70,13 @@ export class RecetaService {
       const costoIva = costoSinIva + costoSinIva * RecipeValues.IVA;
 
       await getRepository(RecetaEntity).update(CreatedReceta.id, {
-        costoTotal: totalCosto,
-        rendimiento,
-        mermaReceta,
+        costoTotal: Number(totalCosto.toFixed(3)),
+        rendimiento: Number(rendimiento.toFixed(3)),
+        mermaReceta: Number(mermaReceta.toFixed(3)),
         costoUnitarioReceta: mermaReceta + totalCosto,
-        costoSinIva,
+        costoSinIva: Number(costoSinIva.toFixed(3)),
         iva: costoSinIva * RecipeValues.IVA,
-        costoIva,
-        precioSugeridoCarta: costoIva + costoIva * receta.precioSugeridoCarta,
+        costoIva: Number(costoIva.toFixed(3)),
       });
 
       return CreatedReceta;
@@ -106,7 +114,7 @@ export class RecetaService {
     const dataQuery = getRepository(RecetaEntity)
       .createQueryBuilder('receta')
       .leftJoin('receta.children', 'children')
-      .select(['receta', 'children.id', 'children.nombre']);
+      .select(['receta', 'children']);
 
     forIn(options.filters, (value, key) => {
       if (key === 'nombre') {

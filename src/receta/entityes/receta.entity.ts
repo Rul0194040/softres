@@ -1,5 +1,5 @@
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
-import { Entity, Column, OneToMany } from 'typeorm';
+import { Entity, Column, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 import { GrupoReceta } from '../enums/grupoReceta.enum';
 import { RecetaDetalleEntity } from './recetaDetalle.entity';
 
@@ -98,8 +98,15 @@ export class RecetaEntity extends CommonEntity {
   })
   grupo?: GrupoReceta;
 
-  @OneToMany(() => RecetaEntity, (receta) => receta.id, { nullable: true })
-  children?: RecetaEntity[];
+  @OneToMany(() => RecetaEntity, (receta) => receta.parent, { nullable: true })
+  children: RecetaEntity[];
+
+  @Column({ type: 'int', nullable: true })
+  parentId: number;
+
+  @ManyToOne(() => RecetaEntity, (receta) => receta.children)
+  @JoinColumn({ name: 'parentId' })
+  parent: RecetaEntity;
 
   @OneToMany(() => RecetaDetalleEntity, (det) => det.parent, { nullable: true })
   detalleReceta?: RecetaDetalleEntity[];

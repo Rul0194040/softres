@@ -8,11 +8,11 @@ export class CreateRecetaDTO {
   @ApiProperty()
   grupo: GrupoReceta;
   @ApiProperty()
+  hasChildren: boolean;
+  @ApiProperty()
   numPorciones?: number;
   @ApiProperty()
   numXporcion?: number;
-  @ApiProperty()
-  hasChildren: boolean;
   @ApiProperty()
   @IsOptional()
   costoTotal?: number;
@@ -41,12 +41,12 @@ export class CreateRecetaDTO {
 
 export class CreateDetalleRecetaDTO {
   @ApiProperty()
+  insumoId: number;
+  @ApiProperty()
   cantReceta: number;
   @ApiProperty()
   @IsOptional()
   cantReal?: number;
-  @ApiProperty()
-  insumoId: number;
   @ApiProperty()
   @IsOptional()
   rendimiento?: number;
