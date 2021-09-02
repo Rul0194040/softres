@@ -1,5 +1,7 @@
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { Entity, Column, OneToMany } from 'typeorm';
+import { GrupoReceta } from '../enums/grupoReceta.enum';
+import { RecetaDetalleEntity } from './recetaDetalle.entity';
 
 @Entity('recetas')
 export class RecetaEntity extends CommonEntity {
@@ -10,6 +12,13 @@ export class RecetaEntity extends CommonEntity {
     nullable: false,
   })
   nombre: string;
+
+  @Column({
+    type: 'mediumint',
+    name: 'rendimiento',
+    nullable: true,
+  })
+  rendimiento?: number;
 
   @Column({
     type: 'mediumint',
@@ -24,6 +33,20 @@ export class RecetaEntity extends CommonEntity {
     nullable: true,
   })
   costoUnitarioReceta?: number;
+
+  @Column({
+    type: 'mediumint',
+    name: 'mermaReceta',
+    nullable: true,
+  })
+  mermaReceta?: number;
+
+  @Column({
+    type: 'mediumint',
+    name: 'iva',
+    nullable: true,
+  })
+  iva?: number;
 
   @Column({
     type: 'mediumint',
@@ -49,10 +72,21 @@ export class RecetaEntity extends CommonEntity {
   @Column({
     type: 'boolean',
     name: 'haschildren',
+    nullable: false,
+  })
+  hasChildren: boolean;
+
+  @Column({
+    type: 'enum',
+    name: 'grupo',
+    enum: GrupoReceta,
     nullable: true,
   })
-  hasChildren?: boolean;
+  grupo?: GrupoReceta;
 
   @OneToMany(() => RecetaEntity, (receta) => receta.id, { nullable: true })
   children?: RecetaEntity[];
+
+  @OneToMany(() => RecetaDetalleEntity, (det) => det.parent, { nullable: true })
+  detalleReceta?: RecetaDetalleEntity[];
 }

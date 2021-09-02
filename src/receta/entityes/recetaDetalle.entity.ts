@@ -1,29 +1,30 @@
+import { RecetaEntity } from './receta.entity';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
-import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 
 @Entity('recetasDetalle')
 export class RecetaDetalleEntity extends CommonEntity {
   @Column({
     type: 'mediumint',
-    name: 'rendimiento',
-    nullable: false,
-  })
-  rendimiento: number;
-
-  @Column({
-    type: 'mediumint',
     name: 'numPorciones',
-    nullable: false,
+    nullable: true,
   })
-  numPorciones: number;
+  numPorciones?: number;
 
   @Column({
     type: 'mediumint',
-    name: 'numXporcion',
-    nullable: false,
+    name: 'costoXporcion',
+    nullable: true,
   })
-  numXporcion: number;
+  costoXporcion?: number;
+
+  @Column({
+    type: 'mediumint',
+    name: 'cantReal',
+    nullable: true,
+  })
+  cantReal?: number;
 
   @Column({
     type: 'mediumint',
@@ -34,15 +35,21 @@ export class RecetaDetalleEntity extends CommonEntity {
 
   @Column({
     type: 'mediumint',
-    name: 'cantReal',
+    name: 'costoUnitarioReceta',
     nullable: false,
   })
-  cantReal: number;
+  costoUnitarioIngrediente: number;
 
   @OneToOne(() => InsumoEntity, { nullable: false })
   @JoinColumn()
   insumo: InsumoEntity;
 
-  @Column({ type: 'mediumint', nullable: false })
-  insumoId: number;
+  @Column({ type: 'mediumint', nullable: true })
+  insumoId?: number;
+
+  @ManyToOne(() => RecetaEntity, { nullable: false })
+  parent: RecetaEntity;
+
+  @Column({ type: 'mediumint', nullable: true })
+  recetaId?: number;
 }

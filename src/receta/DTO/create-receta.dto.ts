@@ -5,6 +5,8 @@ export class CreateRecetaDTO {
   @ApiProperty()
   nombre: string;
   @ApiProperty()
+  hasChildren: boolean;
+  @ApiProperty()
   @IsOptional()
   costoTotal?: number;
   @ApiProperty()
@@ -24,9 +26,6 @@ export class CreateRecetaDTO {
   precioSugeridoCarta?: number;
   @ApiProperty()
   @IsOptional()
-  subReceta?: boolean;
-  @ApiProperty()
-  @IsOptional()
   children?: number[];
   @ApiProperty()
   @IsOptional()
@@ -35,7 +34,10 @@ export class CreateRecetaDTO {
 
 export class CreateDetalleRecetaDTO {
   @ApiProperty()
-  cantReal: number;
+  cantReceta: number;
+  @ApiProperty()
+  @IsOptional()
+  cantReal?: number;
   @ApiProperty()
   insumoId: number;
   @ApiProperty()
@@ -47,7 +49,4 @@ export class CreateDetalleRecetaDTO {
   @ApiProperty()
   @IsOptional()
   numXporcion?: number;
-  @ApiProperty()
-  @IsOptional()
-  cantReceta?: number;
 }
