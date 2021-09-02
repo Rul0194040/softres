@@ -1,3 +1,5 @@
+import { CocinaRules } from './rules/cocina-rules.collection';
+import { BarraRules } from './rules/barra-rules.collection';
 import { createUserDTO } from './DTO/createUser.dto';
 import { ProfileTypes } from './profileTypes.enum';
 import { AlmacenGeneralRules } from './rules/almacenGeneral-rules.collection';
@@ -58,16 +60,16 @@ export const usersToCreate: createUserDTO[] = [
     firstName: 'Chef en Jefe',
     lastName: 'Encargado de Cocina',
     email: 'cocina@' + domain,
-    rules: DirectivosRules.map((r) => r.value),
-    profile: ProfileTypes.DIRECTIVO,
+    rules: CocinaRules.map((r) => r.value),
+    profile: ProfileTypes.COCINA,
     password: process.env.FIRST_PASSWORD,
   },
   {
     firstName: 'Mixologo en Jefe',
     lastName: 'Encargado de Barra',
     email: 'barra@' + domain,
-    rules: DirectivosRules.map((r) => r.value),
-    profile: ProfileTypes.DIRECTIVO,
+    rules: BarraRules.map((r) => r.value),
+    profile: ProfileTypes.BARRA,
     password: process.env.FIRST_PASSWORD,
   },
 ];

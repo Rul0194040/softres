@@ -30,6 +30,7 @@ export class AlmacenEntity extends CommonEntity {
 
   @Column({ type: 'mediumint', nullable: false })
   insumoId: number;
+
   @Column({
     type: 'decimal',
     precision: 10,

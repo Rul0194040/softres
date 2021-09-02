@@ -174,13 +174,13 @@ export class AlmacenService {
 
       if (key === 'depto') {
         dataQuery.andWhere('( depto = :term )', {
-          term: value,
+          term: `%${value.split(' ').join('%')}%`,
         });
       }
 
       if (key === 'type') {
         dataQuery.andWhere('( type = :term )', {
-          term: value,
+          term: `%${value.split(' ').join('%')}%`,
         });
       }
     });
@@ -231,12 +231,18 @@ export class AlmacenService {
         'insumo.unidad',
         'insumo.precioUnitario',
         'insumo.marca',
-      ]);
+      ])
+      .where('insumo.id =:id', { id: insumoId });
 
     forIn(options.filters, (value, key) => {
       if (key === 'nombre') {
         dataQuery.andWhere('( insumo.nombre LIKE :term )', {
           term: `%${value.split(' ').join('%')}%`,
+        });
+      }
+      if (key === 'fecha') {
+        dataQuery.andWhere('(monthname(almacenDet.fecha) = :mes)', {
+          mes: value,
         });
       }
     });
@@ -245,14 +251,14 @@ export class AlmacenService {
       options.sort = 'almacenDet.fecha';
     }
 
-    const count = await dataQuery.getCount();
-
     const data = await dataQuery
-      .where('insumo.id =:id', { id: insumoId })
       .skip(options.skip)
       .take(options.take)
       .orderBy(options.sort, options.direction)
       .getMany();
+
+    const count = await dataQuery.getCount();
+    console.log(count);
 
     return {
       data: data,
