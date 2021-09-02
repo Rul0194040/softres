@@ -74,7 +74,7 @@ export class InsumoService {
     });
 
     if (options.sort === undefined || !Object.keys(options.sort).length) {
-      options.sort = 'insumo.createdAt';
+      options.sort = 'insumo.nombre';
     }
 
     const count = await dataQuery.getCount();
@@ -82,7 +82,7 @@ export class InsumoService {
     const data = await dataQuery
       .skip(options.skip)
       .take(options.take)
-      .orderBy(options.sort, 'DESC')
+      .orderBy(options.sort, options.direction)
       .getMany();
 
     return {

@@ -10,7 +10,9 @@ export class PaginationOptions {
   @ApiProperty()
   sort: any;
 
-  @ApiProperty()
+  @ApiProperty({
+    default: 'ASC',
+  })
   @IsIn(['ASC', 'DESC'])
   @IsOptional()
   direction?: 'ASC' | 'DESC';
