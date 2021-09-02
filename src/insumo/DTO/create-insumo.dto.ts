@@ -8,28 +8,25 @@ export class CreateInsumoDTO {
   nombre: string;
   @ApiProperty()
   unidad: UnidadesTypes;
-  @ApiProperty()
-  @IsOptional()
+  @ApiProperty({ required: false })
   medida?: MedidasTypes;
   @ApiProperty()
   marca: string;
   @ApiProperty()
   precioUnitario: number;
-  @ApiProperty()
+  @ApiProperty({ required: false })
   precioKilo: number;
   @ApiProperty()
   pesoNeto: number;
-  @ApiProperty()
-  @ApiProperty()
+  @ApiProperty({ required: false })
   pesoDrenado?: number;
-  @ApiProperty()
-  @ApiProperty()
+  @ApiProperty({ required: false })
   merma?: number;
   @ApiProperty()
   mermaPorcentaje: number;
   @ApiProperty()
   categoriaId: number;
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   subCategoriaId?: number;
 }
