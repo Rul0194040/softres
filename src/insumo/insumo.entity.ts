@@ -41,42 +41,54 @@ export class InsumoEntity extends CommonEntity {
   marca: string;
 
   @Column({
-    type: 'mediumint',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
     name: 'precioUnitario',
     nullable: false,
   })
   precioUnitario: number;
 
   @Column({
-    type: 'mediumint',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
     name: 'pesoNeto',
     nullable: false,
   })
   pesoNeto: number;
 
   @Column({
-    type: 'mediumint',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
     name: 'pesoDrenado',
     nullable: true,
   })
   pesoDrenado?: number;
 
   @Column({
-    type: 'mediumint',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
     name: 'precioKilo',
     nullable: false,
   })
   precioKilo: number;
 
   @Column({
-    type: 'mediumint',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
     name: 'merma',
     nullable: true,
   })
   merma?: number;
 
   @Column({
-    type: 'mediumint',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
     name: 'mermaPorcentaje',
     nullable: false,
   })

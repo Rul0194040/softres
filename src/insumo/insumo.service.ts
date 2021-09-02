@@ -12,12 +12,15 @@ import { CategoriaEntity } from '@softres/categoria/categoria.entity';
 @Injectable()
 export class InsumoService {
   async create(insumo: CreateInsumoDTO): Promise<InsumoEntity> {
+    insumo.merma = insumo.pesoNeto * (insumo.mermaPorcentaje / 100.0);
+    insumo.pesoDrenado = insumo.pesoNeto - insumo.merma;
+    insumo.precioKilo = (insumo.precioUnitario * 1000) / insumo.pesoDrenado;
+
     const insumoToCreate = plainToClass(InsumoEntity, insumo);
     insumoToCreate.categoria = await getRepository(CategoriaEntity).findOne(
       insumo.categoriaId,
     );
-
-    if (insumo.subCategoriaId) {
+    if (insumo.subCategoriaId && insumo.subCategoriaId !== 0) {
       insumoToCreate.subCategoria = await getRepository(
         CategoriaEntity,
       ).findOne(insumo.subCategoriaId);
@@ -38,6 +41,10 @@ export class InsumoService {
     insumoId: number,
     insumo: UpdateInsumoDTO,
   ): Promise<InsumoEntity> {
+    insumo.merma = insumo.pesoNeto * (insumo.mermaPorcentaje / 100.0);
+    insumo.pesoDrenado = insumo.pesoNeto - insumo.merma;
+    insumo.precioKilo = (insumo.precioUnitario * 1000) / insumo.pesoDrenado;
+
     await getRepository(InsumoEntity).update(insumoId, insumo);
 
     return await getRepository(InsumoEntity)

@@ -71,7 +71,7 @@ export class CategoriaService {
   async getSubcategorias(idCat: number): Promise<CategoriaEntity[]> {
     return await getRepository(CategoriaEntity)
       .createQueryBuilder('categoria')
-      .select(['categoria.id', 'categoria.nombre', 'categoria.parentCatId'])
+      .select(['categoria.id', 'categoria.nombre'])
       .where('categoria.parentCatId = :term', { term: idCat })
       .orderBy('categoria.nombre', 'ASC')
       .getMany();
