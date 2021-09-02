@@ -1,3 +1,4 @@
+import { RecetaDetalleEntity } from './receta/entityes/recetaDetalle.entity';
 import { RecetaEntity } from './receta/entityes/receta.entity';
 import { ProveedorEntity } from './proveedor/entity/proveedor.entity';
 import { CategoriaEntity } from '@softres/categoria/categoria.entity';
@@ -52,8 +53,9 @@ import { ProveedorModule } from './proveedor/proveedor.module';
           CategoriaEntity,
           AlmacenEntity,
           AlmacenDetalleEntity,
-          ProveedorEntity,
           RecetaEntity,
+          RecetaDetalleEntity,
+          ProveedorEntity,
         ],
         synchronize: false,
       }),

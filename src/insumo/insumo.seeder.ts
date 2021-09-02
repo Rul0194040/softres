@@ -1,4 +1,4 @@
-import { InsumoService } from './insumo.service';
+import { ProveedorEntity } from './../proveedor/entity/proveedor.entity';
 import { Injectable } from '@nestjs/common';
 import { InsumoEntity } from './insumo.entity';
 import { Seeder } from 'nestjs-seeder';
@@ -20,6 +20,9 @@ export class InsumosSeeder implements Seeder {
       const insumoToCreate = plainToClass(InsumoEntity, insumo);
       insumoToCreate.categoria = await getRepository(CategoriaEntity).findOne(
         insumo.categoriaId,
+      );
+      insumoToCreate.proveedor = await getRepository(ProveedorEntity).findOne(
+        insumo.proveedorId,
       );
       if (insumo.subCategoriaId) {
         insumoToCreate.subCategoria = await getRepository(

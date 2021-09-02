@@ -13,7 +13,7 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
-import { DeleteResult } from 'typeorm';
+import { DeleteResult, UpdateResult } from 'typeorm';
 import { CreateRecetaDTO } from './DTO/create-receta.dto';
 import { UpdateRecetaDTO } from './DTO/update-receta.dto';
 
@@ -36,7 +36,7 @@ export class RecetaController {
   updateReceta(
     @Param('id', ParseIntPipe) id: number,
     @Body() receta: UpdateRecetaDTO,
-  ): Promise<RecetaEntity> {
+  ): Promise<UpdateResult> {
     return this.recetaService.update(id, receta);
   }
 

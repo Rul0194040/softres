@@ -13,6 +13,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 5000,
     mermaPorcentaje: 5,
     categoriaId: 2,
+    proveedorId: 1,
   },
   {
     nombre: 'Aceite de oliva',
@@ -24,6 +25,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 1000,
     mermaPorcentaje: 5,
     categoriaId: 2,
+    proveedorId: 1,
   },
   {
     nombre: 'Miel de agave',
@@ -35,6 +37,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 4800,
     mermaPorcentaje: 5,
     categoriaId: 21,
+    proveedorId: 1,
   },
   {
     nombre: 'Bactericida',
@@ -46,6 +49,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 3000,
     mermaPorcentaje: 5,
     categoriaId: 7,
+    proveedorId: 1,
   },
   {
     nombre: 'Vinagre balsámico',
@@ -57,6 +61,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 5000,
     mermaPorcentaje: 5,
     categoriaId: 29,
+    proveedorId: 1,
   },
   {
     nombre: 'Vino tipo jerez',
@@ -68,6 +73,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 2000,
     mermaPorcentaje: 5,
     categoriaId: 29,
+    proveedorId: 2,
   },
   {
     nombre: 'Vinagre de manzana',
@@ -79,6 +85,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 7000,
     mermaPorcentaje: 5,
     categoriaId: 29,
+    proveedorId: 2,
   },
   {
     nombre: 'Salsa inglesa',
@@ -90,6 +97,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 1200,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 2,
   },
   {
     nombre: 'Salsa de soya',
@@ -101,6 +109,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 4000,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 2,
   },
   {
     nombre: 'Extracto de vainilla ',
@@ -112,6 +121,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 2000,
     mermaPorcentaje: 5,
     categoriaId: 9,
+    proveedorId: 2,
   },
   {
     nombre: 'Jugo de tomate',
@@ -123,6 +133,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 5000,
     mermaPorcentaje: 5,
     categoriaId: 24,
+    proveedorId: 3,
   },
   {
     nombre: 'Vinagre de manzana',
@@ -134,6 +145,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 9000,
     mermaPorcentaje: 5,
     categoriaId: 29,
+    proveedorId: 3,
   },
   {
     nombre: 'Crema de coco',
@@ -145,6 +157,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 5000,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 3,
   },
   {
     nombre: 'Leche entera',
@@ -157,6 +170,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     mermaPorcentaje: 5,
     categoriaId: 18,
     subCategoriaId: 37,
+    proveedorId: 3,
   },
   {
     nombre: 'Leche deslactosada',
@@ -169,6 +183,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     mermaPorcentaje: 5,
     categoriaId: 18,
     subCategoriaId: 37,
+    proveedorId: 3,
   },
   {
     nombre: 'Saborizante de vainilla',
@@ -180,6 +195,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 5000,
     mermaPorcentaje: 5,
     categoriaId: 9,
+    proveedorId: 3,
   },
   {
     nombre: 'Pepinillos agridulces en conserva',
@@ -191,6 +207,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 3000,
     mermaPorcentaje: 5,
     categoriaId: 5,
+    proveedorId: 3,
   },
   {
     nombre: 'Pimienta negra',
@@ -202,6 +219,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 2000,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 3,
   },
   {
     nombre: 'Canela en polvo',
@@ -213,6 +231,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 1000,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 4,
   },
   {
     nombre: 'Garbanzo ',
@@ -224,6 +243,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 3000,
     mermaPorcentaje: 5,
     categoriaId: 17,
+    proveedorId: 4,
   },
   {
     nombre: 'Garbanzo',
@@ -235,6 +255,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 2000,
     mermaPorcentaje: 5,
     categoriaId: 15,
+    proveedorId: 4,
   },
   {
     nombre: 'Pan rallado',
@@ -246,6 +267,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 2600,
     mermaPorcentaje: 5,
     categoriaId: 23,
+    proveedorId: 4,
   },
   {
     nombre: 'Miel de abeja',
@@ -257,6 +279,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 3000,
     mermaPorcentaje: 5,
     categoriaId: 21,
+    proveedorId: 4,
   },
   {
     nombre: 'Miel de maple',
@@ -268,6 +291,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 6000,
     mermaPorcentaje: 5,
     categoriaId: 21,
+    proveedorId: 4,
   },
   {
     nombre: 'Eneldo',
@@ -279,6 +303,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 7000,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 4,
   },
   {
     nombre: 'Orégano',
@@ -290,6 +315,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 2000,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 4,
   },
   {
     nombre: 'Canela en rollo de 21"',
@@ -301,6 +327,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 7225,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 5,
   },
   {
     nombre: 'Clavo entero',
@@ -312,6 +339,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 1000,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 5,
   },
   {
     nombre: 'Azahár',
@@ -323,6 +351,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 2000,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 5,
   },
   {
     nombre: 'Laurel',
@@ -334,6 +363,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 7000,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 5,
   },
   {
     nombre: 'Panela',
@@ -345,6 +375,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 4000,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 5,
   },
   {
     nombre: 'Flor de jamaica',
@@ -356,6 +387,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 5000,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 5,
   },
   {
     nombre: 'Nuez sin cáscara',
@@ -367,6 +399,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 6000,
     mermaPorcentaje: 5,
     categoriaId: 13,
+    proveedorId: 5,
   },
   {
     nombre: 'Almendras',
@@ -378,6 +411,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 4000,
     mermaPorcentaje: 5,
     categoriaId: 13,
+    proveedorId: 5,
   },
   {
     nombre: 'Dátiles deshuesados ',
@@ -389,6 +423,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 9000,
     mermaPorcentaje: 5,
     categoriaId: 13,
+    proveedorId: 5,
   },
   {
     nombre: 'Cacahuate crudo',
@@ -400,6 +435,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 4500,
     mermaPorcentaje: 5,
     categoriaId: 17,
+    proveedorId: 6,
   },
   {
     nombre: 'Lentejas',
@@ -411,6 +447,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 5000,
     mermaPorcentaje: 5,
     categoriaId: 17,
+    proveedorId: 6,
   },
   {
     nombre: 'Pasta tipo spaghetti',
@@ -422,6 +459,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 6100,
     mermaPorcentaje: 5,
     categoriaId: 22,
+    proveedorId: 6,
   },
   {
     nombre: 'Pasta de fideo grueso',
@@ -433,6 +471,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 2000,
     mermaPorcentaje: 5,
     categoriaId: 22,
+    proveedorId: 6,
   },
   {
     nombre: 'Carbón activado',
@@ -444,6 +483,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 2000,
     mermaPorcentaje: 5,
     categoriaId: 26,
+    proveedorId: 6,
   },
   {
     nombre: 'Manteca vegetal',
@@ -455,6 +495,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 2500,
     mermaPorcentaje: 5,
     categoriaId: 20,
+    proveedorId: 6,
   },
   {
     nombre: 'Harina de maíz azul',
@@ -466,6 +507,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 3000,
     mermaPorcentaje: 5,
     categoriaId: 15,
+    proveedorId: 7,
   },
   {
     nombre: 'Azúcar mascabado',
@@ -477,6 +519,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 3000,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 7,
   },
   {
     nombre: 'Cocoa en polvo ',
@@ -488,6 +531,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 4500,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 7,
   },
   {
     nombre: 'Arroz',
@@ -499,6 +543,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 6000,
     mermaPorcentaje: 5,
     categoriaId: 3,
+    proveedorId: 7,
   },
   {
     nombre: 'Chile onza',
@@ -510,6 +555,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 8000,
     mermaPorcentaje: 5,
     categoriaId: 4,
+    proveedorId: 7,
   },
   {
     nombre: 'Chile pasilla oaxaqueño',
@@ -521,6 +567,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 90000,
     mermaPorcentaje: 5,
     categoriaId: 4,
+    proveedorId: 7,
   },
   {
     nombre: 'Chile ancho',
@@ -532,6 +579,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 52000,
     mermaPorcentaje: 5,
     categoriaId: 4,
+    proveedorId: 7,
   },
   {
     nombre: 'Chile árbol',
@@ -543,6 +591,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 7800,
     mermaPorcentaje: 5,
     categoriaId: 4,
+    proveedorId: 7,
   },
   {
     nombre: 'Chile huajillo',
@@ -554,6 +603,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 4500,
     mermaPorcentaje: 5,
     categoriaId: 4,
+    proveedorId: 8,
   },
   {
     nombre: 'Chile chilhuacle',
@@ -565,6 +615,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 90000,
     mermaPorcentaje: 5,
     categoriaId: 4,
+    proveedorId: 8,
   },
   {
     nombre: 'Chile piquín',
@@ -576,6 +627,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 1500,
     mermaPorcentaje: 5,
     categoriaId: 4,
+    proveedorId: 8,
   },
   {
     nombre: 'Harina de trigo',
@@ -587,6 +639,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 50000,
     mermaPorcentaje: 5,
     categoriaId: 15,
+    proveedorId: 8,
   },
   {
     nombre: 'Harina de trigo vitaminada',
@@ -598,6 +651,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 78000,
     mermaPorcentaje: 5,
     categoriaId: 15,
+    proveedorId: 8,
   },
   {
     nombre: 'Harina',
@@ -609,6 +663,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 8400,
     mermaPorcentaje: 5,
     categoriaId: 15,
+    proveedorId: 8,
   },
   {
     nombre: 'Sal',
@@ -620,6 +675,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 7800,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 8,
   },
   {
     nombre: 'Azúcar',
@@ -631,6 +687,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 60600,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 8,
   },
   {
     nombre: 'Orégano molido',
@@ -642,6 +699,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 87200,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 8,
   },
   {
     nombre: 'Pimentón/paprika',
@@ -653,6 +711,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 35100,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 9,
   },
   {
     nombre: 'Nuez mosacada',
@@ -664,6 +723,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 65000,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 9,
   },
   {
     nombre: 'Gengibre molido',
@@ -675,6 +735,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 32500,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 9,
   },
   {
     nombre: 'Clavo molido',
@@ -686,6 +747,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 12500,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 9,
   },
   {
     nombre: 'Levadura seca ',
@@ -697,6 +759,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 4000,
     mermaPorcentaje: 5,
     categoriaId: 26,
+    proveedorId: 9,
   },
   {
     nombre: 'Pan molido',
@@ -708,6 +771,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 4000,
     mermaPorcentaje: 5,
     categoriaId: 23,
+    proveedorId: 9,
   },
   {
     nombre: 'Galletas saladas',
@@ -719,6 +783,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 2000,
     mermaPorcentaje: 5,
     categoriaId: 14,
+    proveedorId: 9,
   },
   {
     nombre: 'Chipotles adobados',
@@ -730,6 +795,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 3000,
     mermaPorcentaje: 5,
     categoriaId: 8,
+    proveedorId: 9,
   },
   {
     nombre: 'Atún',
@@ -741,6 +807,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 9800,
     mermaPorcentaje: 5,
     categoriaId: 10,
+    proveedorId: 9,
   },
   {
     nombre: 'Leche condensada',
@@ -753,6 +820,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     mermaPorcentaje: 5,
     categoriaId: 18,
     subCategoriaId: 37,
+    proveedorId: 9,
   },
   {
     nombre: 'Polvo para hornear',
@@ -764,6 +832,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 45000,
     mermaPorcentaje: 5,
     categoriaId: 26,
+    proveedorId: 10,
   },
   {
     nombre: 'Crema de avellanas',
@@ -775,6 +844,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 48000,
     mermaPorcentaje: 5,
     categoriaId: 26,
+    proveedorId: 10,
   },
   {
     nombre: 'Palillos',
@@ -786,6 +856,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 12000,
     mermaPorcentaje: 5,
     categoriaId: 26,
+    proveedorId: 10,
   },
   {
     nombre: 'Cerillos',
@@ -797,6 +868,7 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 14000,
     mermaPorcentaje: 5,
     categoriaId: 26,
+    proveedorId: 10,
   },
   {
     nombre: 'Huevos',
@@ -808,5 +880,6 @@ export const insumosToCreate: CreateInsumoDTO[] = [
     pesoNeto: 68015,
     mermaPorcentaje: 5,
     categoriaId: 16,
+    proveedorId: 10,
   },
 ];
