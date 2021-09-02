@@ -22,7 +22,7 @@ export class RecetaService {
         {
           where: [
             { hasChildren: false, grupo: GrupoReceta.SUBRECETA },
-            { hasChildren: false, grupo: GrupoReceta.AMBOS },
+            { hasChildren: false, grupo: GrupoReceta.EXSUBRES },
           ],
         },
       );
@@ -81,7 +81,7 @@ export class RecetaService {
         {
           where: [
             { hasChildren: false, grupo: GrupoReceta.SUBRECETA },
-            { hasChildren: false, grupo: GrupoReceta.AMBOS },
+            { hasChildren: false, grupo: GrupoReceta.EXSUBRES },
           ],
         },
       );

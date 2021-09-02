@@ -7,20 +7,6 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 export class RecetaDetalleEntity extends CommonEntity {
   @Column({
     type: 'mediumint',
-    name: 'numPorciones',
-    nullable: true,
-  })
-  numPorciones?: number;
-
-  @Column({
-    type: 'mediumint',
-    name: 'costoXporcion',
-    nullable: true,
-  })
-  costoXporcion?: number;
-
-  @Column({
-    type: 'mediumint',
     name: 'cantReal',
     nullable: true,
   })

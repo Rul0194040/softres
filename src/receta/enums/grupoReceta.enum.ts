@@ -1,5 +1,8 @@
 export enum GrupoReceta {
+  FUERTE = 'fuerte',
+  COMPLEMENTO = 'complemento',
   EXTRA = 'extra',
   SUBRECETA = 'subreceta',
-  AMBOS = 'extra/subreceta',
+  EXSUBRES = 'extra/subreceta',
+  COMPSUBRES = 'complemento/subreceta',
 }

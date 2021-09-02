@@ -5,6 +5,10 @@ export class CreateRecetaDTO {
   @ApiProperty()
   nombre: string;
   @ApiProperty()
+  numPorciones?: number;
+  @ApiProperty()
+  numXporcion?: number;
+  @ApiProperty()
   hasChildren: boolean;
   @ApiProperty()
   @IsOptional()
@@ -43,10 +47,4 @@ export class CreateDetalleRecetaDTO {
   @ApiProperty()
   @IsOptional()
   rendimiento?: number;
-  @ApiProperty()
-  @IsOptional()
-  numPorciones?: number;
-  @ApiProperty()
-  @IsOptional()
-  numXporcion?: number;
 }
