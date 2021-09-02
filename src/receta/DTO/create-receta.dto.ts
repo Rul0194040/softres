@@ -1,9 +1,12 @@
+import { GrupoReceta } from './../enums/grupoReceta.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
 
 export class CreateRecetaDTO {
   @ApiProperty()
   nombre: string;
+  @ApiProperty()
+  grupo: GrupoReceta;
   @ApiProperty()
   numPorciones?: number;
   @ApiProperty()
