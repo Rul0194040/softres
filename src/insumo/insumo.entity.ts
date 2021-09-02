@@ -1,5 +1,6 @@
 import { CategoriaEntity } from '@softres/categoria/categoria.entity';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
+import { ProveedorEntity } from '@softres/proveedor/entity/proveedor.entity';
 import { Column, Entity, Index, ManyToOne } from 'typeorm';
 import { MedidasTypes } from './enums/medidasTypes.enum';
 import { UnidadesTypes } from './enums/unidadesTypes.enum';
@@ -82,11 +83,11 @@ export class InsumoEntity extends CommonEntity {
   })
   mermaPorcentaje: number;
 
-  // @ManyToOne(() => ProveedorEntity, { nullable: true })
-  // proveedor?: ProveedorEntity;
+  @ManyToOne(() => ProveedorEntity, { nullable: true })
+  proveedor?: ProveedorEntity;
 
-  // @Column({ type: 'int', nullable: true })
-  // proveedorId?: number;
+  @Column({ type: 'int', nullable: true })
+  proveedorId?: number;
 
   @ManyToOne(() => CategoriaEntity, { nullable: true })
   categoria?: CategoriaEntity;
