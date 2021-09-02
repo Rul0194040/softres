@@ -1,3 +1,5 @@
+import { RecetaEntity } from './receta/entityes/receta.entity';
+import { ProveedorEntity } from './proveedor/entity/proveedor.entity';
 import { CategoriaEntity } from '@softres/categoria/categoria.entity';
 import { UserEntity } from '@softres/user/user.entity';
 import { Module } from '@nestjs/common';
@@ -20,6 +22,7 @@ import { AppConfig } from './app.config';
 import { InsumoEntity } from './insumo/insumo.entity';
 import { AlmacenEntity } from './almacen/entitys/almacen.entity';
 import { AlmacenDetalleEntity } from './almacen/entitys/almacenDetalle.entity';
+import { ProveedorModule } from './proveedor/proveedor.module';
 
 @Module({
   imports: [
@@ -49,6 +52,8 @@ import { AlmacenDetalleEntity } from './almacen/entitys/almacenDetalle.entity';
           CategoriaEntity,
           AlmacenEntity,
           AlmacenDetalleEntity,
+          ProveedorEntity,
+          RecetaEntity,
         ],
         synchronize: false,
       }),
@@ -63,6 +68,7 @@ import { AlmacenDetalleEntity } from './almacen/entitys/almacenDetalle.entity';
     ComprasModule,
     AuthModule,
     VentasModule,
+    ProveedorModule,
   ],
   controllers: [AppController],
   providers: [AppService],
