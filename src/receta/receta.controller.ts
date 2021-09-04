@@ -18,7 +18,7 @@ import { CreateRecetaDTO } from './DTO/create-receta.dto';
 import { UpdateRecetaDTO } from './DTO/update-receta.dto';
 
 @Controller('receta')
-@ApiTags('recetas')
+@ApiTags('Receta')
 export class RecetaController {
   constructor(private readonly recetaService: RecetaService) {}
 

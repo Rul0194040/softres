@@ -74,6 +74,7 @@ export class RecetaService {
       return CreatedReceta;
     }
   }
+
   async update(id: number, receta: UpdateRecetaDTO): Promise<UpdateResult> {
     if (receta.children) {
       const newChildren = await getRepository(RecetaEntity).findByIds(
@@ -94,6 +95,7 @@ export class RecetaService {
       precioSugeridoCarta: receta.precioSugeridoCarta,
     });
   }
+
   async getById(id: number): Promise<any> {
     return getRepository(RecetaEntity).findOne(id);
   }
@@ -125,7 +127,7 @@ export class RecetaService {
     const data = await dataQuery
       .skip(options.skip)
       .take(options.take)
-      .orderBy(options.sort, 'DESC')
+      .orderBy(options.sort, options.direction)
       .getMany();
 
     return {

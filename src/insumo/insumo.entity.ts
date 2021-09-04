@@ -95,11 +95,11 @@ export class InsumoEntity extends CommonEntity {
   })
   mermaPorcentaje: number;
 
-  @ManyToOne(() => ProveedorEntity, { nullable: true })
-  proveedor?: ProveedorEntity;
-
   @Column({ type: 'int', nullable: true })
   proveedorId?: number;
+
+  @ManyToOne(() => ProveedorEntity, { nullable: true })
+  proveedor?: ProveedorEntity;
 
   @ManyToOne(() => CategoriaEntity, { nullable: true })
   categoria?: CategoriaEntity;

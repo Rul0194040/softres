@@ -166,21 +166,15 @@ export class AlmacenService {
       ]);
 
     forIn(options.filters, (value, key) => {
-      if (key === 'nombre') {
-        dataQuery.andWhere('( categoria.nombre LIKE :term )', {
+      if (key === 'buscar') {
+        dataQuery.andWhere('( insumo.nombre LIKE :term )', {
           term: `%${value.split(' ').join('%')}%`,
         });
       }
 
-      if (key === 'depto') {
-        dataQuery.andWhere('( depto = :term )', {
-          term: `%${value.split(' ').join('%')}%`,
-        });
-      }
-
-      if (key === 'type') {
-        dataQuery.andWhere('( type = :term )', {
-          term: `%${value.split(' ').join('%')}%`,
+      if (key === 'categoria') {
+        dataQuery.andWhere('( insumo.categoriaId = :term2 )', {
+          term2: value,
         });
       }
     });
