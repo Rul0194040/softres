@@ -1,7 +1,7 @@
 import { RecetaEntity } from './receta.entity';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import { Column, Entity, ManyToOne } from 'typeorm';
 
 @Entity('recetasDetalle')
 export class RecetaDetalleEntity extends CommonEntity {
@@ -26,8 +26,7 @@ export class RecetaDetalleEntity extends CommonEntity {
   })
   costoUnitarioIngrediente: number;
 
-  @OneToOne(() => InsumoEntity, { nullable: false })
-  @JoinColumn()
+  @ManyToOne(() => InsumoEntity, { nullable: false })
   insumo: InsumoEntity;
 
   @Column({ type: 'mediumint', nullable: true })
@@ -35,7 +34,4 @@ export class RecetaDetalleEntity extends CommonEntity {
 
   @ManyToOne(() => RecetaEntity, { nullable: false })
   parent: RecetaEntity;
-
-  @Column({ type: 'mediumint', nullable: true })
-  recetaId?: number;
 }
