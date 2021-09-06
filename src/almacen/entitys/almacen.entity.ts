@@ -14,9 +14,6 @@ export class AlmacenEntity extends CommonEntity {
   })
   type: AlmacenType;
 
-  @OneToMany(() => AlmacenDetalleEntity, (detalle) => detalle.almacen)
-  detalle: AlmacenDetalleEntity;
-
   @Column({
     type: 'enum',
     enum: Deptos,
@@ -24,20 +21,17 @@ export class AlmacenEntity extends CommonEntity {
   })
   depto: Deptos;
 
-  @OneToOne(() => InsumoEntity, { nullable: false })
-  @JoinColumn()
-  insumo: InsumoEntity;
-
-  @Column({ type: 'mediumint', nullable: false })
-  insumoId: number;
+  @Column({
+    type: 'integer',
+    nullable: false,
+  })
+  maximo: number;
 
   @Column({
-    type: 'decimal',
-    precision: 10,
-    scale: 2,
-    default: 0,
+    type: 'integer',
+    nullable: false,
   })
-  capacidad: number;
+  minimo: number;
 
   @Column({
     type: 'decimal',
@@ -53,4 +47,16 @@ export class AlmacenEntity extends CommonEntity {
     nullable: false,
   })
   total: number;
+
+  @OneToOne(() => InsumoEntity, { nullable: false })
+  @JoinColumn()
+  insumo: InsumoEntity;
+
+  @Column({ type: 'mediumint', nullable: false })
+  insumoId: number;
+
+  @OneToMany(() => AlmacenDetalleEntity, (detalle) => detalle.almacen, {
+    nullable: true,
+  })
+  detalle: AlmacenDetalleEntity[];
 }

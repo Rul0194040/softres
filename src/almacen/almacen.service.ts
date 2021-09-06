@@ -24,13 +24,14 @@ export class AlmacenService {
     const total = almacen.cantidad * insumo.pesoNeto;
 
     const almacenToCreate: CreateAlmacenDTO = {
+      cantidad: almacen.cantidad,
       depto: almacen.depto,
-      type: almacen.type,
       insumo,
       insumoId: almacen.insumoId,
-      cantidad: almacen.cantidad,
-      capacidad: almacen.capacidad,
+      maximo: almacen.maximo,
+      minimo: almacen.minimo,
       total,
+      type: almacen.type,
     };
     const createdAlmacen = await getRepository(AlmacenEntity).save(
       almacenToCreate,
