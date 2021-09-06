@@ -63,16 +63,37 @@ export class InsumoService {
     const dataQuery = getRepository(InsumoEntity)
       .createQueryBuilder('insumo')
       .leftJoin('insumo.categoria', 'categoria')
-      .select(['insumo', 'categoria.id', 'categoria.nombre']);
+      .leftJoin('insumo.subCategoria', 'subcategoria')
+      .leftJoin('insumo.proveedor', 'proveedor')
+      .select([
+        'insumo',
+        'categoria.id',
+        'categoria.nombre',
+        'subcategoria.id',
+        'subcategoria.nombre',
+        'proveedor.id',
+        'proveedor.nombre',
+      ]);
 
     forIn(options.filters, (value, key) => {
-      if (key === 'categoria') {
-        dataQuery.andWhere('( categoria.id = :term )', {
-          term: value,
+      if (key === 'buscar') {
+        dataQuery.andWhere('( insumo.nombre LIKE :term )', {
+          term: `%${value.split(' ').join('%')}%`,
+        });
+      }
+
+      if (key === 'categoria' && value !== null) {
+        dataQuery.andWhere('( insumo.categoriaId = :term2 )', {
+          term2: value,
+        });
+      }
+
+      if (key === 'subcategoria' && value !== null) {
+        dataQuery.andWhere('( insumo.subCategoriaId = :term3 )', {
+          term3: value,
         });
       }
     });
-
     if (options.sort === undefined || !Object.keys(options.sort).length) {
       options.sort = 'insumo.nombre';
     }

@@ -117,7 +117,10 @@ export class AlmacenController {
         const allowedTypes = [
           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
           'application/vnd.ms-excel',
+          'application/wps-office.xlsx',
+          'application/wps-office.xls',
         ];
+
         if (
           allowedTypes.indexOf(file.mimetype) > -1 &&
           (file.originalname.split('.').reverse()[0] === 'xls' ||
