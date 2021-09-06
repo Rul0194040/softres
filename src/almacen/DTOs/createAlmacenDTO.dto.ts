@@ -21,7 +21,7 @@ export class CreateAlmacenDTO {
   depto: Deptos;
   @ApiProperty({ enum: AlmacenType })
   type: AlmacenType;
-  @ApiProperty()
+  @ApiProperty({ nullable: true })
   @IsOptional()
   insumo?: InsumoEntity;
   @ApiProperty({ nullable: true })
