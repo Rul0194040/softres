@@ -21,15 +21,6 @@ export class CompraDetalleEntity extends CommonEntity {
     nullable: false,
     default: 0.0,
   })
-  descuento: number;
-
-  @Column({
-    type: 'decimal',
-    precision: 10,
-    scale: 2,
-    nullable: false,
-    default: 0.0,
-  })
   total: number;
 
   @ManyToOne(() => InsumoEntity, { nullable: false })

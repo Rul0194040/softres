@@ -1,6 +1,7 @@
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { ProveedorEntity } from '@softres/proveedor/entity/proveedor.entity';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { PagoTypes } from '../enum/pagoTypes.enum';
 import { StatusTypes } from '../enum/statusTypes.enum';
 import { CompraDetalleEntity } from './compraDetalles.entity';
 
@@ -8,7 +9,7 @@ import { CompraDetalleEntity } from './compraDetalles.entity';
 export class CompraEntity extends CommonEntity {
   @Column({
     type: 'date',
-    nullable: true,
+    nullable: false,
     default: null,
   })
   fecha: Date;
@@ -47,6 +48,27 @@ export class CompraEntity extends CommonEntity {
     default: 0,
   })
   pagado: boolean;
+
+  @Column({
+    type: 'boolean',
+    nullable: false,
+    default: 0,
+  })
+  factura: boolean;
+
+  @Column({
+    type: 'enum',
+    enum: PagoTypes,
+    nullable: false,
+    default: PagoTypes.CREDITO,
+  })
+  formaPago: PagoTypes;
+
+  @Column({
+    type: 'date',
+    nullable: true,
+  })
+  fechaEntrega: Date;
 
   @ManyToOne(() => ProveedorEntity, { nullable: false })
   proveedor?: ProveedorEntity;

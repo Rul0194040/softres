@@ -24,6 +24,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '@softres/user/user.entity';
 import { UserModule } from './user/user.module';
 import { VentasModule } from './ventas/ventas.module';
+import { CompraEntity } from './compra/entities/compra.entity';
+import { CompraDetalleEntity } from './compra/entities/compraDetalles.entity';
 
 @Module({
   imports: [
@@ -56,6 +58,8 @@ import { VentasModule } from './ventas/ventas.module';
           RecetaEntity,
           RecetaDetalleEntity,
           ProveedorEntity,
+          CompraEntity,
+          CompraDetalleEntity,
         ],
         synchronize: false,
       }),

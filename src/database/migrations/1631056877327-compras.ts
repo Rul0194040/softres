@@ -1,14 +1,14 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class compra1630963120864 implements MigrationInterface {
-  name = 'compra1630963120864';
+export class compras1631056877327 implements MigrationInterface {
+  name = 'compras1631056877327';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `CREATE TABLE \`softres\`.\`comprasDetalle\` (\`id\` int NOT NULL AUTO_INCREMENT, \`uuid\` char(36) NOT NULL, \`createdAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`active\` tinyint NOT NULL DEFAULT 1, \`cantidad\` decimal(10,2) NOT NULL DEFAULT '0.00', \`descuento\` decimal(10,2) NOT NULL DEFAULT '0.00', \`total\` decimal(10,2) NOT NULL DEFAULT '0.00', \`insumoId\` int NULL, \`compraId\` int NOT NULL, UNIQUE INDEX \`IDX_8beeb3e413ead9af9d55d5d0fa\` (\`uuid\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`,
+      `CREATE TABLE \`softres\`.\`comprasDetalle\` (\`id\` int NOT NULL AUTO_INCREMENT, \`uuid\` char(36) NOT NULL, \`createdAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`active\` tinyint NOT NULL DEFAULT 1, \`cantidad\` decimal(10,2) NOT NULL DEFAULT '0.00', \`total\` decimal(10,2) NOT NULL DEFAULT '0.00', \`insumoId\` int NULL, \`compraId\` int NOT NULL, UNIQUE INDEX \`IDX_8beeb3e413ead9af9d55d5d0fa\` (\`uuid\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`,
     );
     await queryRunner.query(
-      `ALTER TABLE \`softres\`.\`compras\` ADD \`fecha\` datetime NULL DEFAULT NULL`,
+      `ALTER TABLE \`softres\`.\`compras\` ADD \`fecha\` date NOT NULL`,
     );
     await queryRunner.query(
       `ALTER TABLE \`softres\`.\`compras\` ADD \`folio\` text NOT NULL`,
@@ -24,6 +24,15 @@ export class compra1630963120864 implements MigrationInterface {
     );
     await queryRunner.query(
       `ALTER TABLE \`softres\`.\`compras\` ADD \`pagado\` tinyint NOT NULL DEFAULT '0'`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`compras\` ADD \`factura\` tinyint NOT NULL DEFAULT '0'`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`compras\` ADD \`formaPago\` enum ('Credito', 'Contado') NOT NULL DEFAULT 'Credito'`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`compras\` ADD \`fechaEntrega\` date NULL`,
     );
     await queryRunner.query(
       `ALTER TABLE \`softres\`.\`compras\` ADD \`proveedorId\` int NOT NULL`,
@@ -51,6 +60,15 @@ export class compra1630963120864 implements MigrationInterface {
     );
     await queryRunner.query(
       `ALTER TABLE \`softres\`.\`compras\` DROP COLUMN \`proveedorId\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`compras\` DROP COLUMN \`fechaEntrega\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`compras\` DROP COLUMN \`formaPago\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`compras\` DROP COLUMN \`factura\``,
     );
     await queryRunner.query(
       `ALTER TABLE \`softres\`.\`compras\` DROP COLUMN \`pagado\``,
