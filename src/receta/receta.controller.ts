@@ -9,6 +9,8 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
@@ -16,6 +18,11 @@ import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgR
 import { DeleteResult, UpdateResult } from 'typeorm';
 import { CreateRecetaDTO } from './DTO/create-receta.dto';
 import { UpdateRecetaDTO } from './DTO/update-receta.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FileOptions } from '@softres/common/DTOs/fileOptions.dto';
+import { extname } from 'path';
+import { existsSync, mkdirSync } from 'fs';
+import { diskStorage } from 'multer';
 
 @Controller('receta')
 @ApiTags('Receta')
@@ -56,5 +63,48 @@ export class RecetaController {
     @Body() options: PaginationOptions,
   ): Promise<PaginationPrimeNgResult> {
     return this.recetaService.paginate(options);
+  }
+
+  @Post('image')
+  @UseInterceptors(
+    FileInterceptor('carga', {
+      fileFilter: (req, file, cb) => {
+        const allowedTypes = [];
+
+        if (
+          true
+          // allowedTypes.indexOf(file.mimetype) > -1 &&
+          // (file.originalname.split('.').reverse()[0] === 'xls' ||
+          //   file.originalname.split('.').reverse()[0] === 'xlsx')
+        ) {
+          return cb(null, true);
+        }
+        return cb(
+          new Error(
+            'Tipo de archivo no aceptado, se aceptan solamente xlsx y xls',
+          ),
+          false,
+        );
+      },
+      storage: diskStorage({
+        destination: (req, file, cb) => {
+          const dirPath = './uploads/recetas';
+          if (!existsSync(`${dirPath}`)) {
+            mkdirSync(`${dirPath}`, { recursive: true });
+          }
+          cb(null, dirPath);
+        },
+        filename: (req, file, cb) => {
+          const idPlace = req.params['recetaId'];
+          cb(null, `receta-${idPlace}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
+  async image(
+    @Param('recetaId', ParseIntPipe) recetaId: number,
+    @UploadedFile() file: FileOptions,
+  ): Promise<UpdateResult> {
+    return this.recetaService.updateImage(recetaId, file.path);
   }
 }

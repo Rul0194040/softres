@@ -1,16 +1,16 @@
-import { RecetaDetalleEntity } from './entityes/recetaDetalle.entity';
-import { InsumoEntity } from '@softres/insumo/insumo.entity';
-import { RecetaEntity } from './entityes/receta.entity';
-import { getRepository, UpdateResult } from 'typeorm';
-import { UpdateRecetaDTO } from './DTO/update-receta.dto';
-import { Injectable } from '@nestjs/common';
 import { CreateRecetaDTO } from './DTO/create-receta.dto';
+import { forIn } from 'lodash';
+import { getRepository, UpdateResult } from 'typeorm';
+import { GrupoReceta } from './enums/grupoReceta.enum';
+import { Injectable } from '@nestjs/common';
+import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
 import { plainToClass } from 'class-transformer';
-import { forIn } from 'lodash';
-import { GrupoReceta } from './enums/grupoReceta.enum';
+import { RecetaDetalleEntity } from './entityes/recetaDetalle.entity';
+import { RecetaEntity } from './entityes/receta.entity';
 import { RecipeValues } from './enums/recipeValues.enum';
+import { UpdateRecetaDTO } from './DTO/update-receta.dto';
 
 @Injectable()
 export class RecetaService {
@@ -143,5 +143,12 @@ export class RecetaService {
       skip: options.skip,
       totalItems: count,
     };
+  }
+
+  updateImage(
+    recetaId: number,
+    path: string,
+  ): UpdateResult | PromiseLike<UpdateResult> {
+    return getRepository(RecetaEntity).update(recetaId, { imagen: path });
   }
 }
