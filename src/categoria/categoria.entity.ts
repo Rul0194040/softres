@@ -1,5 +1,5 @@
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
-import { Entity, Column, OneToOne, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity('categorias')
 export class CategoriaEntity extends CommonEntity {

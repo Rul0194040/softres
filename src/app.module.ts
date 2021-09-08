@@ -1,3 +1,5 @@
+import { MenuEntity } from './menu/entitys/menu.entity';
+import { SeccionEntity } from './menu/entitys/section.entity';
 import { RecetaDetalleEntity } from './receta/entityes/recetaDetalle.entity';
 import { RecetaEntity } from './receta/entityes/receta.entity';
 import { ProveedorEntity } from './proveedor/entity/proveedor.entity';
@@ -56,6 +58,8 @@ import { ProveedorModule } from './proveedor/proveedor.module';
           RecetaEntity,
           RecetaDetalleEntity,
           ProveedorEntity,
+          SeccionEntity,
+          MenuEntity,
         ],
         synchronize: false,
       }),
@@ -71,6 +75,7 @@ import { ProveedorModule } from './proveedor/proveedor.module';
     AuthModule,
     VentasModule,
     ProveedorModule,
+    MenuModule,
   ],
   controllers: [AppController],
   providers: [AppService],
