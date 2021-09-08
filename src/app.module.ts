@@ -26,10 +26,11 @@ import { UserModule } from './user/user.module';
 import { VentasModule } from './ventas/ventas.module';
 import { CompraEntity } from './compra/entities/compra.entity';
 import { CompraDetalleEntity } from './compra/entities/compraDetalles.entity';
-import { AppConfig } from './app.config';
+import { CompraSolicitudEntity } from './compra/entities/solicitudCompra.entity';
+import { AlmacenModule } from './almacen/almacen.module';
 import { AlmacenEntity } from './almacen/entitys/almacen.entity';
 import { AlmacenDetalleEntity } from './almacen/entitys/almacenDetalle.entity';
-import { AlmacenModule } from './almacen/almacen.module';
+import { AppConfig } from './app.config';
 import { CotizacionModule } from './cotizacion/cotizacion.module';
 
 @Module({
@@ -63,6 +64,7 @@ import { CotizacionModule } from './cotizacion/cotizacion.module';
           RecetaEntity,
           RecetaDetalleEntity,
           ProveedorEntity,
+          CompraSolicitudEntity,
           CompraEntity,
           CompraDetalleEntity,
           SeccionEntity,

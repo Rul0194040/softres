@@ -8,6 +8,6 @@ export class CreateCompraDetalleDto {
   @ApiProperty({ nullable: false })
   insumoId: number;
 
-  @ApiProperty({ nullable: false })
-  compraId: number;
+  @ApiProperty({ nullable: true })
+  compraId?: number;
 }

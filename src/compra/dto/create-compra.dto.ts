@@ -39,6 +39,9 @@ export class CreateCompraDto {
   @ApiProperty({ nullable: false })
   proveedorId: number;
 
+  @ApiProperty({ nullable: true })
+  solicitudId: number;
+
   @ApiProperty({ nullable: true, type: [CreateCompraDetalleDto] })
   @IsOptional()
   detalles?: CreateCompraDetalleDto[];
