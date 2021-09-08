@@ -31,6 +31,9 @@ export class CreateRecetaDTO {
   @ApiProperty()
   @IsOptional()
   precioSugeridoCarta?: number;
+  @ApiProperty({ nullable: true })
+  @IsOptional()
+  imagen?: string;
   @ApiProperty()
   @IsOptional()
   children?: number[];

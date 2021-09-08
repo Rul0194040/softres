@@ -107,6 +107,13 @@ export class RecetaEntity extends CommonEntity {
   })
   grupo?: GrupoReceta;
 
+  @Column({
+    type: 'varchar',
+    length: 20,
+    nullable: true,
+  })
+  imagen: string;
+
   @OneToMany(() => RecetaEntity, (receta) => receta.parent, { nullable: true })
   children: RecetaEntity[];
 
