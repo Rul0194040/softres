@@ -1,5 +1,3 @@
-import { RecetaEntity } from './entityes/receta.entity';
-import { RecetaService } from './receta.service';
 import {
   Body,
   Controller,
@@ -13,16 +11,18 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
-import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
-import { DeleteResult, UpdateResult } from 'typeorm';
 import { CreateRecetaDTO } from './DTO/create-receta.dto';
-import { UpdateRecetaDTO } from './DTO/update-receta.dto';
+import { DeleteResult, UpdateResult } from 'typeorm';
+import { diskStorage } from 'multer';
+import { existsSync, mkdirSync } from 'fs';
+import { extname } from 'path';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileOptions } from '@softres/common/DTOs/fileOptions.dto';
-import { extname } from 'path';
-import { existsSync, mkdirSync } from 'fs';
-import { diskStorage } from 'multer';
+import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
+import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
+import { RecetaEntity } from './entityes/receta.entity';
+import { RecetaService } from './receta.service';
+import { UpdateRecetaDTO } from './DTO/update-receta.dto';
 
 @Controller('receta')
 @ApiTags('Receta')
@@ -65,23 +65,24 @@ export class RecetaController {
     return this.recetaService.paginate(options);
   }
 
-  @Post('image')
+  @Post('updateImagen/:recetaId')
   @UseInterceptors(
     FileInterceptor('carga', {
       fileFilter: (req, file, cb) => {
-        const allowedTypes = [];
+        const allowedTypes = [
+          'image/png',
+          'image/jpg',
+          'image/jpeg',
+          'image/gif',
+          'image/svg+xml',
+        ];
 
-        if (
-          true
-          // allowedTypes.indexOf(file.mimetype) > -1 &&
-          // (file.originalname.split('.').reverse()[0] === 'xls' ||
-          //   file.originalname.split('.').reverse()[0] === 'xlsx')
-        ) {
+        if (allowedTypes.indexOf(file.mimetype) > -1) {
           return cb(null, true);
         }
         return cb(
           new Error(
-            'Tipo de archivo no aceptado, se aceptan solamente xlsx y xls',
+            'Tipo de archivo no aceptado, se aceptan solamente png, jpg, jpeg, gif o svg',
           ),
           false,
         );
@@ -105,6 +106,6 @@ export class RecetaController {
     @Param('recetaId', ParseIntPipe) recetaId: number,
     @UploadedFile() file: FileOptions,
   ): Promise<UpdateResult> {
-    return this.recetaService.updateImage(recetaId, file.path);
+    return this.recetaService.updateImage(recetaId, file.filename);
   }
 }

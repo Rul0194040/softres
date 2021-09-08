@@ -109,6 +109,7 @@ export class RecetaEntity extends CommonEntity {
 
   @Column({
     type: 'varchar',
+    length: 20,
     nullable: true,
   })
   imagen: string;
