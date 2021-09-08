@@ -1,7 +1,11 @@
-import { AlmacenDetalleEntity } from './almacen/entitys/almacenDetalle.entity';
-import { AlmacenEntity } from './almacen/entitys/almacen.entity';
-import { AlmacenModule } from './almacen/almacen.module';
-import { AppConfig } from './app.config';
+import { MenuEntity } from './menu/entitys/menu.entity';
+import { SeccionEntity } from './menu/entitys/section.entity';
+import { RecetaDetalleEntity } from './receta/entityes/recetaDetalle.entity';
+import { RecetaEntity } from './receta/entityes/receta.entity';
+import { ProveedorEntity } from './proveedor/entity/proveedor.entity';
+import { CategoriaEntity } from '@softres/categoria/categoria.entity';
+import { UserEntity } from '@softres/user/user.entity';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -58,8 +62,6 @@ import { CompraDetalleEntity } from './compra/entities/compraDetalles.entity';
           RecetaEntity,
           RecetaDetalleEntity,
           ProveedorEntity,
-          CompraEntity,
-          CompraDetalleEntity,
         ],
         synchronize: false,
       }),
@@ -74,7 +76,6 @@ import { CompraDetalleEntity } from './compra/entities/compraDetalles.entity';
     AuthModule,
     VentasModule,
     ProveedorModule,
-    CompraModule,
   ],
   controllers: [AppController],
   providers: [AppService],
