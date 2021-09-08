@@ -9,21 +9,22 @@ export class CreateAlmacenDTO {
   @ApiProperty()
   insumoId: number;
   @ApiProperty()
-  capacidad: number;
+  minimo: number;
   @ApiProperty()
+  maximo: number;
+  @ApiProperty({ nullable: true, default: 0.0 })
   cantidad: number;
-  @ApiProperty()
+  @ApiProperty({ nullable: true, default: 0.0 })
+  @IsOptional()
   total?: number;
-  @ApiProperty()
-  @IsOptional()
-  depto?: Deptos;
-  @ApiProperty()
-  @IsOptional()
-  type?: AlmacenType;
-  @ApiProperty()
+  @ApiProperty({ enum: Deptos })
+  depto: Deptos;
+  @ApiProperty({ enum: AlmacenType })
+  type: AlmacenType;
+  @ApiProperty({ nullable: true })
   @IsOptional()
   insumo?: InsumoEntity;
-  @ApiProperty()
+  @ApiProperty({ nullable: true })
   @IsOptional()
   detalles?: CreateDetalleDTO[];
 }
