@@ -20,6 +20,7 @@ export class CompraSolicitudEntity extends CommonEntity {
   @Column({
     type: 'numeric',
     nullable: false,
+    default: 0.0,
   })
   total: number;
 

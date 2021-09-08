@@ -1,11 +1,11 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class solicitud1631062675996 implements MigrationInterface {
-  name = 'solicitud1631062675996';
+export class solicitud1631121219772 implements MigrationInterface {
+  name = 'solicitud1631121219772';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `CREATE TABLE \`softres\`.\`compraSolicitud\` (\`id\` int NOT NULL AUTO_INCREMENT, \`uuid\` char(36) NOT NULL, \`createdAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`active\` tinyint NOT NULL DEFAULT 1, \`fecha\` date NOT NULL, \`folio\` varchar(100) NOT NULL, \`total\` decimal NOT NULL, UNIQUE INDEX \`IDX_e05f7c87956150c574ba17820e\` (\`uuid\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`,
+      `CREATE TABLE \`softres\`.\`compraSolicitud\` (\`id\` int NOT NULL AUTO_INCREMENT, \`uuid\` char(36) NOT NULL, \`createdAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`active\` tinyint NOT NULL DEFAULT 1, \`fecha\` date NOT NULL, \`folio\` varchar(100) NOT NULL, \`total\` decimal NOT NULL DEFAULT '0', UNIQUE INDEX \`IDX_e05f7c87956150c574ba17820e\` (\`uuid\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`,
     );
     await queryRunner.query(
       `ALTER TABLE \`softres\`.\`compras\` ADD \`solicitudId\` int NOT NULL`,
