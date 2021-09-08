@@ -1,29 +1,31 @@
-import { RecetaDetalleEntity } from './receta/entityes/recetaDetalle.entity';
-import { RecetaEntity } from './receta/entityes/receta.entity';
-import { ProveedorEntity } from './proveedor/entity/proveedor.entity';
-import { CategoriaEntity } from '@softres/categoria/categoria.entity';
-import { UserEntity } from '@softres/user/user.entity';
-import { Module } from '@nestjs/common';
+import { AlmacenDetalleEntity } from './almacen/entitys/almacenDetalle.entity';
+import { AlmacenEntity } from './almacen/entitys/almacen.entity';
+import { AlmacenModule } from './almacen/almacen.module';
+import { AppConfig } from './app.config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ConfigKeys } from './common/enums/configKeys.enum';
-import { UserModule } from './user/user.module';
-import { InsumoModule } from './insumo/insumo.module';
-import { CategoriaModule } from './categoria/categoria.module';
-import { RecetaModule } from './receta/receta.module';
-import { MenuModule } from './menu/menu.module';
-import { AlmacenModule } from './almacen/almacen.module';
-import { ComprasModule } from './compras/compras.module';
-import { VentasModule } from './ventas/ventas.module';
 import { AuthModule } from './auth/auth.module';
-import { RateLimiterModule } from 'nestjs-rate-limiter';
-import { AppConfig } from './app.config';
+import { CategoriaEntity } from '@softres/categoria/categoria.entity';
+import { CategoriaModule } from './categoria/categoria.module';
+import { CompraModule } from './compra/compra.module';
+import { ConfigKeys } from './common/enums/configKeys.enum';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { InsumoEntity } from './insumo/insumo.entity';
-import { AlmacenEntity } from './almacen/entitys/almacen.entity';
-import { AlmacenDetalleEntity } from './almacen/entitys/almacenDetalle.entity';
+import { InsumoModule } from './insumo/insumo.module';
+import { MenuModule } from './menu/menu.module';
+import { Module } from '@nestjs/common';
+import { ProveedorEntity } from './proveedor/entity/proveedor.entity';
 import { ProveedorModule } from './proveedor/proveedor.module';
+import { RateLimiterModule } from 'nestjs-rate-limiter';
+import { RecetaDetalleEntity } from './receta/entityes/recetaDetalle.entity';
+import { RecetaEntity } from './receta/entityes/receta.entity';
+import { RecetaModule } from './receta/receta.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity } from '@softres/user/user.entity';
+import { UserModule } from './user/user.module';
+import { VentasModule } from './ventas/ventas.module';
+import { CompraEntity } from './compra/entities/compra.entity';
+import { CompraDetalleEntity } from './compra/entities/compraDetalles.entity';
 
 @Module({
   imports: [
@@ -56,6 +58,8 @@ import { ProveedorModule } from './proveedor/proveedor.module';
           RecetaEntity,
           RecetaDetalleEntity,
           ProveedorEntity,
+          CompraEntity,
+          CompraDetalleEntity,
         ],
         synchronize: false,
       }),
@@ -67,10 +71,10 @@ import { ProveedorModule } from './proveedor/proveedor.module';
     RecetaModule,
     MenuModule,
     AlmacenModule,
-    ComprasModule,
     AuthModule,
     VentasModule,
     ProveedorModule,
+    CompraModule,
   ],
   controllers: [AppController],
   providers: [AppService],
