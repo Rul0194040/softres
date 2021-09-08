@@ -26,6 +26,7 @@ import { UserModule } from './user/user.module';
 import { VentasModule } from './ventas/ventas.module';
 import { CompraEntity } from './compra/entities/compra.entity';
 import { CompraDetalleEntity } from './compra/entities/compraDetalles.entity';
+import { CompraSolicitudEntity } from './compra/entities/solicitudCompra.entity';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { CompraDetalleEntity } from './compra/entities/compraDetalles.entity';
           ProveedorEntity,
           CompraEntity,
           CompraDetalleEntity,
+          CompraSolicitudEntity,
         ],
         synchronize: false,
       }),

@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCompraDto } from './dto/create-compra.dto';
+import { CreateCompraSolicitudDto } from './dto/create-solicitud.dto';
 import { UpdateCompraDto } from './dto/update-compra.dto';
+import { CompraDetalleEntity } from './entities/compraDetalles.entity';
+import { CompraSolicitudEntity } from './entities/solicitudCompra.entity';
 
 @Injectable()
 export class CompraService {
   create(createCompraDto: CreateCompraDto) {
+    const s: CompraDetalleEntity = new CompraDetalleEntity();
     return 'This action adds a new compra';
   }
 
@@ -22,5 +26,9 @@ export class CompraService {
 
   remove(id: number) {
     return `This action removes a #${id} compra`;
+  }
+
+  createSolicitud(solicitud: CreateCompraSolicitudDto): CompraSolicitudEntity {
+    return null;
   }
 }
