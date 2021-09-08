@@ -1,10 +1,5 @@
 import { MenuEntity } from './menu/entitys/menu.entity';
 import { SeccionEntity } from './menu/entitys/section.entity';
-import { RecetaDetalleEntity } from './receta/entityes/recetaDetalle.entity';
-import { RecetaEntity } from './receta/entityes/receta.entity';
-import { ProveedorEntity } from './proveedor/entity/proveedor.entity';
-import { CategoriaEntity } from '@softres/categoria/categoria.entity';
-import { UserEntity } from '@softres/user/user.entity';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -17,7 +12,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { InsumoEntity } from './insumo/insumo.entity';
 import { InsumoModule } from './insumo/insumo.module';
 import { MenuModule } from './menu/menu.module';
-import { Module } from '@nestjs/common';
 import { ProveedorEntity } from './proveedor/entity/proveedor.entity';
 import { ProveedorModule } from './proveedor/proveedor.module';
 import { RateLimiterModule } from 'nestjs-rate-limiter';
@@ -30,6 +24,10 @@ import { UserModule } from './user/user.module';
 import { VentasModule } from './ventas/ventas.module';
 import { CompraEntity } from './compra/entities/compra.entity';
 import { CompraDetalleEntity } from './compra/entities/compraDetalles.entity';
+import { AppConfig } from './app.config';
+import { AlmacenEntity } from './almacen/entitys/almacen.entity';
+import { AlmacenDetalleEntity } from './almacen/entitys/almacenDetalle.entity';
+import { AlmacenModule } from './almacen/almacen.module';
 
 @Module({
   imports: [
@@ -62,6 +60,10 @@ import { CompraDetalleEntity } from './compra/entities/compraDetalles.entity';
           RecetaEntity,
           RecetaDetalleEntity,
           ProveedorEntity,
+          CompraEntity,
+          CompraDetalleEntity,
+          SeccionEntity,
+          MenuEntity,
         ],
         synchronize: false,
       }),
@@ -76,6 +78,8 @@ import { CompraDetalleEntity } from './compra/entities/compraDetalles.entity';
     AuthModule,
     VentasModule,
     ProveedorModule,
+    CompraModule,
+    MenuModule,
   ],
   controllers: [AppController],
   providers: [AppService],
