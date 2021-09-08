@@ -1,4 +1,4 @@
-import { DeleteResult, UpdateResult } from 'typeorm';
+import { DeleteResult } from 'typeorm';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import {
   Body,

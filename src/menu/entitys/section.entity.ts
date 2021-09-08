@@ -20,4 +20,7 @@ export class SeccionEntity extends CommonEntity {
     nullable: true,
   })
   menu?: MenuEntity;
+
+  @Column({ type: 'int', nullable: false })
+  menuId: number;
 }

@@ -124,4 +124,7 @@ export class RecetaEntity extends CommonEntity {
     nullable: true,
   })
   seccion?: SeccionEntity;
+
+  @Column({ type: 'int', nullable: true })
+  seccionId?: number;
 }
