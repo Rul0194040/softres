@@ -1,3 +1,5 @@
+import { CotizacionDetalleEntity } from './cotizacion/entitys/cotizacionDetalle.entity';
+import { CotizacionEntity } from './cotizacion/entitys/cotizacion.entity';
 import { MenuEntity } from './menu/entitys/menu.entity';
 import { SeccionEntity } from './menu/entitys/section.entity';
 import { Module } from '@nestjs/common';
@@ -28,6 +30,7 @@ import { AppConfig } from './app.config';
 import { AlmacenEntity } from './almacen/entitys/almacen.entity';
 import { AlmacenDetalleEntity } from './almacen/entitys/almacenDetalle.entity';
 import { AlmacenModule } from './almacen/almacen.module';
+import { CotizacionModule } from './cotizacion/cotizacion.module';
 
 @Module({
   imports: [
@@ -64,6 +67,8 @@ import { AlmacenModule } from './almacen/almacen.module';
           CompraDetalleEntity,
           SeccionEntity,
           MenuEntity,
+          CotizacionEntity,
+          CotizacionDetalleEntity,
         ],
         synchronize: false,
       }),
@@ -80,6 +85,7 @@ import { AlmacenModule } from './almacen/almacen.module';
     ProveedorModule,
     CompraModule,
     MenuModule,
+    CotizacionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
