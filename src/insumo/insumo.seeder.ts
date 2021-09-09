@@ -30,6 +30,13 @@ export class InsumosSeeder implements Seeder {
         ).findOne(insumo.subCategoriaId);
       }
 
+      insumoToCreate.merma =
+        insumoToCreate.pesoNeto * (insumoToCreate.mermaPorcentaje / 100.0);
+      insumoToCreate.pesoDrenado =
+        insumoToCreate.pesoNeto - insumoToCreate.merma;
+      insumoToCreate.precioKilo =
+        (insumoToCreate.precioUnitario * 1000) / insumoToCreate.pesoDrenado;
+
       await getRepository(InsumoEntity).save(insumoToCreate);
     }
   }

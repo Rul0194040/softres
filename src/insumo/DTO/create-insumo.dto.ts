@@ -14,7 +14,7 @@ export class CreateInsumoDTO {
   precioUnitario: number;
   @ApiProperty()
   @IsOptional()
-  precioKilo: number;
+  precioKilo?: number;
   @ApiProperty()
   pesoNeto: number;
   @ApiProperty()
