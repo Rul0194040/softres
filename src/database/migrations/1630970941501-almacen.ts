@@ -13,6 +13,9 @@ export class almacen1630970941501 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE \`softres\`.\`almacen\` ADD \`minimo\` int NOT NULL`,
     );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`almacen\` CHANGE \`depto\` \`depto\` enum ('COCINA', 'BARRA', 'ALMACÉN') NOT NULL DEFAULT 'COCINA'`,
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
