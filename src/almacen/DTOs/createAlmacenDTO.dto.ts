@@ -24,7 +24,7 @@ export class CreateAlmacenDTO {
   @ApiProperty({ nullable: true })
   @IsOptional()
   insumo?: InsumoEntity;
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, type: [CreateDetalleDTO] })
   @IsOptional()
   detalles?: CreateDetalleDTO[];
 }
