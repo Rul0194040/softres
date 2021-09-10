@@ -152,7 +152,6 @@ export class AlmacenService {
         'almacen.createdAt',
         'almacen.id',
         'almacen.cantidad',
-        'almacen.capacidad',
         'almacen.depto',
         'almacen.type',
         'almacen.total',
