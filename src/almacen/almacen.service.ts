@@ -98,7 +98,7 @@ export class AlmacenService {
     this.updateTablaContable(firstDetalleId);
 
     return getRepository(AlmacenDetalleEntity).find({
-      where: `almacenId =${almacenId}`,
+      where: { almacenId },
     });
   }
 
