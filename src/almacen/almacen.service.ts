@@ -38,32 +38,10 @@ export class AlmacenService {
     );
 
     if (almacen.detalles) {
-      const createdDetalle: AlmacenDetalleEntity[] = [];
-      for (let idx = 0; idx < almacen.detalles.length; idx++) {
-        const detalle: CreateDetalleDTO = {
-          almacenId: createdAlmacen.id,
-          referencia:
-            almacen.detalles[idx].entradas != null
-              ? `E-${moment(createdAlmacen.createdAt).format('DDMMYYYY')}`
-              : `S-${moment(createdAlmacen.createdAt).format('DDMMYYYY')}`,
-          precioUnitario: almacen.detalles[idx].precioUnitario,
-          entradas: almacen.detalles[idx].entradas
-            ? almacen.detalles[idx].entradas
-            : 0,
-          salidas: almacen.detalles[idx].salidas
-            ? almacen.detalles[idx].salidas
-            : 0,
-          precioMedio: almacen.detalles[idx].precioMedio
-            ? almacen.detalles[idx].precioMedio
-            : 0,
-          cargo: almacen.detalles[idx].cargo ? almacen.detalles[idx].cargo : 0,
-          abono: almacen.detalles[idx].abono ? almacen.detalles[idx].abono : 0,
-          saldo: almacen.detalles[idx].saldo ? almacen.detalles[idx].saldo : 0,
-        };
-        createdDetalle[idx] = await getRepository(AlmacenDetalleEntity).save(
-          detalle,
-        );
-      }
+      const createdDetalle: AlmacenDetalleEntity[] = await this.createDetalle(
+        createdAlmacen.id,
+        almacen.detalles,
+      );
       const result: AlmacenInformeDTO = {
         almacen: createdAlmacen,
         detalle: createdDetalle,
@@ -79,7 +57,6 @@ export class AlmacenService {
     almacenId: number,
     almacenDetalle: CreateDetalleDTO[],
   ): Promise<AlmacenDetalleEntity[]> {
-    const createdDetalle: AlmacenDetalleEntity[] = [];
     const almacenParent = await getRepository(AlmacenEntity).findOne(almacenId);
     let firstDetalleId = 0;
 
@@ -108,20 +85,21 @@ export class AlmacenService {
         referencia,
         entradas,
         salidas,
-        existencias: 0,
         precioUnitario: almacenDetalle[idx].precioUnitario,
         saldo: almacenDetalle[idx].saldo ? almacenDetalle[idx].saldo : 0,
       };
-      createdDetalle[idx] = await getRepository(AlmacenDetalleEntity).save(
+      const createdDetalle = await getRepository(AlmacenDetalleEntity).save(
         detalle,
       );
 
-      if (firstDetalleId === 0) firstDetalleId = createdDetalle[idx].id;
+      if (firstDetalleId === 0) firstDetalleId = createdDetalle.id;
     }
 
     this.updateTablaContable(firstDetalleId);
 
-    return createdDetalle;
+    return getRepository(AlmacenDetalleEntity).find({
+      where: { almacenId },
+    });
   }
 
   async getByid(almacenId: number): Promise<AlmacenEntity> {
@@ -315,6 +293,7 @@ export class AlmacenService {
         stock = detalle.existencias;
         costoVenta += toFloat(detalle.abono);
         preSaldo = toFloat(detalle.saldo);
+
         await getRepository(AlmacenDetalleEntity).update(detalle.id, detalle);
       }
       stock += toFloat(detalle.entradas) - toFloat(detalle.salidas);

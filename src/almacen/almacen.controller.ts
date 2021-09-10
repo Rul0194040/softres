@@ -22,7 +22,7 @@ import { UpdateResult, DeleteResult } from 'typeorm';
 import { CreateAlmacenDTO } from './DTOs/createAlmacenDTO.dto';
 import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
 import { AlmacenDetalleEntity } from './entitys/almacenDetalle.entity';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { existsSync, mkdirSync } from 'fs';
@@ -41,6 +41,9 @@ export class AlmacenController {
   }
 
   @Post('createDetalle/:almacenId')
+  @ApiBody({
+    type: [CreateDetalleDTO],
+  })
   createDetAlmacen(
     @Param('almacenId', ParseIntPipe) almacenId: number,
     @Body(new ParseArrayPipe({ items: CreateDetalleDTO }))
