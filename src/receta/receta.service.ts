@@ -166,7 +166,8 @@ export class RecetaService {
         'insumo.nombre',
         'insumo.precioKilo',
         'insumo.mermaPorcentaje',
-      ]);
+      ])
+      .where('receta.id=:recetaId', { recetaId });
 
     forIn(options.filters, (value, key) => {
       if (key === 'nombre') {
