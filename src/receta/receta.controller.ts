@@ -20,7 +20,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { FileOptions } from '@softres/common/DTOs/fileOptions.dto';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
-import { RecetaEntity } from './entityes/receta.entity';
+import { RecetaEntity } from './entities/receta.entity';
 import { RecetaService } from './receta.service';
 import { UpdateRecetaDTO } from './DTO/update-receta.dto';
 

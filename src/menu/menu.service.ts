@@ -1,5 +1,5 @@
 import { UpdateMenuDTO } from './DTOs/update-menu.dto';
-import { RecetaEntity } from './../receta/entityes/receta.entity';
+import { RecetaEntity } from './../receta/entities/receta.entity';
 import { DeleteResult, getRepository, UpdateResult } from 'typeorm';
 import { SeccionEntity } from './entitys/section.entity';
 import { MenuEntity } from './entitys/menu.entity';

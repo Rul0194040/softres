@@ -1,5 +1,5 @@
 import { MenuEntity } from './menu.entity';
-import { RecetaEntity } from './../../receta/entityes/receta.entity';
+import { RecetaEntity } from './../../receta/entities/receta.entity';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 
