@@ -1,3 +1,4 @@
+import { SolicitudEntity } from './../../compra/entities/solicitud.entity';
 import { CotizacionDetalleEntity } from './cotizacionDetalle.entity';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
@@ -23,11 +24,14 @@ export class CotizacionEntity extends CommonEntity {
     enum: CotzEstados,
     default: CotzEstados.EN_PROCESO,
   })
-  depto: CotzEstados;
+  status: CotzEstados;
 
   @OneToMany(
     () => CotizacionDetalleEntity,
     (cotizacionDetalle) => cotizacionDetalle.cotizacion,
   )
   cotizacionDetalle: CotizacionDetalleEntity;
+
+  @ManyToOne(() => SolicitudEntity, { nullable: true })
+  solicitud: SolicitudEntity;
 }

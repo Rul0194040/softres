@@ -1,3 +1,4 @@
+import { SolicitudEntity } from './../compra/entities/solicitud.entity';
 import { CategoriaEntity } from '@softres/categoria/categoria.entity';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { ProveedorEntity } from '@softres/proveedor/entity/proveedor.entity';
@@ -112,4 +113,7 @@ export class InsumoEntity extends CommonEntity {
 
   @Column({ type: 'int', nullable: true })
   subCategoriaId?: number;
+
+  @ManyToOne(() => SolicitudEntity, { nullable: false })
+  solicitud: SolicitudEntity;
 }
