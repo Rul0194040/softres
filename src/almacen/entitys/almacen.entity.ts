@@ -23,13 +23,15 @@ export class AlmacenEntity extends CommonEntity {
 
   @Column({
     type: 'integer',
-    nullable: false,
+    nullable: true,
+    default: 0,
   })
   maximo: number;
 
   @Column({
     type: 'integer',
-    nullable: false,
+    nullable: true,
+    default: 0,
   })
   minimo: number;
 
