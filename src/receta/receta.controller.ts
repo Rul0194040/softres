@@ -71,7 +71,7 @@ export class RecetaController {
    * @param options opciones de paginacion
    * @returns {PaginationPrimeNgResult}
    */
-  @Post('paginate/detreceta/recetaId')
+  @Post('paginate/detreceta/:recetaId')
   paginateDetalle(
     @Param('recetaId') recetaid: number,
     @Body() options: PaginationOptions,
