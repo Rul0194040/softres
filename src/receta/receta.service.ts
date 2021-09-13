@@ -145,6 +145,56 @@ export class RecetaService {
     };
   }
 
+  async paginateDetalle(
+    recetaId: number,
+    options: PaginationOptions,
+  ): Promise<PaginationPrimeNgResult> {
+    const dataQuery = getRepository(RecetaDetalleEntity)
+      .createQueryBuilder('det')
+      .leftJoin('det.insumo', 'insumo')
+      .leftJoin('det.parent', 'receta')
+      .select([
+        'det.id',
+        'det.cantReceta',
+        'det.cantReal',
+        'det.costoUnitarioIngrediente',
+        'det.createdAt',
+        'receta.id',
+        'receta.nombre',
+        'insumo.id',
+        'insumo.nombre',
+        'insumo.nombre',
+        'insumo.precioKilo',
+        'insumo.mermaPorcentaje',
+      ]);
+
+    forIn(options.filters, (value, key) => {
+      if (key === 'nombre') {
+        dataQuery.andWhere('( receta.nombre LIKE :term )', {
+          term: `%${value.split(' ').join('%')}%`,
+        });
+      }
+    });
+
+    if (options.sort === undefined || !Object.keys(options.sort).length) {
+      options.sort = 'det.createdAt';
+    }
+
+    const count = await dataQuery.getCount();
+
+    const data = await dataQuery
+      .skip(options.skip)
+      .take(options.take)
+      .orderBy(options.sort, options.direction)
+      .getMany();
+
+    return {
+      data: data,
+      skip: options.skip,
+      totalItems: count,
+    };
+  }
+
   updateImage(
     recetaId: number,
     path: string,
