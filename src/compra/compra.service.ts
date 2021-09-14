@@ -1,3 +1,5 @@
+import { SolicitudEntity } from './entities/solicitud.entity';
+import { CreateSolicitudDTO } from './dto/createSolicitud.dto';
 import { Injectable } from '@nestjs/common';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { plainToClass } from 'class-transformer';
@@ -6,6 +8,7 @@ import { CreateCompraDto } from './dto/create-compra.dto';
 import { UpdateCompraDto } from './dto/update-compra.dto';
 import { CompraEntity } from './entities/compra.entity';
 import { CompraDetalleEntity } from './entities/compraDetalles.entity';
+import * as moment from 'moment';
 
 @Injectable()
 export class CompraService {
@@ -67,6 +70,17 @@ export class CompraService {
    */
 
   async createSolicitud(
-    createCompraDto: CreateCompraDto,
-  ): Promise<CompraEntity> {}
+    solicitud: CreateSolicitudDTO,
+  ): Promise<SolicitudEntity> {
+    const ins = await getRepository(InsumoEntity).findByIds(solicitud.insumos);
+
+    const solicitudToCreate: SolicitudEntity = {
+      fecha: solicitud.fecha ? solicitud.fecha : moment().toDate(),
+      folio: `${moment().format('DDMMYYYY')}${solicitud.depto.substr(0, 2)}`,
+      depto: solicitud.depto,
+      insumos: ins,
+    };
+
+    return await getRepository(SolicitudEntity).save(solicitudToCreate);
+  }
 }

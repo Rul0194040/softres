@@ -6,6 +6,19 @@ import { Deptos } from '@softres/almacen/enums/deptos.enum';
 @Entity('compras')
 export class SolicitudEntity extends CommonEntity {
   @Column({
+    type: 'date',
+    nullable: false,
+    default: null,
+  })
+  fecha: Date;
+
+  @Column({
+    type: 'text',
+    nullable: false,
+  })
+  folio: string;
+
+  @Column({
     type: 'enum',
     enum: Deptos,
     default: Deptos.COCINA,
