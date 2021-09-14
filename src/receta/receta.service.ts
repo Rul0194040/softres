@@ -7,8 +7,8 @@ import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
 import { plainToClass } from 'class-transformer';
-import { RecetaDetalleEntity } from './entityes/recetaDetalle.entity';
-import { RecetaEntity } from './entityes/receta.entity';
+import { RecetaDetalleEntity } from './entities/recetaDetalle.entity';
+import { RecetaEntity } from './entities/receta.entity';
 import { RecipeValues } from './enums/recipeValues.enum';
 import { UpdateRecetaDTO } from './DTO/update-receta.dto';
 

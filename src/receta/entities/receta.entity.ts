@@ -1,4 +1,4 @@
-import { SeccionEntity } from './../../menu/entitys/section.entity';
+import { SeccionEntity } from '../../menu/entitys/section.entity';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { Entity, Column, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 import { GrupoReceta } from '../enums/grupoReceta.enum';
@@ -113,6 +113,12 @@ export class RecetaEntity extends CommonEntity {
     nullable: true,
   })
   imagen: string;
+
+  @Column({
+    type: 'numeric',
+    default: 0,
+  })
+  enCocina: number;
 
   @OneToMany(() => RecetaEntity, (receta) => receta.parent, { nullable: true })
   children: RecetaEntity[];
