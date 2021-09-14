@@ -10,7 +10,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateRecetaDTO } from './DTO/create-receta.dto';
 import { DeleteResult, UpdateResult } from 'typeorm';
 import { diskStorage } from 'multer';
@@ -110,6 +110,10 @@ export class RecetaController {
   }
 
   @Put('updateExistencia/:recetaId')
+  @ApiOperation({
+    description:
+      'Actualiza las existencias de los almacenes de los insumos a utilizar en la receta',
+  })
   async updateExistencia(
     @Param('recetaId', ParseIntPipe) recetaId: number,
   ): Promise<any> {
