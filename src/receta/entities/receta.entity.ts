@@ -118,7 +118,7 @@ export class RecetaEntity extends CommonEntity {
     type: 'numeric',
     default: 0,
   })
-  enCocina: number;
+  existencia: number;
 
   @OneToMany(() => RecetaEntity, (receta) => receta.parent, { nullable: true })
   children: RecetaEntity[];

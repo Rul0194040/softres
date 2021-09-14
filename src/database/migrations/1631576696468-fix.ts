@@ -5,13 +5,13 @@ export class fix1631576696468 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE \`softres\`.\`recetas\` ADD \`enCocina\` decimal NOT NULL DEFAULT '0'`,
+      `ALTER TABLE \`softres\`.\`recetas\` ADD \`existencia\` decimal NOT NULL DEFAULT '0'`,
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE \`softres\`.\`recetas\` DROP COLUMN \`enCocina\``,
+      `ALTER TABLE \`softres\`.\`recetas\` DROP COLUMN \`existencia\``,
     );
   }
 }
