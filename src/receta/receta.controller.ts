@@ -108,4 +108,11 @@ export class RecetaController {
   ): Promise<UpdateResult> {
     return this.recetaService.updateImage(recetaId, file.filename);
   }
+
+  @Put('updateExistencia/:recetaId')
+  async updateExistencia(
+    @Param('recetaId', ParseIntPipe) recetaId: number,
+  ): Promise<any> {
+    return this.recetaService.updateExistencias(recetaId);
+  }
 }

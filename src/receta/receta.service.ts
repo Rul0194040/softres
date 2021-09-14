@@ -11,9 +11,14 @@ import { RecetaDetalleEntity } from './entities/recetaDetalle.entity';
 import { RecetaEntity } from './entities/receta.entity';
 import { RecipeValues } from './enums/recipeValues.enum';
 import { UpdateRecetaDTO } from './DTO/update-receta.dto';
+import { AlmacenEntity } from '@softres/almacen/entitys/almacen.entity';
+import { AlmacenDetalleEntity } from '@softres/almacen/entitys/almacenDetalle.entity';
+import { AlmacenService } from '@softres/almacen/almacen.service';
 
 @Injectable()
 export class RecetaService {
+  private readonly almacenService: AlmacenService = new AlmacenService();
+
   async create(receta: CreateRecetaDTO): Promise<RecetaEntity> {
     const recetaTocreate = plainToClass(RecetaEntity, receta);
 
@@ -150,5 +155,31 @@ export class RecetaService {
     path: string,
   ): UpdateResult | PromiseLike<UpdateResult> {
     return getRepository(RecetaEntity).update(recetaId, { imagen: path });
+  }
+
+  async updateExistencias(recetaId: number): Promise<UpdateResult> {
+    const receta = await getRepository(RecetaEntity).findOne(recetaId, {
+      relations: ['children', 'detalleReceta'],
+    });
+    receta.children.forEach((subreceta) => {
+      this.updateExistencias(subreceta.id);
+    });
+    receta.detalleReceta.forEach(async (detalle) => {
+      const almacen = await getRepository(AlmacenEntity).findOne({
+        insumoId: detalle.insumoId,
+      });
+
+      const detalleToCreate = getRepository(AlmacenDetalleEntity).create({
+        salidas: detalle.cantReceta,
+        abono: detalle.costoUnitarioIngrediente,
+        precioUnitario: 0,
+        saldo: 0,
+      });
+
+      this.almacenService.createDetalle(almacen.id, [detalleToCreate]);
+    });
+    return getRepository(RecetaEntity).update(receta.id, {
+      enCocina: receta.enCocina + 1,
+    });
   }
 }

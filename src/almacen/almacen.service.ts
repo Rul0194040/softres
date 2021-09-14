@@ -8,12 +8,12 @@ import { DeleteResult, getRepository, UpdateResult } from 'typeorm';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
 import { forIn } from 'lodash';
-import * as moment from 'moment';
 import { AlmacenInformeDTO } from './DTOs/almacenInforneDTO.dto';
 import { AlmacenDetalleEntity } from './entitys/almacenDetalle.entity';
+import * as moment from 'moment';
 import * as Excel from 'exceljs';
 
-const toFloat = (num): number => parseFloat(num + '');
+const toFloat = (num: string | number): number => parseFloat(num + '');
 
 @Injectable()
 export class AlmacenService {
@@ -21,7 +21,7 @@ export class AlmacenService {
     almacen: CreateAlmacenDTO,
   ): Promise<AlmacenInformeDTO | AlmacenEntity> {
     const insumo = await getRepository(InsumoEntity).findOne(almacen.insumoId);
-    const total = almacen.cantidad * insumo.pesoNeto;
+    const total = 0;
 
     const almacenToCreate: CreateAlmacenDTO = {
       cantidad: almacen.cantidad,
@@ -60,43 +60,52 @@ export class AlmacenService {
     const almacenParent = await getRepository(AlmacenEntity).findOne(almacenId);
     let firstDetalleId = 0;
 
-    for (let idx = 0; idx < almacenDetalle.length; idx++) {
-      let entradas: number, salidas: number, referencia: string;
+    for (let i = 0; i < almacenDetalle.length; i++) {
+      const detalle = almacenDetalle[i];
+      let entradas = 0,
+        salidas = 0,
+        cargo = 0,
+        abono = 0,
+        referencia: string;
 
-      const fecha: Date = almacenDetalle[idx].fecha
-        ? almacenDetalle[idx].fecha
-        : moment().toDate();
+      const fecha: Date = detalle.fecha ? detalle.fecha : moment().toDate();
 
       if (
-        almacenDetalle[idx].entradas !== null &&
-        almacenDetalle[idx].entradas !== undefined &&
-        almacenDetalle[idx].entradas !== 0
+        detalle.entradas !== null &&
+        detalle.entradas !== undefined &&
+        detalle.entradas !== 0
       ) {
-        entradas = almacenDetalle[idx].entradas;
         referencia = `E-${moment(fecha).format('DDMMYYYY')}`;
+        entradas = detalle.entradas;
+        cargo = detalle.cargo
+          ? detalle.cargo
+          : detalle.precioUnitario * entradas;
       } else {
-        salidas = almacenDetalle[idx].salidas;
         referencia = `S-${moment(fecha).format('DDMMYYYY')}`;
+        salidas = detalle.salidas;
+        abono = detalle.abono
+          ? detalle.abono
+          : detalle.precioUnitario * salidas;
       }
 
-      const detalle: CreateDetalleDTO = {
+      const detalleToCreate: CreateDetalleDTO = {
         almacenId: almacenParent.id,
         fecha,
         referencia,
         entradas,
         salidas,
-        precioUnitario: almacenDetalle[idx].precioUnitario,
-        saldo: almacenDetalle[idx].saldo ? almacenDetalle[idx].saldo : 0,
+        precioUnitario: detalle.precioUnitario,
+        cargo,
+        abono,
+        saldo: 0,
       };
       const createdDetalle = await getRepository(AlmacenDetalleEntity).save(
-        detalle,
+        detalleToCreate,
       );
 
       if (firstDetalleId === 0) firstDetalleId = createdDetalle.id;
     }
-
     this.updateTablaContable(firstDetalleId);
-
     return getRepository(AlmacenDetalleEntity).find({
       where: { almacenId },
     });
@@ -260,7 +269,7 @@ export class AlmacenService {
     return await this.updateTablaContable(detalleId);
   }
 
-  async updateTablaContable(detalleId: number): Promise<any> {
+  async updateTablaContable(detalleId: number): Promise<UpdateResult> {
     const mainDetalle: AlmacenDetalleEntity = await getRepository(
       AlmacenDetalleEntity,
     ).findOne({ id: detalleId });
@@ -273,17 +282,9 @@ export class AlmacenService {
 
     let preSaldo = toFloat(0.0);
     let stock = toFloat(0.0);
-    let costoVenta = toFloat(0.0);
 
     detalleArray.forEach(async (detalle) => {
       if (detalle.createdAt >= mainDetalle.createdAt) {
-        if (toFloat(detalle.entradas) !== 0) {
-          detalle.cargo =
-            toFloat(detalle.entradas) * toFloat(detalle.precioUnitario);
-        } else {
-          detalle.abono =
-            toFloat(detalle.salidas) * toFloat(detalle.precioUnitario);
-        }
         detalle.existencias =
           toFloat(stock) + toFloat(detalle.entradas) - toFloat(detalle.salidas);
         detalle.saldo =
@@ -291,20 +292,17 @@ export class AlmacenService {
         detalle.precioMedio = preSaldo / (stock || 1 * 1.0);
 
         stock = detalle.existencias;
-        costoVenta += toFloat(detalle.abono);
         preSaldo = toFloat(detalle.saldo);
 
         await getRepository(AlmacenDetalleEntity).update(detalle.id, detalle);
       }
       stock += toFloat(detalle.entradas) - toFloat(detalle.salidas);
-      costoVenta += toFloat(detalle.precioMedio);
       preSaldo = toFloat(detalle.saldo);
     });
 
-    return {
-      costoVenta: costoVenta,
-      stock: stock,
-    };
+    return getRepository(AlmacenEntity).update(mainDetalle.almacenId, {
+      total: stock,
+    });
   }
 
   async masiveAlmacen(
