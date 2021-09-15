@@ -1,3 +1,4 @@
+import { SolicitudEntity } from './compra/entities/solicitud.entity';
 import { ProveedorEntity } from './proveedor/entity/proveedor.entity';
 import { ProveedorSeeder } from './proveedor/proveedor.seeder';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
@@ -38,7 +39,13 @@ seeder({
         username: _configService.get<string>(ConfigKeys.MYSQL_USER),
         password: _configService.get<string>(ConfigKeys.MYSQL_PASSWORD),
         database: _configService.get<string>(ConfigKeys.MYSQL_DB),
-        entities: [UserEntity, CategoriaEntity, InsumoEntity, ProveedorEntity],
+        entities: [
+          UserEntity,
+          CategoriaEntity,
+          InsumoEntity,
+          ProveedorEntity,
+          SolicitudEntity,
+        ],
         synchronize: false,
       }),
     }),

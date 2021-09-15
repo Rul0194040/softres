@@ -1,6 +1,6 @@
 import { SolicitudEntity } from './entities/solicitud.entity';
-import { CreateSolicitudDTO } from './dto/createSolicitud.dto';
-import { Injectable } from '@nestjs/common';
+import { CreateSolicitudDTO } from './dto/create-solicitud.dto';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { plainToClass } from 'class-transformer';
 import { getRepository, UpdateResult } from 'typeorm';
@@ -74,6 +74,13 @@ export class CompraService {
   ): Promise<SolicitudEntity> {
     const ins = await getRepository(InsumoEntity).findByIds(solicitud.insumos);
 
+    if (!ins) {
+      throw new HttpException(
+        'no hay insumos que agregar',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const solicitudToCreate: SolicitudEntity = {
       fecha: solicitud.fecha ? solicitud.fecha : moment().toDate(),
       folio: `${moment().format('DDMMYYYY')}${solicitud.depto.substr(0, 2)}`,
@@ -82,5 +89,14 @@ export class CompraService {
     };
 
     return await getRepository(SolicitudEntity).save(solicitudToCreate);
+  }
+
+  async getSolicitudById(id: number): Promise<SolicitudEntity> {
+    return await getRepository(SolicitudEntity)
+      .createQueryBuilder('solicitud')
+      .leftJoin('solicitud.insumos', 'insumos')
+      .select(['solicitud', 'insumos'])
+      .where('solicitud.id=:id', { id })
+      .getOne();
   }
 }

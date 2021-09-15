@@ -3,7 +3,7 @@ import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { Deptos } from '@softres/almacen/enums/deptos.enum';
 
-@Entity('compras')
+@Entity('solicitud')
 export class SolicitudEntity extends CommonEntity {
   @Column({
     type: 'date',

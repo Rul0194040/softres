@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CompraService } from './compra.service';
 import { CreateCompraDto } from './dto/create-compra.dto';
@@ -35,10 +27,5 @@ export class CompraController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCompraDto: UpdateCompraDto) {
     return this.compraService.update(+id, updateCompraDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.compraService.remove(+id);
   }
 }
