@@ -16,6 +16,10 @@ export class CreateCompraDto {
   @IsOptional()
   descuento?: number;
 
+  @ApiProperty({ nullable: true })
+  @IsOptional()
+  total?: number;
+
   @ApiProperty({
     enum: StatusTypes,
     default: StatusTypes.BORRADOR,
@@ -36,8 +40,8 @@ export class CreateCompraDto {
   @IsOptional()
   fechaEntrega: Date;
 
-  @ApiProperty({ nullable: false })
-  proveedorId: number;
+  @ApiProperty({ nullable: true })
+  proveedorId?: number;
 
   @ApiProperty({ nullable: true })
   solicitudId: number;

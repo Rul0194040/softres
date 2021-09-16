@@ -26,12 +26,12 @@ export class CompraDetalleEntity extends CommonEntity {
   @Column({ type: 'mediumint', nullable: false })
   insumoId: number;
 
-  @Column({ type: 'mediumint', nullable: false })
+  @Column({ type: 'mediumint', nullable: true })
   compraId: number;
 
-  @ManyToOne(() => InsumoEntity, { nullable: false })
+  @ManyToOne(() => InsumoEntity, { nullable: true })
   insumo: InsumoEntity;
 
-  @ManyToOne(() => CompraEntity, { nullable: false })
+  @ManyToOne(() => CompraEntity, { nullable: true })
   compra: CompraEntity;
 }
