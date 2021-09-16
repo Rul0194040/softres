@@ -36,6 +36,7 @@ export class CompraService {
       await getRepository(CompraEntity).update(createdCompra.id, {
         total: sumTotal,
       });
+      createdCompra.total = sumTotal;
     }
     return createdCompra;
   }
