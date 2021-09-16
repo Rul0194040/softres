@@ -1,3 +1,4 @@
+import { SolicitudDetalleEntity } from './entities/solicitudDetalle.entity';
 import { SolicitudEntity } from './entities/solicitud.entity';
 import { CreateSolicitudDTO } from './dto/create-solicitud.dto';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
@@ -9,6 +10,7 @@ import { UpdateCompraDto } from './dto/update-compra.dto';
 import { CompraEntity } from './entities/compra.entity';
 import { CompraDetalleEntity } from './entities/compraDetalles.entity';
 import * as moment from 'moment';
+import { InformeSolicitud } from './dto/solicitud-informe.dto';
 
 @Injectable()
 export class CompraService {
@@ -71,24 +73,49 @@ export class CompraService {
 
   async createSolicitud(
     solicitud: CreateSolicitudDTO,
-  ): Promise<SolicitudEntity> {
+  ): Promise<InformeSolicitud> {
     const ins = await getRepository(InsumoEntity).findByIds(solicitud.insumos);
 
     if (!ins) {
       throw new HttpException(
         'no hay insumos que agregar',
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.NOT_FOUND,
       );
     }
 
     const solicitudToCreate: SolicitudEntity = {
+      usuarioId: solicitud.usuarioId,
       fecha: solicitud.fecha ? solicitud.fecha : moment().toDate(),
       folio: `${moment().format('DDMMYYYY')}${solicitud.depto.substr(0, 2)}`,
       depto: solicitud.depto,
-      insumos: ins,
     };
 
-    return await getRepository(SolicitudEntity).save(solicitudToCreate);
+    const createdSolicitud = await getRepository(SolicitudEntity).save(
+      solicitudToCreate,
+    );
+
+    const detalles: SolicitudDetalleEntity[] = [];
+
+    for (let idx = 0; idx < solicitud.detalles.length; idx++) {
+      const registro = solicitud.detalles[idx];
+
+      const solicitudDetalle: SolicitudDetalleEntity = {
+        cantidad: registro.cantidad,
+        insumoId: registro.insumoId,
+        solicitudId: registro.solicitudId,
+      };
+
+      detalles[idx] = await getRepository(SolicitudDetalleEntity).save(
+        solicitudDetalle,
+      );
+    }
+
+    const result: InformeSolicitud = {
+      solicitud: createdSolicitud,
+      detalles,
+    };
+
+    return result;
   }
 
   async getSolicitudById(id: number): Promise<SolicitudEntity> {

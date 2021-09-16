@@ -1,10 +1,18 @@
 import { InsumoEntity } from './../../insumo/insumo.entity';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { Deptos } from '@softres/almacen/enums/deptos.enum';
+import { SolicitudEstados } from '../solicitud-estados.enum';
+import { SolicitudDetalleEntity } from './solicitudDetalle.entity';
+import { UserEntity } from '@softres/user/user.entity';
 
 @Entity('solicitud')
 export class SolicitudEntity extends CommonEntity {
+  @ManyToOne(() => UserEntity, { nullable: true })
+  usuario?: UserEntity;
+  @Column({ type: 'int', nullable: false })
+  usuarioId: number;
+
   @Column({
     type: 'date',
     nullable: false,
@@ -25,8 +33,16 @@ export class SolicitudEntity extends CommonEntity {
   })
   depto: Deptos;
 
-  @OneToMany(() => InsumoEntity, (insumo) => insumo.solicitud, {
+  @Column({
+    type: 'enum',
+    enum: SolicitudEstados,
+    nullable: true,
+    default: SolicitudEstados.GENERADA,
+  })
+  status?: SolicitudEstados;
+
+  @OneToMany(() => SolicitudDetalleEntity, (detalle) => detalle.solicitud, {
     nullable: true,
   })
-  insumos?: InsumoEntity[];
+  detalle?: SolicitudDetalleEntity[];
 }
