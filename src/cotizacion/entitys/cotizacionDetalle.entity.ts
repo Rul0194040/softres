@@ -10,12 +10,10 @@ export class CotizacionDetalleEntity extends CommonEntity {
   cotizacion: CotizacionEntity;
   @Column({ type: 'int', nullable: false })
   cotizacionId: number;
-
   @ManyToOne(() => InsumoEntity, { nullable: false })
   insumo: InsumoEntity;
   @Column({ type: 'int', nullable: false })
   insumoId: number;
-
   @ManyToOne(() => ProveedorEntity, { nullable: true })
   proveedor1: ProveedorEntity;
   @Column({ type: 'int', nullable: true })

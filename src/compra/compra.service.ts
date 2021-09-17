@@ -118,7 +118,7 @@ export class CompraService {
 
     const solicitudToCreate: SolicitudEntity = {
       usuarioId: solicitud.usuarioId,
-      fecha: solicitud.fecha ? solicitud.fecha : moment().toDate(),
+      fecha: solicitud.fecha ? new Date(solicitud.fecha) : moment().toDate(),
       folio: `${moment().format('DDMMYYYY')}${solicitud.depto.substr(0, 2)}`,
       depto: solicitud.depto,
     };
@@ -135,7 +135,7 @@ export class CompraService {
       const solicitudDetalle: SolicitudDetalleEntity = {
         cantidad: registro.cantidad,
         insumoId: registro.insumoId,
-        solicitudId: registro.solicitudId,
+        solicitudId: createdSolicitud.id,
       };
 
       detalles[idx] = await getRepository(SolicitudDetalleEntity).save(
@@ -152,11 +152,8 @@ export class CompraService {
   }
 
   async getSolicitudById(id: number): Promise<SolicitudEntity> {
-    return await getRepository(SolicitudEntity)
-      .createQueryBuilder('solicitud')
-      .leftJoin('solicitud.insumos', 'insumos')
-      .select(['solicitud', 'insumos'])
-      .where('solicitud.id=:id', { id })
-      .getOne();
+    return await getRepository(SolicitudEntity).findOne(id, {
+      relations: ['detalle'],
+    });
   }
 }

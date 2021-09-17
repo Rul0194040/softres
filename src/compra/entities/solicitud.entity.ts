@@ -1,8 +1,7 @@
-import { InsumoEntity } from './../../insumo/insumo.entity';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { Deptos } from '@softres/almacen/enums/deptos.enum';
-import { SolicitudEstados } from '../solicitud-estados.enum';
+import { SolicitudEstados } from '../enum/solicitud-estados.enum';
 import { SolicitudDetalleEntity } from './solicitudDetalle.entity';
 import { UserEntity } from '@softres/user/user.entity';
 
