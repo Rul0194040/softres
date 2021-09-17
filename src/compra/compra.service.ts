@@ -3,14 +3,16 @@ import { SolicitudEntity } from './entities/solicitud.entity';
 import { CreateSolicitudDTO } from './dto/create-solicitud.dto';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
-import { plainToClass } from 'class-transformer';
 import { getRepository, UpdateResult } from 'typeorm';
-import { CreateCompraDto } from './dto/create-compra.dto';
+import { CreateCompraDTO } from './dto/create-compra.dto';
 import { UpdateCompraDto } from './dto/update-compra.dto';
 import { CompraEntity } from './entities/compra.entity';
-import { CompraDetalleEntity } from './entities/compraDetalles.entity';
 import * as moment from 'moment';
 import { InformeSolicitud } from './dto/solicitud-informe.dto';
+import { CompraDetalleEntity } from './entities/compraDetalles.entity';
+import { CotizacionEntity } from '@softres/cotizacion/entitys/cotizacion.entity';
+import { CotizacionDetalleEntity } from '@softres/cotizacion/entitys/cotizacionDetalle.entity';
+import { InformeCompra } from './dto/informe-compra.dto';
 
 @Injectable()
 export class CompraService {
@@ -25,28 +27,59 @@ export class CompraService {
 ..######...#######..##.....##.##........##.....##.##.....##..######.
  */
 
-  async create(createCompraDto: CreateCompraDto): Promise<CompraEntity> {
-    const orden: CompraEntity =
-      getRepository(CompraEntity).create(createCompraDto);
-    let sumTotal = 0.0;
-    if (orden.detalleCompra && orden.detalleCompra.length !== 0) {
-      orden.detalleCompra.forEach(async (detalle) => {
-        detalle.compraId = orden.id;
-        const newDetalle: CompraDetalleEntity = plainToClass(
-          CompraDetalleEntity,
-          detalle,
-        );
-        newDetalle.insumo = await getRepository(InsumoEntity).findOne(
-          newDetalle.insumoId,
-        );
-        newDetalle.total =
-          newDetalle.insumo.precioUnitario * newDetalle.cantidad;
-        sumTotal += newDetalle.total;
-        await getRepository(CompraDetalleEntity).create(newDetalle);
-      });
+  async create(compra: CreateCompraDTO): Promise<InformeCompra> {
+    const cotizacion = await getRepository(CotizacionEntity).findOne(
+      compra.cotizacionId,
+    );
+
+    const compraToCreate: CompraEntity = {
+      fecha: compra.fecha ? compra.fecha : moment().toDate(),
+      folio: compra.folio,
+      status: compra.status,
+      cotizacionId: compra.cotizacionId,
+    };
+
+    const createdCompra = await getRepository(CompraEntity).save(
+      compraToCreate,
+    );
+    const insumosCotizados = await getRepository(CotizacionDetalleEntity)
+      .createQueryBuilder('cotz')
+      .leftJoin('cotz.insumo', 'insumo')
+      .select([
+        'cotz.id',
+        'cotz.solicitudId',
+        'cotz.cantidad',
+        'insumo.id',
+        'insumo.nombre',
+      ])
+      .where('cotz.solicitudId=:id', { id: cotizacion.id })
+      .getMany();
+
+    const detalles: CompraDetalleEntity[] = [];
+
+    for (let idx = 0; idx < insumosCotizados.length; idx++) {
+      const registro = compra.detalles[idx];
+
+      const compraDetalle: CompraDetalleEntity = {
+        cantidad: registro.cantidad,
+        insumoId: registro.insumoId,
+        proveedor: registro.proveedor,
+        proveedorId: registro.proveedorId,
+        compraId: registro.compraId,
+        total: registro.total,
+      };
+
+      detalles[idx] = await getRepository(CompraDetalleEntity).save(
+        compraDetalle,
+      );
     }
-    orden.total = sumTotal;
-    return orden;
+
+    const result: InformeCompra = {
+      compra: createdCompra,
+      detalles,
+    };
+
+    return result;
   }
 
   findAll(): Promise<CompraEntity[]> {

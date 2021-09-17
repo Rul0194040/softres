@@ -1,3 +1,4 @@
+import { SolicitudDetalleEntity } from './compra/entities/solicitudDetalle.entity';
 import { SolicitudEntity } from './compra/entities/solicitud.entity';
 import { CotizacionDetalleEntity } from './cotizacion/entitys/cotizacionDetalle.entity';
 import { CotizacionEntity } from './cotizacion/entitys/cotizacion.entity';
@@ -67,6 +68,7 @@ import { CotizacionModule } from './cotizacion/cotizacion.module';
           CompraEntity,
           CompraDetalleEntity,
           SolicitudEntity,
+          SolicitudDetalleEntity,
           SeccionEntity,
           MenuEntity,
           CotizacionEntity,

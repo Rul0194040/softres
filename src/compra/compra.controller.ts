@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CompraService } from './compra.service';
-import { CreateCompraDto } from './dto/create-compra.dto';
+import { CreateCompraDTO } from './dto/create-compra.dto';
 import { UpdateCompraDto } from './dto/update-compra.dto';
 
 @Controller('compra')
@@ -10,7 +10,7 @@ export class CompraController {
   constructor(private readonly compraService: CompraService) {}
 
   @Post()
-  create(@Body() createCompraDto: CreateCompraDto) {
+  create(@Body() createCompraDto: CreateCompraDTO) {
     return this.compraService.create(createCompraDto);
   }
 

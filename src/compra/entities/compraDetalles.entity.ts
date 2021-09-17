@@ -1,3 +1,4 @@
+import { ProveedorEntity } from '@softres/proveedor/entity/proveedor.entity';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
@@ -7,12 +8,10 @@ import { CompraEntity } from './compra.entity';
 export class CompraDetalleEntity extends CommonEntity {
   @Column({
     type: 'decimal',
-    precision: 10,
-    scale: 2,
     nullable: false,
     default: 0.0,
   })
-  cantidad: number;
+  total: number;
 
   @Column({
     type: 'decimal',
@@ -21,17 +20,23 @@ export class CompraDetalleEntity extends CommonEntity {
     nullable: false,
     default: 0.0,
   })
-  total: number;
+  cantidad: number;
 
-  @Column({ type: 'mediumint', nullable: false })
+  @ManyToOne(() => ProveedorEntity, { nullable: false })
+  proveedor: ProveedorEntity;
+
+  @Column({ type: 'smallint', nullable: false })
+  proveedorId: number;
+
+  @ManyToOne(() => InsumoEntity, { nullable: true })
+  insumo?: InsumoEntity;
+
+  @Column({ type: 'smallint', nullable: false })
   insumoId: number;
 
-  @Column({ type: 'mediumint', nullable: false })
+  @ManyToOne(() => CompraEntity, { nullable: true })
+  compra?: CompraEntity;
+
+  @Column({ type: 'smallint', nullable: false })
   compraId: number;
-
-  @ManyToOne(() => InsumoEntity, { nullable: false })
-  insumo: InsumoEntity;
-
-  @ManyToOne(() => CompraEntity, { nullable: false })
-  compra: CompraEntity;
 }
