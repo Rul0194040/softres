@@ -1,10 +1,8 @@
+import { CotizacionEntity } from './../../cotizacion/entitys/cotizacion.entity';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
-import { ProveedorEntity } from '@softres/proveedor/entity/proveedor.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
-import { PagoTypes } from '../enum/pagoTypes.enum';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { StatusTypes } from '../enum/statusTypes.enum';
 import { CompraDetalleEntity } from './compraDetalles.entity';
-import { CompraSolicitudEntity } from './compraSolicitud.entity';
 
 @Entity('compras')
 export class CompraEntity extends CommonEntity {
@@ -22,13 +20,6 @@ export class CompraEntity extends CommonEntity {
   folio: string;
 
   @Column({
-    type: 'decimal',
-    nullable: true,
-    default: 0.0,
-  })
-  descuento: number;
-
-  @Column({
     type: 'enum',
     enum: StatusTypes,
     nullable: false,
@@ -36,53 +27,12 @@ export class CompraEntity extends CommonEntity {
   })
   status: StatusTypes;
 
-  @Column({
-    type: 'decimal',
-    nullable: false,
-    default: 0.0,
-  })
-  total: number;
+  @ManyToOne(() => CotizacionEntity, { nullable: true })
+  cotizacion?: CotizacionEntity;
 
-  @Column({
-    type: 'boolean',
-    nullable: false,
-    default: 0,
-  })
-  pagado: boolean;
-
-  @Column({
-    type: 'boolean',
-    nullable: false,
-    default: 0,
-  })
-  factura: boolean;
-
-  @Column({
-    type: 'enum',
-    enum: PagoTypes,
-    nullable: false,
-    default: PagoTypes.CREDITO,
-  })
-  formaPago: PagoTypes;
-
-  @Column({
-    type: 'date',
-    nullable: true,
-  })
-  fechaEntrega: Date;
-
-  @Column({ type: 'int', nullable: false })
-  proveedorId: number;
-
-  @Column({ type: 'int', nullable: true })
-  solicitudId: number;
+  @Column({ type: 'smallint', nullable: false })
+  cotizacionId: number;
 
   @OneToMany(() => CompraDetalleEntity, (det) => det.compra, { nullable: true })
-  detalles?: CompraDetalleEntity[];
-
-  @ManyToOne(() => ProveedorEntity, { nullable: false })
-  proveedor?: ProveedorEntity;
-
-  @ManyToOne(() => CompraSolicitudEntity, { nullable: true })
-  solicitud: CompraSolicitudEntity;
+  detalleCompra?: CompraDetalleEntity[];
 }

@@ -1,10 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
-import { PagoTypes } from '../enum/pagoTypes.enum';
 import { StatusTypes } from '../enum/statusTypes.enum';
-import { CreateCompraDetalleDto } from './create-detalle.dto';
+import { CreateCompraDetalleDTO } from './create-detalle.dto';
 
-export class CreateCompraDto {
+export class CreateCompraDTO {
   @ApiProperty({ nullable: true })
   @IsOptional()
   fecha?: Date;
@@ -12,41 +11,20 @@ export class CreateCompraDto {
   @ApiProperty({ nullable: false })
   folio: string;
 
-  @ApiProperty({ nullable: true, default: 0.0 })
-  @IsOptional()
-  descuento?: number;
-
-  @ApiProperty({ nullable: true })
-  @IsOptional()
-  total?: number;
-
   @ApiProperty({
     enum: StatusTypes,
     default: StatusTypes.BORRADOR,
   })
+  @IsOptional()
   status?: StatusTypes;
 
-  @ApiProperty({ nullable: false, default: 0 })
+  @ApiProperty({ nullable: false })
+  cotizacionId: number;
+
+  @ApiProperty()
+  compraId: number;
+
+  @ApiProperty({ nullable: true, type: [CreateCompraDetalleDTO] })
   @IsOptional()
-  pagado?: boolean;
-
-  @ApiProperty({ nullable: false, default: 0 })
-  factura?: boolean;
-
-  @ApiProperty({ nullable: false, enum: PagoTypes })
-  formaPago: PagoTypes;
-
-  @ApiProperty({ nullable: true })
-  @IsOptional()
-  fechaEntrega: Date;
-
-  @ApiProperty({ nullable: true })
-  proveedorId?: number;
-
-  @ApiProperty({ nullable: true })
-  solicitudId: number;
-
-  @ApiProperty({ nullable: true, type: [CreateCompraDetalleDto] })
-  @IsOptional()
-  detalles?: CreateCompraDetalleDto[];
+  detalles?: CreateCompraDetalleDTO[];
 }

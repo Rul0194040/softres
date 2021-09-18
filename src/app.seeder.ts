@@ -1,3 +1,4 @@
+import { SolicitudEntity } from './compra/entities/solicitud.entity';
 import { ProveedorEntity } from './proveedor/entity/proveedor.entity';
 import { ProveedorSeeder } from './proveedor/proveedor.seeder';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';

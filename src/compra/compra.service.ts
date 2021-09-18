@@ -1,44 +1,85 @@
-import { CompraDetalleEntity } from './entities/compraDetalles.entity';
-import { CompraEntity } from './entities/compra.entity';
-import { CompraSolicitudEntity } from './entities/compraSolicitud.entity';
-import { CreateCompraDto } from './dto/create-compra.dto';
-import { CreateCompraSolicitudDto } from './dto/create-solicitud.dto';
-import { getRepository, UpdateResult } from 'typeorm';
-import { Injectable } from '@nestjs/common';
+import { SolicitudDetalleEntity } from './entities/solicitudDetalle.entity';
+import { SolicitudEntity } from './entities/solicitud.entity';
+import { CreateSolicitudDTO } from './dto/create-solicitud.dto';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
-import { plainToClass } from 'class-transformer';
+import { getRepository, UpdateResult } from 'typeorm';
+import { CreateCompraDTO } from './dto/create-compra.dto';
 import { UpdateCompraDto } from './dto/update-compra.dto';
+import { CompraEntity } from './entities/compra.entity';
 import * as moment from 'moment';
-import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
-import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
-import { forIn } from 'lodash';
+import { InformeSolicitud } from './dto/solicitud-informe.dto';
+import { CompraDetalleEntity } from './entities/compraDetalles.entity';
+import { CotizacionEntity } from '@softres/cotizacion/entitys/cotizacion.entity';
+import { CotizacionDetalleEntity } from '@softres/cotizacion/entitys/cotizacionDetalle.entity';
+import { InformeCompra } from './dto/informe-compra.dto';
 
 @Injectable()
 export class CompraService {
-  async create(compra: CreateCompraDto): Promise<CompraEntity> {
-    compra.fecha = compra.fecha ? compra.fecha : moment().toDate();
-    const createdCompra = await getRepository(CompraEntity).save(compra);
+  /**
+ * 
+..######...#######..##.....##.########..########.....###.....######.
+.##....##.##.....##.###...###.##.....##.##.....##...##.##...##....##
+.##.......##.....##.####.####.##.....##.##.....##..##...##..##......
+.##.......##.....##.##.###.##.########..########..##.....##..######.
+.##.......##.....##.##.....##.##........##...##...#########.......##
+.##....##.##.....##.##.....##.##........##....##..##.....##.##....##
+..######...#######..##.....##.##........##.....##.##.....##..######.
+ */
 
-    let sumTotal = 0.0;
-    if (compra.detalles && compra.detalles.length !== 0) {
-      compra.detalles.forEach(async (detalle) => {
-        detalle.compraId = createdCompra.id;
-        const detalleToCreate = plainToClass(CompraDetalleEntity, detalle);
-        const insumo = await getRepository(InsumoEntity).findOne(
-          detalle.insumoId,
-        );
-        detalleToCreate.insumo = insumo;
-        detalleToCreate.total =
-          insumo.precioUnitario * detalleToCreate.cantidad;
-        sumTotal += detalleToCreate.total;
-        await getRepository(CompraDetalleEntity).manager.save(detalleToCreate);
-      });
-      await getRepository(CompraEntity).update(createdCompra.id, {
-        total: sumTotal,
-      });
-      createdCompra.total = sumTotal;
+  async create(compra: CreateCompraDTO): Promise<InformeCompra> {
+    const cotizacion = await getRepository(CotizacionEntity).findOne(
+      compra.cotizacionId,
+    );
+
+    const compraToCreate: CompraEntity = {
+      fecha: compra.fecha ? compra.fecha : moment().toDate(),
+      folio: compra.folio,
+      status: compra.status,
+      cotizacionId: compra.cotizacionId,
+    };
+
+    const createdCompra = await getRepository(CompraEntity).save(
+      compraToCreate,
+    );
+    const insumosCotizados = await getRepository(CotizacionDetalleEntity)
+      .createQueryBuilder('cotz')
+      .leftJoin('cotz.insumo', 'insumo')
+      .select([
+        'cotz.id',
+        'cotz.solicitudId',
+        'cotz.cantidad',
+        'insumo.id',
+        'insumo.nombre',
+      ])
+      .where('cotz.solicitudId=:id', { id: cotizacion.id })
+      .getMany();
+
+    const detalles: CompraDetalleEntity[] = [];
+
+    for (let idx = 0; idx < insumosCotizados.length; idx++) {
+      const registro = compra.detalles[idx];
+
+      const compraDetalle: CompraDetalleEntity = {
+        cantidad: registro.cantidad,
+        insumoId: registro.insumoId,
+        proveedor: registro.proveedor,
+        proveedorId: registro.proveedorId,
+        compraId: registro.compraId,
+        total: registro.total,
+      };
+
+      detalles[idx] = await getRepository(CompraDetalleEntity).save(
+        compraDetalle,
+      );
     }
-    return createdCompra;
+
+    const result: InformeCompra = {
+      compra: createdCompra,
+      detalles,
+    };
+
+    return result;
   }
 
   findAll(): Promise<CompraEntity[]> {
@@ -53,67 +94,66 @@ export class CompraService {
     return getRepository(CompraEntity).update(id, updateCompraDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} compra`;
-  }
-
-  getSolicitud(id: number): Promise<CompraSolicitudEntity> {
-    return getRepository(CompraSolicitudEntity).findOne(id, {
-      relations: ['detalles'],
-    });
-  }
+  /**
+..######...#######..##.......####..######..####.########.##.....##.########..########..######.
+.##....##.##.....##.##........##..##....##..##.....##....##.....##.##.....##.##.......##....##
+.##.......##.....##.##........##..##........##.....##....##.....##.##.....##.##.......##......
+..######..##.....##.##........##..##........##.....##....##.....##.##.....##.######....######.
+.......##.##.....##.##........##..##........##.....##....##.....##.##.....##.##.............##
+.##....##.##.....##.##........##..##....##..##.....##....##.....##.##.....##.##.......##....##
+..######...#######..########.####..######..####....##.....#######..########..########..######.
+   */
 
   async createSolicitud(
-    solicitud: CreateCompraSolicitudDto,
-  ): Promise<CompraSolicitudEntity> {
-    solicitud.fecha = solicitud.fecha ? solicitud.fecha : moment().toDate();
-    const createdSolicitud = await getRepository(CompraSolicitudEntity).save(
-      solicitud,
-    );
-    let sumTotal = 0.0;
-    if (solicitud.detalles && solicitud.detalles.length !== 0) {
-      solicitud.detalles.forEach(async (orden) => {
-        orden.solicitudId = createdSolicitud.id;
-        const newOrdenCompra = await this.create(orden);
-        sumTotal += newOrdenCompra.total;
-      });
-      await getRepository(CompraSolicitudEntity).update(createdSolicitud.id, {
-        total: sumTotal,
-      });
+    solicitud: CreateSolicitudDTO,
+  ): Promise<InformeSolicitud> {
+    const ins = await getRepository(InsumoEntity).findByIds(solicitud.insumos);
+
+    if (!ins) {
+      throw new HttpException(
+        'no hay insumos que agregar',
+        HttpStatus.NOT_FOUND,
+      );
     }
-    return getRepository(CompraSolicitudEntity).findOne(createdSolicitud.id);
+
+    const solicitudToCreate: SolicitudEntity = {
+      usuarioId: solicitud.usuarioId,
+      fecha: solicitud.fecha ? new Date(solicitud.fecha) : moment().toDate(),
+      folio: `${moment().format('DDMMYYYY')}${solicitud.depto.substr(0, 2)}`,
+      depto: solicitud.depto,
+    };
+
+    const createdSolicitud = await getRepository(SolicitudEntity).save(
+      solicitudToCreate,
+    );
+
+    const detalles: SolicitudDetalleEntity[] = [];
+
+    for (let idx = 0; idx < solicitud.detalles.length; idx++) {
+      const registro = solicitud.detalles[idx];
+
+      const solicitudDetalle: SolicitudDetalleEntity = {
+        cantidad: registro.cantidad,
+        insumoId: registro.insumoId,
+        solicitudId: createdSolicitud.id,
+      };
+
+      detalles[idx] = await getRepository(SolicitudDetalleEntity).save(
+        solicitudDetalle,
+      );
+    }
+
+    const result: InformeSolicitud = {
+      solicitud: createdSolicitud,
+      detalles,
+    };
+
+    return result;
   }
 
-  async paginateSolicitud(
-    options: PaginationOptions,
-  ): Promise<PaginationPrimeNgResult> {
-    const dataQuery = getRepository(CompraSolicitudEntity).createQueryBuilder(
-      'solicitud',
-    );
-    forIn(options.filters, (value, key) => {
-      if (key === 'buscar') {
-        dataQuery.andWhere('( solicitud.folio LIKE :term )', {
-          term: `%${value.split(' ').join('%')}%`,
-        });
-      }
+  async getSolicitudById(id: number): Promise<SolicitudEntity> {
+    return await getRepository(SolicitudEntity).findOne(id, {
+      relations: ['detalle'],
     });
-
-    if (options.sort === undefined || !Object.keys(options.sort).length) {
-      options.sort = 'solicitud.createdAt';
-    }
-
-    const data = await dataQuery
-      .skip(options.skip)
-      .take(options.take)
-      .orderBy(options.sort, options.direction)
-      .getMany();
-
-    const count = await dataQuery.getCount();
-
-    return {
-      data: data,
-      skip: options.skip,
-      totalItems: count,
-    };
   }
 }

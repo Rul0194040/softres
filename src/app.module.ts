@@ -1,7 +1,10 @@
-import { AlmacenDetalleEntity } from './almacen/entitys/almacenDetalle.entity';
-import { AlmacenEntity } from './almacen/entitys/almacen.entity';
-import { AlmacenModule } from './almacen/almacen.module';
-import { AppConfig } from './app.config';
+import { SolicitudDetalleEntity } from './compra/entities/solicitudDetalle.entity';
+import { SolicitudEntity } from './compra/entities/solicitud.entity';
+import { CotizacionDetalleEntity } from './cotizacion/entitys/cotizacionDetalle.entity';
+import { CotizacionEntity } from './cotizacion/entitys/cotizacion.entity';
+import { MenuEntity } from './menu/entitys/menu.entity';
+import { SeccionEntity } from './menu/entitys/section.entity';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -32,6 +35,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '@softres/user/user.entity';
 import { UserModule } from './user/user.module';
 import { VentasModule } from './ventas/ventas.module';
+import { CompraEntity } from './compra/entities/compra.entity';
+import { CompraDetalleEntity } from './compra/entities/compraDetalles.entity';
+import { AlmacenModule } from './almacen/almacen.module';
+import { AlmacenEntity } from './almacen/entitys/almacen.entity';
+import { AlmacenDetalleEntity } from './almacen/entitys/almacenDetalle.entity';
+import { AppConfig } from './app.config';
+import { CotizacionModule } from './cotizacion/cotizacion.module';
 
 @Module({
   imports: [
@@ -64,9 +74,10 @@ import { VentasModule } from './ventas/ventas.module';
           RecetaEntity,
           RecetaDetalleEntity,
           ProveedorEntity,
-          CompraSolicitudEntity,
           CompraEntity,
           CompraDetalleEntity,
+          SolicitudEntity,
+          SolicitudDetalleEntity,
           SeccionEntity,
           MenuEntity,
           CotizacionEntity,
