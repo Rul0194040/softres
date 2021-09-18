@@ -65,9 +65,23 @@ export class RecetaController {
     return this.recetaService.paginate(options);
   }
 
+  /**
+   * Paginate
+   *
+   * @param options opciones de paginacion
+   * @returns {PaginationPrimeNgResult}
+   */
+  @Post('paginate/detreceta/:recetaId')
+  paginateDetalle(
+    @Param('recetaId') recetaid: number,
+    @Body() options: PaginationOptions,
+  ): Promise<PaginationPrimeNgResult> {
+    return this.recetaService.paginateDetalle(recetaid, options);
+  }
+
   @Post('updateImagen/:recetaId')
   @UseInterceptors(
-    FileInterceptor('carga', {
+    FileInterceptor('image', {
       fileFilter: (req, file, cb) => {
         const allowedTypes = [
           'image/png',
