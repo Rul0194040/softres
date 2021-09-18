@@ -4,7 +4,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { PagoTypes } from '../enum/pagoTypes.enum';
 import { StatusTypes } from '../enum/statusTypes.enum';
 import { CompraDetalleEntity } from './compraDetalles.entity';
-import { CompraSolicitudEntity } from './solicitudCompra.entity';
+import { CompraSolicitudEntity } from './compraSolicitud.entity';
 
 @Entity('compras')
 export class CompraEntity extends CommonEntity {
@@ -74,15 +74,15 @@ export class CompraEntity extends CommonEntity {
   @Column({ type: 'int', nullable: false })
   proveedorId: number;
 
-  @Column({ type: 'int', nullable: false })
+  @Column({ type: 'int', nullable: true })
   solicitudId: number;
 
   @OneToMany(() => CompraDetalleEntity, (det) => det.compra, { nullable: true })
-  detalleCompra?: CompraDetalleEntity[];
+  detalles?: CompraDetalleEntity[];
 
   @ManyToOne(() => ProveedorEntity, { nullable: false })
   proveedor?: ProveedorEntity;
 
-  @ManyToOne(() => CompraSolicitudEntity, { nullable: false })
+  @ManyToOne(() => CompraSolicitudEntity, { nullable: true })
   solicitud: CompraSolicitudEntity;
 }

@@ -10,4 +10,7 @@ export class CreateCompraDetalleDto {
 
   @ApiProperty({ nullable: true })
   compraId?: number;
+
+  @ApiProperty({ nullable: true })
+  total?: number;
 }

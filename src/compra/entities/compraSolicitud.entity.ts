@@ -1,5 +1,6 @@
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { Column, Entity, OneToMany } from 'typeorm';
+import { StatusTypes } from '../enum/statusTypes.enum';
 import { CompraEntity } from './compra.entity';
 
 @Entity('compraSolicitud')
@@ -24,6 +25,13 @@ export class CompraSolicitudEntity extends CommonEntity {
   })
   total: number;
 
+  @Column({
+    type: 'enum',
+    enum: StatusTypes,
+    nullable: false,
+  })
+  status: StatusTypes;
+
   @OneToMany(() => CompraEntity, (com) => com.solicitud, { nullable: true })
-  detalleSolicitud?: CompraEntity[];
+  detalles?: CompraEntity[];
 }
