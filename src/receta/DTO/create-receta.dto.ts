@@ -2,10 +2,23 @@ import { GrupoReceta } from './../enums/grupoReceta.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
 
+export class CreateDetalleRecetaDTO {
+  @ApiProperty()
+  insumoId: number;
+  @ApiProperty()
+  cantReceta: number;
+  @ApiProperty()
+  @IsOptional()
+  cantReal?: number;
+  @ApiProperty()
+  @IsOptional()
+  rendimiento?: number;
+}
+
 export class CreateRecetaDTO {
   @ApiProperty()
   nombre: string;
-  @ApiProperty()
+  @ApiProperty({ enum: GrupoReceta })
   grupo: GrupoReceta;
   @ApiProperty()
   hasChildren: boolean;
@@ -34,23 +47,9 @@ export class CreateRecetaDTO {
   @ApiProperty({ nullable: true })
   @IsOptional()
   imagen?: string;
-  @ApiProperty()
+  @ApiProperty({ type: [Number] })
   @IsOptional()
   children?: number[];
-  @ApiProperty()
-  @IsOptional()
+  @ApiProperty({ nullable: false, type: [CreateDetalleRecetaDTO] })
   detalles?: CreateDetalleRecetaDTO[];
-}
-
-export class CreateDetalleRecetaDTO {
-  @ApiProperty()
-  insumoId: number;
-  @ApiProperty()
-  cantReceta: number;
-  @ApiProperty()
-  @IsOptional()
-  cantReal?: number;
-  @ApiProperty()
-  @IsOptional()
-  rendimiento?: number;
 }
