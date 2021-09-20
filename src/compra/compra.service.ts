@@ -161,18 +161,19 @@ export class CompraService {
   }
 
   async paginate(options: PaginationOptions): Promise<PaginationPrimeNgResult> {
-    const dataQuery = getRepository(SolicitudEntity).createQueryBuilder();
+    const dataQuery =
+      getRepository(SolicitudEntity).createQueryBuilder('solicitud');
 
     forIn(options.filters, (value, key) => {
-      if (key === 'nombre') {
-        dataQuery.andWhere('( nombre LIKE :term )', {
+      if (key === 'folio') {
+        dataQuery.andWhere('( solicitud.folio LIKE :term )', {
           term: `%${value.split(' ').join('%')}%`,
         });
       }
     });
 
     if (options.sort === undefined || !Object.keys(options.sort).length) {
-      options.sort = 'nombre';
+      options.sort = 'solicitud.fecha';
     }
 
     const count = await dataQuery.getCount();
