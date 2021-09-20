@@ -13,6 +13,9 @@ import { CompraDetalleEntity } from './entities/compraDetalles.entity';
 import { CotizacionEntity } from '@softres/cotizacion/entitys/cotizacion.entity';
 import { CotizacionDetalleEntity } from '@softres/cotizacion/entitys/cotizacionDetalle.entity';
 import { InformeCompra } from './dto/informe-compra.dto';
+import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
+import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
+import { forIn } from 'lodash';
 
 @Injectable()
 export class CompraService {
@@ -155,5 +158,35 @@ export class CompraService {
     return await getRepository(SolicitudEntity).findOne(id, {
       relations: ['detalle'],
     });
+  }
+
+  async paginate(options: PaginationOptions): Promise<PaginationPrimeNgResult> {
+    const dataQuery = getRepository(SolicitudEntity).createQueryBuilder();
+
+    forIn(options.filters, (value, key) => {
+      if (key === 'nombre') {
+        dataQuery.andWhere('( nombre LIKE :term )', {
+          term: `%${value.split(' ').join('%')}%`,
+        });
+      }
+    });
+
+    if (options.sort === undefined || !Object.keys(options.sort).length) {
+      options.sort = 'nombre';
+    }
+
+    const count = await dataQuery.getCount();
+
+    const data = await dataQuery
+      .skip(options.skip)
+      .take(options.take)
+      .orderBy(options.sort, options.direction)
+      .getMany();
+
+    return {
+      data: data,
+      skip: options.skip,
+      totalItems: count,
+    };
   }
 }

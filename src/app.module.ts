@@ -1,24 +1,14 @@
 import { SolicitudDetalleEntity } from './compra/entities/solicitudDetalle.entity';
 import { SolicitudEntity } from './compra/entities/solicitud.entity';
-import { CotizacionDetalleEntity } from './cotizacion/entitys/cotizacionDetalle.entity';
-import { CotizacionEntity } from './cotizacion/entitys/cotizacion.entity';
-import { MenuEntity } from './menu/entitys/menu.entity';
-import { SeccionEntity } from './menu/entitys/section.entity';
-import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { CategoriaEntity } from '@softres/categoria/categoria.entity';
-import { CategoriaModule } from './categoria/categoria.module';
-import { CompraDetalleEntity } from './compra/entities/compraDetalles.entity';
-import { CompraEntity } from './compra/entities/compra.entity';
 import { CompraModule } from './compra/compra.module';
-import { CompraSolicitudEntity } from './compra/entities/compraSolicitud.entity';
 import { ConfigKeys } from './common/enums/configKeys.enum';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CotizacionDetalleEntity } from './cotizacion/entitys/cotizacionDetalle.entity';
 import { CotizacionEntity } from './cotizacion/entitys/cotizacion.entity';
-import { CotizacionModule } from './cotizacion/cotizacion.module';
 import { InsumoEntity } from './insumo/insumo.entity';
 import { InsumoModule } from './insumo/insumo.module';
 import { MenuEntity } from './menu/entitys/menu.entity';
@@ -42,6 +32,7 @@ import { AlmacenEntity } from './almacen/entitys/almacen.entity';
 import { AlmacenDetalleEntity } from './almacen/entitys/almacenDetalle.entity';
 import { AppConfig } from './app.config';
 import { CotizacionModule } from './cotizacion/cotizacion.module';
+import { CategoriaModule } from './categoria/categoria.module';
 
 @Module({
   imports: [
