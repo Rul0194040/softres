@@ -123,7 +123,8 @@ export class RecetaService {
   }
 
   async dashboard(user: LoginIdentityDTO): Promise<DashboardDTO> {
-    let numRecetas: number, numMenu: number;
+    let numRecetas = 0,
+      numMenu = 0;
 
     if ((user.profile = ProfileTypes.COCINA)) {
       numRecetas = await getRepository(RecetaEntity).count({
@@ -132,7 +133,9 @@ export class RecetaService {
       numMenu = await getRepository(MenuEntity).count({
         where: { depto: Deptos.COCINA },
       });
-    } else {
+    }
+
+    if ((user.profile = ProfileTypes.BARRA)) {
       numRecetas = await getRepository(RecetaEntity).count({
         where: { depto: Deptos.BARRA },
       });
