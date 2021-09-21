@@ -21,7 +21,7 @@ export class AlmacenService {
     almacen: CreateAlmacenDTO,
   ): Promise<AlmacenInformeDTO | AlmacenEntity> {
     const insumo = await getRepository(InsumoEntity).findOne(almacen.insumoId);
-    const total = almacen.cantidad*insumo.pesoNeto;
+    const total = almacen.cantidad * insumo.pesoNeto;
 
     const almacenToCreate: CreateAlmacenDTO = {
       cantidad: almacen.cantidad,
@@ -97,7 +97,7 @@ export class AlmacenService {
         precioUnitario: detalle.precioUnitario,
         cargo,
         abono,
-        saldo: 0,
+        saldo: detalle.saldo + entradas,
       };
       const createdDetalle = await getRepository(AlmacenDetalleEntity).save(
         detalleToCreate,
