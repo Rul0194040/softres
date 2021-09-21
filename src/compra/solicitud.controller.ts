@@ -5,7 +5,7 @@ import { CompraService } from './compra.service';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
 
-@Controller('solicitud')
+@Controller('Solicitud')
 @ApiTags('solicitud')
 export class SolicitudController {
   constructor(private readonly compraService: CompraService) {}

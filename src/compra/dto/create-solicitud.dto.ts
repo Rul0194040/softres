@@ -6,8 +6,6 @@ export class CreateSolicitudDetallesDTO {
   cantidad: number;
   @ApiProperty({ nullable: false })
   insumoId: number;
-  @ApiProperty({ nullable: false })
-  solicitudId: number;
 }
 
 export class CreateSolicitudDTO {
@@ -17,15 +15,9 @@ export class CreateSolicitudDTO {
   @ApiProperty({ nullable: true })
   fecha?: Date;
 
-  @ApiProperty({ nullable: false })
-  folio: string;
-
   @ApiProperty({ nullable: false, enum: Deptos })
   depto: Deptos;
 
-  @ApiProperty({ nullable: false, type: [Number] })
-  insumos: number[];
-
   @ApiProperty({ nullable: false, type: [CreateSolicitudDetallesDTO] })
-  detalles: CreateSolicitudDetallesDTO[];
+  detalle: CreateSolicitudDetallesDTO[];
 }

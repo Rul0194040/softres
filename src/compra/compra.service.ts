@@ -1,21 +1,20 @@
+import { CompraDetalleEntity } from './entities/compraDetalles.entity';
+import { CompraEntity } from './entities/compra.entity';
+import { CotizacionDetalleEntity } from '@softres/cotizacion/entitys/cotizacionDetalle.entity';
+import { CotizacionEntity } from '@softres/cotizacion/entitys/cotizacion.entity';
+import { CreateCompraDTO } from './dto/create-compra.dto';
+import { CreateSolicitudDTO } from './dto/create-solicitud.dto';
+import { forIn } from 'lodash';
+import { getRepository, UpdateResult } from 'typeorm';
+import { InformeCompra } from './dto/informe-compra.dto';
+import { InformeSolicitud } from './dto/solicitud-informe.dto';
+import { Injectable } from '@nestjs/common';
+import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
+import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
 import { SolicitudDetalleEntity } from './entities/solicitudDetalle.entity';
 import { SolicitudEntity } from './entities/solicitud.entity';
-import { CreateSolicitudDTO } from './dto/create-solicitud.dto';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { InsumoEntity } from '@softres/insumo/insumo.entity';
-import { getRepository, UpdateResult } from 'typeorm';
-import { CreateCompraDTO } from './dto/create-compra.dto';
 import { UpdateCompraDto } from './dto/update-compra.dto';
-import { CompraEntity } from './entities/compra.entity';
 import * as moment from 'moment';
-import { InformeSolicitud } from './dto/solicitud-informe.dto';
-import { CompraDetalleEntity } from './entities/compraDetalles.entity';
-import { CotizacionEntity } from '@softres/cotizacion/entitys/cotizacion.entity';
-import { CotizacionDetalleEntity } from '@softres/cotizacion/entitys/cotizacionDetalle.entity';
-import { InformeCompra } from './dto/informe-compra.dto';
-import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
-import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
-import { forIn } from 'lodash';
 
 @Injectable()
 export class CompraService {
@@ -110,15 +109,6 @@ export class CompraService {
   async createSolicitud(
     solicitud: CreateSolicitudDTO,
   ): Promise<InformeSolicitud> {
-    const ins = await getRepository(InsumoEntity).findByIds(solicitud.insumos);
-
-    if (!ins) {
-      throw new HttpException(
-        'no hay insumos que agregar',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
     const solicitudToCreate: SolicitudEntity = {
       usuarioId: solicitud.usuarioId,
       fecha: solicitud.fecha ? new Date(solicitud.fecha) : moment().toDate(),
@@ -132,8 +122,8 @@ export class CompraService {
 
     const detalles: SolicitudDetalleEntity[] = [];
 
-    for (let idx = 0; idx < solicitud.detalles.length; idx++) {
-      const registro = solicitud.detalles[idx];
+    for (let idx = 0; idx < solicitud.detalle.length; idx++) {
+      const registro = solicitud.detalle[idx];
 
       const solicitudDetalle: SolicitudDetalleEntity = {
         cantidad: registro.cantidad,
@@ -155,14 +145,35 @@ export class CompraService {
   }
 
   async getSolicitudById(id: number): Promise<SolicitudEntity> {
-    return await getRepository(SolicitudEntity).findOne(id, {
-      relations: ['detalle'],
-    });
+    return getRepository(SolicitudEntity)
+      .createQueryBuilder('solicitud')
+      .leftJoin('solicitud.detalle', 'detalle')
+      .leftJoin('solicitud.usuario', 'usuario')
+      .leftJoin('detalle.insumo', 'insumo')
+      .where('solicitud.id = :id', { id })
+      .select([
+        'solicitud',
+        'detalle',
+        'usuario.id',
+        'usuario.firstName',
+        'usuario.lastName',
+        'insumo.id',
+        'insumo.nombre',
+        'insumo.medida',
+      ])
+      .getOne();
   }
 
   async paginate(options: PaginationOptions): Promise<PaginationPrimeNgResult> {
-    const dataQuery =
-      getRepository(SolicitudEntity).createQueryBuilder('solicitud');
+    const dataQuery = getRepository(SolicitudEntity)
+      .createQueryBuilder('solicitud')
+      .leftJoin('solicitud.usuario', 'usuario')
+      .select([
+        'solicitud',
+        'usuario.id',
+        'usuario.firstName',
+        'usuario.lastName',
+      ]);
 
     forIn(options.filters, (value, key) => {
       if (key === 'folio') {
