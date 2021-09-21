@@ -36,11 +36,6 @@ export class RecetaController {
     return this.recetaService.create(receta);
   }
 
-  @Get(':id')
-  GetRecetaById(@Param('id', ParseIntPipe) id: number): Promise<RecetaEntity> {
-    return this.recetaService.getById(id);
-  }
-
   @Get('dashboard')
   GetDash(): Promise<DashboardDTO> {
     return this.recetaService.dashboard();
@@ -49,6 +44,11 @@ export class RecetaController {
   @Get(':imgpath')
   seeUploadedFile(@Param('imgpath') image, @Res() res) {
     return res.sendFile(image, { root: './uploads' });
+  }
+
+  @Get(':id')
+  GetRecetaById(@Param('id', ParseIntPipe) id: number): Promise<RecetaEntity> {
+    return this.recetaService.getById(id);
   }
 
   @Put(':id')
