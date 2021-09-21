@@ -3,6 +3,7 @@ import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { Entity, Column, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 import { GrupoReceta } from '../enums/grupoReceta.enum';
 import { RecetaDetalleEntity } from './recetaDetalle.entity';
+import { Deptos } from '@softres/almacen/enums/deptos.enum';
 
 @Entity('recetas')
 export class RecetaEntity extends CommonEntity {
@@ -13,6 +14,13 @@ export class RecetaEntity extends CommonEntity {
     nullable: false,
   })
   nombre: string;
+
+  @Column({
+    type: 'enum',
+    enum: Deptos,
+    default: Deptos.COCINA,
+  })
+  depto: Deptos;
 
   @Column({
     type: 'varchar',

@@ -147,6 +147,11 @@ export class RecetaService {
           term: `%${value.split(' ').join('%')}%`,
         });
       }
+      if (key === 'departamento') {
+        dataQuery.andWhere('( receta.depto LIKE :term )', {
+          term: `%${value.split(' ').join('%')}%`,
+        });
+      }
     });
 
     if (options.sort === undefined || !Object.keys(options.sort).length) {

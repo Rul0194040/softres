@@ -16,11 +16,6 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js'],
   rules: {
-    'quotes': ['error', 'single'],
-    'semi': ['error', 'always'],
-    'indent': ['error', 2],
-    'no-multi-spaces': ['error'],
-    'comma-dangle':['error','always-multiline'],
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
