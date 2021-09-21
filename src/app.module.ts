@@ -33,6 +33,7 @@ import { AlmacenDetalleEntity } from './almacen/entitys/almacenDetalle.entity';
 import { AppConfig } from './app.config';
 import { CotizacionModule } from './cotizacion/cotizacion.module';
 import { CategoriaModule } from './categoria/categoria.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -90,6 +91,7 @@ import { CategoriaModule } from './categoria/categoria.module';
     CompraModule,
     MenuModule,
     CotizacionModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],

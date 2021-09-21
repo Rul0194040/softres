@@ -1,3 +1,4 @@
+import { DashboardDTO } from './../dashboard/DTOs/dashboard.dto';
 import {
   Body,
   Controller,
@@ -37,6 +38,11 @@ export class RecetaController {
   @Get(':id')
   GetRecetaById(@Param('id', ParseIntPipe) id: number): Promise<RecetaEntity> {
     return this.recetaService.getById(id);
+  }
+
+  @Get('dashboard')
+  GetDash(): Promise<DashboardDTO> {
+    return this.recetaService.dashboard();
   }
 
   @Put(':id')

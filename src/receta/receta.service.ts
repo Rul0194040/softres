@@ -1,3 +1,5 @@
+import { DashboardDTO } from './../dashboard/DTOs/dashboard.dto';
+import { MenuEntity } from './../menu/entitys/menu.entity';
 import { CreateRecetaDTO } from './DTO/create-receta.dto';
 import { forIn } from 'lodash';
 import { getRepository, UpdateResult } from 'typeorm';
@@ -115,6 +117,22 @@ export class RecetaService {
 
   async delete(id: number): Promise<any> {
     return getRepository(RecetaEntity).delete(id);
+  }
+
+  async dashboard(): Promise<DashboardDTO> {
+    const numRecetas = await getRepository(RecetaEntity)
+      .createQueryBuilder('recetas')
+      .getCount();
+    const numMenu = await getRepository(MenuEntity)
+      .createQueryBuilder('menu')
+      .getCount();
+
+    const result = {
+      recetas: numRecetas,
+      menus: numMenu,
+    };
+
+    return result;
   }
 
   async paginate(options: PaginationOptions): Promise<PaginationPrimeNgResult> {
