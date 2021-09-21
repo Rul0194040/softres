@@ -184,6 +184,7 @@ export class RecetaService {
         'det.createdAt',
         'receta.id',
         'receta.nombre',
+        'receta.imagen',
         'insumo.id',
         'insumo.nombre',
         'insumo.nombre',

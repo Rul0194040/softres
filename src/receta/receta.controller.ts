@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -43,6 +44,11 @@ export class RecetaController {
   @Get('dashboard')
   GetDash(): Promise<DashboardDTO> {
     return this.recetaService.dashboard();
+  }
+
+  @Get(':imgpath')
+  seeUploadedFile(@Param('imgpath') image, @Res() res) {
+    return res.sendFile(image, { root: './uploads' });
   }
 
   @Put(':id')
