@@ -17,8 +17,8 @@ import { UpdateMenuDTO } from './DTOs/update-menu.dto';
 import { MenuEntity } from './entitys/menu.entity';
 import { MenuService } from './menu.service';
 
-@Controller('Menú')
-@ApiTags('menu')
+@Controller('menu')
+@ApiTags('Menú')
 export class MenuController {
   constructor(private readonly menuService: MenuService) {}
 

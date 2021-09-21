@@ -271,7 +271,7 @@ export class RecetaService {
       this.almacenService.createDetalle(almacen.id, [detalleToCreate]);
     });
     return getRepository(RecetaEntity).update(receta.id, {
-      existencia: receta.existencia + 1,
+      existencia: parseInt(receta.existencia + '') + 1,
     });
   }
 }
