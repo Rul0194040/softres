@@ -126,16 +126,19 @@ export class RecetaService {
     let numRecetas = 0,
       numMenu = 0;
 
-    if ((user.profile = ProfileTypes.COCINA)) {
-      numRecetas = await getRepository(RecetaEntity).count({
-        where: { depto: Deptos.COCINA },
-      });
+    console.log(user.profile);
+
+    if (user.profile == ProfileTypes.COCINA) {
+      numRecetas = await getRepository(RecetaEntity)
+        .createQueryBuilder('receta')
+        .where('receta.depto=:depto', { depto: Deptos.COCINA })
+        .getCount();
       numMenu = await getRepository(MenuEntity).count({
         where: { depto: Deptos.COCINA },
       });
     }
 
-    if ((user.profile = ProfileTypes.BARRA)) {
+    if (user.profile == ProfileTypes.BARRA) {
       numRecetas = await getRepository(RecetaEntity).count({
         where: { depto: Deptos.BARRA },
       });
