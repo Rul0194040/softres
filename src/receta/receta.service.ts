@@ -1,7 +1,9 @@
+import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
 import { Injectable } from '@nestjs/common';
 import { AlmacenService } from '@softres/almacen/almacen.service';
 import { AlmacenEntity } from '@softres/almacen/entitys/almacen.entity';
 import { AlmacenDetalleEntity } from '@softres/almacen/entitys/almacenDetalle.entity';
+import { Deptos } from '@softres/almacen/enums/deptos.enum';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
@@ -16,6 +18,7 @@ import { RecetaEntity } from './entities/receta.entity';
 import { RecetaDetalleEntity } from './entities/recetaDetalle.entity';
 import { GrupoReceta } from './enums/grupoReceta.enum';
 import { RecipeValues } from './enums/recipeValues.enum';
+import { ProfileTypes } from '@softres/user/profileTypes.enum';
 
 @Injectable()
 export class RecetaService {
@@ -119,13 +122,24 @@ export class RecetaService {
     return getRepository(RecetaEntity).delete(id);
   }
 
-  async dashboard(): Promise<DashboardDTO> {
-    const numRecetas = await getRepository(RecetaEntity)
-      .createQueryBuilder('recetas')
-      .getCount();
-    const numMenu = await getRepository(MenuEntity)
-      .createQueryBuilder('menu')
-      .getCount();
+  async dashboard(user: LoginIdentityDTO): Promise<DashboardDTO> {
+    let numRecetas: number, numMenu: number;
+
+    if ((user.profile = ProfileTypes.COCINA)) {
+      numRecetas = await getRepository(RecetaEntity).count({
+        where: { depto: Deptos.COCINA },
+      });
+      numMenu = await getRepository(MenuEntity).count({
+        where: { depto: Deptos.COCINA },
+      });
+    } else {
+      numRecetas = await getRepository(RecetaEntity).count({
+        where: { depto: Deptos.BARRA },
+      });
+      numMenu = await getRepository(MenuEntity).count({
+        where: { depto: Deptos.BARRA },
+      });
+    }
 
     const result = {
       recetas: numRecetas,

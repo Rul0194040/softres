@@ -1,3 +1,4 @@
+import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
 import { DashboardDTO } from './../dashboard/DTOs/dashboard.dto';
 import {
   Body,
@@ -10,6 +11,7 @@ import {
   Put,
   Res,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -25,9 +27,12 @@ import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgR
 import { RecetaEntity } from './entities/receta.entity';
 import { RecetaService } from './receta.service';
 import { UpdateRecetaDTO } from './DTO/update-receta.dto';
+import { User } from '@softres/user/DTO/user.decorator';
+import { JwtAuthGuard } from '@softres/auth/guards/jwt.guard';
 
 @Controller('receta')
 @ApiTags('Receta')
+@UseGuards(JwtAuthGuard)
 export class RecetaController {
   constructor(private readonly recetaService: RecetaService) {}
 
@@ -37,8 +42,8 @@ export class RecetaController {
   }
 
   @Get('dashboard')
-  GetDash(): Promise<DashboardDTO> {
-    return this.recetaService.dashboard();
+  GetDash(@User() user: LoginIdentityDTO): Promise<DashboardDTO> {
+    return this.recetaService.dashboard(user);
   }
 
   @Get(':imgpath')

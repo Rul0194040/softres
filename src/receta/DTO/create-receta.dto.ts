@@ -1,3 +1,4 @@
+import { Deptos } from './../../almacen/enums/deptos.enum';
 import { GrupoReceta } from './../enums/grupoReceta.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
@@ -18,6 +19,8 @@ export class CreateDetalleRecetaDTO {
 export class CreateRecetaDTO {
   @ApiProperty()
   nombre: string;
+  @ApiProperty({ enum: Deptos })
+  departamento: Deptos;
   @ApiProperty({ enum: GrupoReceta })
   grupo: GrupoReceta;
   @ApiProperty()

@@ -1,3 +1,4 @@
+import { Deptos } from '@softres/almacen/enums/deptos.enum';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { Entity, Column, OneToMany } from 'typeorm';
 import { SeccionEntity } from './section.entity';
@@ -10,6 +11,13 @@ export class MenuEntity extends CommonEntity {
     nullable: false,
   })
   nombre: string;
+
+  @Column({
+    type: 'enum',
+    enum: Deptos,
+    default: Deptos.COCINA,
+  })
+  depto: Deptos;
 
   @OneToMany(() => SeccionEntity, (seccion) => seccion.menu)
   secciones: SeccionEntity[];
