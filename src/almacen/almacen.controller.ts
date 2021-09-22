@@ -1,3 +1,5 @@
+import { JwtAuthGuard } from './../auth/guards/jwt.guard';
+import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
 import { FileOptions } from './../common/DTOs/fileOptions.dto';
 import { CreateDetalleDTO } from './DTOs/createDetalleDTO.dto';
 import { AlmacenInformeDTO } from './DTOs/almacenInforneDTO.dto';
@@ -14,6 +16,7 @@ import {
   Post,
   Put,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
@@ -27,9 +30,11 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { existsSync, mkdirSync } from 'fs';
 import { extname } from 'path';
+import { User } from '@softres/user/DTO/user.decorator';
 
 @Controller('almacen')
 @ApiTags('Almacén')
+@UseGuards(JwtAuthGuard)
 export class AlmacenController {
   constructor(private readonly almacenService: AlmacenService) {}
 
@@ -50,6 +55,14 @@ export class AlmacenController {
     almacen: CreateDetalleDTO[],
   ): Promise<AlmacenDetalleEntity[]> {
     return this.almacenService.createDetalle(almacenId, almacen);
+  }
+
+  @Post('insumos-minimos')
+  insumosMinimos(
+    @Body() options: PaginationOptions,
+    @User() user: LoginIdentityDTO,
+  ): Promise<PaginationPrimeNgResult> {
+    return this.almacenService.insMinimos(options, user);
   }
 
   @Get(':id')

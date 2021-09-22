@@ -1,10 +1,18 @@
+import { Deptos } from './enums/deptos.enum';
+import { ProfileTypes } from './../user/profileTypes.enum';
+import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
 import { CreateDetalleDTO } from './DTOs/createDetalleDTO.dto';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { CreateAlmacenDTO } from './DTOs/createAlmacenDTO.dto';
 import { AlmacenEntity } from './entitys/almacen.entity';
 import { Injectable } from '@nestjs/common';
 import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
-import { DeleteResult, getRepository, UpdateResult } from 'typeorm';
+import {
+  DeleteResult,
+  getRepository,
+  SelectQueryBuilder,
+  UpdateResult,
+} from 'typeorm';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
 import { forIn } from 'lodash';
@@ -338,5 +346,111 @@ export class AlmacenService {
       } //Titulos
     });
     return this.createDetalle(almacenId, response);
+  }
+
+  async insMinimos(
+    options: PaginationOptions,
+    user: LoginIdentityDTO,
+  ): Promise<PaginationPrimeNgResult> {
+    let dataQuery: SelectQueryBuilder<AlmacenEntity>;
+
+    switch (user.profile) {
+      case ProfileTypes.COMPRAS:
+        dataQuery = getRepository(AlmacenEntity)
+          .createQueryBuilder('almacen')
+          .leftJoin('almacen.insumo', 'insumo')
+          .select([
+            'almacen.id',
+            'almacen.maximo',
+            'almacen.minimo',
+            'almacen.total',
+            'almacen.depto',
+            'insumo.id',
+            'insumo.nombre',
+          ])
+          .where('almacen.total=<almacen.minimo')
+          .groupBy('almacen.depto');
+        break;
+
+      case ProfileTypes.ALMACEN_GENERAL:
+        dataQuery = getRepository(AlmacenEntity)
+          .createQueryBuilder('almacen')
+          .leftJoin('almacen.insumo', 'insumo')
+          .select([
+            'almacen.id',
+            'almacen.maximo',
+            'almacen.minimo',
+            'almacen.total',
+            'almacen.depto',
+            'insumo.id',
+            'insumo.nombre',
+          ])
+          .where('almacen.total=<almacen.minimo')
+          .groupBy('almacen.depto');
+        break;
+
+      case ProfileTypes.COCINA:
+        dataQuery = getRepository(AlmacenEntity)
+          .createQueryBuilder('almacen')
+          .leftJoin('almacen.insumo', 'insumo')
+          .select([
+            'almacen.id',
+            'almacen.maximo',
+            'almacen.minimo',
+            'almacen.total',
+            'almacen.depto',
+            'insumo.id',
+            'insumo.nombre',
+          ])
+          .where('almacen.total=<almacen.minimo AND almacen.depto=:depto', {
+            depto: Deptos.COCINA,
+          });
+        break;
+
+      case ProfileTypes.BARRA:
+        dataQuery = getRepository(AlmacenEntity)
+          .createQueryBuilder('almacen')
+          .leftJoin('almacen.insumo', 'insumo')
+          .select([
+            'almacen.id',
+            'almacen.maximo',
+            'almacen.minimo',
+            'almacen.total',
+            'insumo.id',
+            'insumo.nombre',
+          ])
+          .where('almacen.total=<almacen.minimo AND almacen.depto=:depto', {
+            depto: Deptos.BARRA,
+          });
+        break;
+
+      default:
+        break;
+    }
+
+    forIn(options.filters, (value, key) => {
+      if (key === 'buscar') {
+        dataQuery.andWhere('( insumo.nombre LIKE :term )', {
+          term: `%${value.split(' ').join('%')}%`,
+        });
+      }
+    });
+    if (options.sort === undefined || !Object.keys(options.sort).length) {
+      options.sort = 'insumo.nombre';
+    }
+
+    const count = await dataQuery.getCount();
+
+    const data = await dataQuery
+      .skip(options.skip)
+      .take(options.take)
+      .orderBy(options.sort, options.direction)
+      .getMany();
+
+    return {
+      data: data,
+      skip: options.skip,
+      totalItems: count,
+    };
   }
 }
