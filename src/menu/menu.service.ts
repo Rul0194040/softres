@@ -48,7 +48,18 @@ export class MenuService {
   async paginate(options: PaginationOptions): Promise<PaginationPrimeNgResult> {
     const dataQuery = getRepository(MenuEntity)
       .createQueryBuilder('menu')
-      .select(['menu.id', 'menu.createdAt', 'menu.nombre']);
+      .leftJoin('menu.secciones', 'secciones')
+      .leftJoin('secciones.recetas', 'recetas')
+      .select([
+        'menu.id',
+        'menu.createdAt',
+        'menu.nombre',
+        'secciones.id',
+        'secciones.nombre',
+        'recetas.id',
+        'recetas.nombre',
+        'recetas.depto',
+      ]);
 
     forIn(options.filters, (value, key) => {
       if (key === 'nombre') {
