@@ -155,6 +155,8 @@ export class AlmacenService {
         'insumo.medida',
         'insumo.unidad',
         'insumo.precioUnitario',
+        'insumo.precioKilo',
+        'insumo.pesoNeto',
         'insumo.marca',
         'categoria.id',
         'categoria.nombre',
