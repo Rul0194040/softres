@@ -40,6 +40,15 @@ export class MenuController {
     return this.menuService.update(id, menu);
   }
 
+  @Put(':menuId/:sectionId')
+  updateSection(
+    @Param('menuId', ParseIntPipe) menuId: number,
+    @Param('sectionId', ParseIntPipe) sectionId: number,
+    @Body() recetas: number[],
+  ): Promise<UpdateResult> {
+    return this.menuService.updateSection(menuId, sectionId, recetas);
+  }
+
   @Delete(':id')
   deleteMenu(@Param('id') id: number): Promise<DeleteResult> {
     return this.menuService.delete(id);

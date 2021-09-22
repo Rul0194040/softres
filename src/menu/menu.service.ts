@@ -3,7 +3,7 @@ import { RecetaEntity } from './../receta/entities/receta.entity';
 import { DeleteResult, getRepository, UpdateResult } from 'typeorm';
 import { SeccionEntity } from './entitys/section.entity';
 import { MenuEntity } from './entitys/menu.entity';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateMenuDTO } from './DTOs/create-menu.dto';
 import { plainToClass } from 'class-transformer';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
@@ -33,6 +33,35 @@ export class MenuService {
 
   async getByid(menuId: number): Promise<MenuEntity> {
     return await getRepository(MenuEntity).findOne(menuId);
+  }
+
+  async updateSection(
+    menuId: number,
+    sectionId: number,
+    newRecetas: number[],
+  ): Promise<UpdateResult> {
+    const section = await getRepository(SeccionEntity).findOne({
+      where: { id: sectionId, menuId },
+    });
+    const repetido = section.recetas.every((value) => {
+      newRecetas.every((itm) => value.id == itm);
+    });
+    const recetas = await getRepository(RecetaEntity).findByIds(newRecetas);
+
+    if (!section) {
+      throw new HttpException('menú ó sección no existe', HttpStatus.NOT_FOUND);
+    }
+
+    if (repetido) {
+      throw new HttpException(
+        'la receta ya existe en la seccion',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return await getRepository(SeccionEntity).update(sectionId, {
+      recetas: section.recetas.concat(recetas),
+    });
   }
 
   async update(menuId: number, menu: UpdateMenuDTO): Promise<UpdateResult> {
