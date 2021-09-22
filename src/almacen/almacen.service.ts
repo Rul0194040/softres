@@ -355,24 +355,7 @@ export class AlmacenService {
     let dataQuery: SelectQueryBuilder<AlmacenEntity>;
 
     switch (user.profile) {
-      case ProfileTypes.COMPRAS:
-        dataQuery = getRepository(AlmacenEntity)
-          .createQueryBuilder('almacen')
-          .leftJoin('almacen.insumo', 'insumo')
-          .select([
-            'almacen.id',
-            'almacen.maximo',
-            'almacen.minimo',
-            'almacen.total',
-            'almacen.depto',
-            'insumo.id',
-            'insumo.nombre',
-          ])
-          .where('almacen.total=<almacen.minimo')
-          .groupBy('almacen.depto');
-        break;
-
-      case ProfileTypes.ALMACEN_GENERAL:
+      case ProfileTypes.COMPRAS || ProfileTypes.ALMACEN_GENERAL:
         dataQuery = getRepository(AlmacenEntity)
           .createQueryBuilder('almacen')
           .leftJoin('almacen.insumo', 'insumo')
