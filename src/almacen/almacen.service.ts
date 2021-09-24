@@ -29,7 +29,6 @@ export class AlmacenService {
     almacen: CreateAlmacenDTO,
   ): Promise<AlmacenInformeDTO | AlmacenEntity> {
     const insumo = await getRepository(InsumoEntity).findOne(almacen.insumoId);
-    const total = almacen.cantidad * insumo.pesoNeto;
 
     const almacenToCreate: CreateAlmacenDTO = {
       cantidad: almacen.cantidad,
@@ -38,14 +37,14 @@ export class AlmacenService {
       insumoId: almacen.insumoId,
       maximo: almacen.maximo,
       minimo: almacen.minimo,
-      total,
+      total: 0,
       type: almacen.type,
     };
     const createdAlmacen = await getRepository(AlmacenEntity).save(
       almacenToCreate,
     );
 
-    if (almacen.detalles) {
+    if (almacen.detalles && almacen.detalles.length !== 0) {
       const createdDetalle: AlmacenDetalleEntity[] = await this.createDetalle(
         createdAlmacen.id,
         almacen.detalles,
@@ -247,7 +246,6 @@ export class AlmacenService {
       .getMany();
 
     const count = await dataQuery.getCount();
-    console.log(count);
 
     return {
       data: data,
