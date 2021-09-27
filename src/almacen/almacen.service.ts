@@ -368,8 +368,7 @@ export class AlmacenService {
             'insumo.id',
             'insumo.nombre',
           ])
-          .where('almacen.total=<almacen.minimo')
-          .groupBy('almacen.depto');
+          .where('almacen.total<=almacen.minimo');
         break;
 
       case ProfileTypes.COCINA:
@@ -385,7 +384,7 @@ export class AlmacenService {
             'insumo.id',
             'insumo.nombre',
           ])
-          .where('almacen.total=<almacen.minimo AND almacen.depto=:depto', {
+          .where('almacen.total<=almacen.minimo AND almacen.depto=:depto', {
             depto: Deptos.COCINA,
           });
         break;
@@ -402,7 +401,7 @@ export class AlmacenService {
             'insumo.id',
             'insumo.nombre',
           ])
-          .where('almacen.total=<almacen.minimo AND almacen.depto=:depto', {
+          .where('almacen.total<=almacen.minimo AND almacen.depto=:depto', {
             depto: Deptos.BARRA,
           });
         break;
