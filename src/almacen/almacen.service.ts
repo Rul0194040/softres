@@ -358,58 +358,40 @@ export class AlmacenService {
     options: PaginationOptions,
     user: LoginIdentityDTO,
   ): Promise<PaginationPrimeNgResult> {
-    let dataQuery: SelectQueryBuilder<AlmacenEntity>;
+    const dataQuery = getRepository(AlmacenEntity)
+      .createQueryBuilder('almacen')
+      .leftJoin('almacen.insumo', 'insumo')
+      .select([
+        'almacen.id',
+        'almacen.maximo',
+        'almacen.minimo',
+        'almacen.total',
+        'almacen.depto',
+        'insumo.id',
+        'insumo.nombre',
+      ]);
 
     switch (user.profile) {
       case ProfileTypes.COMPRAS || ProfileTypes.ALMACEN_GENERAL:
-        dataQuery = getRepository(AlmacenEntity)
-          .createQueryBuilder('almacen')
-          .leftJoin('almacen.insumo', 'insumo')
-          .select([
-            'almacen.id',
-            'almacen.maximo',
-            'almacen.minimo',
-            'almacen.total',
-            'almacen.depto',
-            'insumo.id',
-            'insumo.nombre',
-          ])
-          .where('almacen.total<=almacen.minimo');
+        dataQuery.where('almacen.total<=almacen.minimo');
         break;
 
       case ProfileTypes.COCINA:
-        dataQuery = getRepository(AlmacenEntity)
-          .createQueryBuilder('almacen')
-          .leftJoin('almacen.insumo', 'insumo')
-          .select([
-            'almacen.id',
-            'almacen.maximo',
-            'almacen.minimo',
-            'almacen.total',
-            'almacen.depto',
-            'insumo.id',
-            'insumo.nombre',
-          ])
-          .where('almacen.total<=almacen.minimo AND almacen.depto=:depto', {
+        dataQuery.where(
+          'almacen.total<=almacen.minimo AND almacen.depto=:depto',
+          {
             depto: Deptos.COCINA,
-          });
+          },
+        );
         break;
 
       case ProfileTypes.BARRA:
-        dataQuery = getRepository(AlmacenEntity)
-          .createQueryBuilder('almacen')
-          .leftJoin('almacen.insumo', 'insumo')
-          .select([
-            'almacen.id',
-            'almacen.maximo',
-            'almacen.minimo',
-            'almacen.total',
-            'insumo.id',
-            'insumo.nombre',
-          ])
-          .where('almacen.total<=almacen.minimo AND almacen.depto=:depto', {
+        dataQuery.where(
+          'almacen.total<=almacen.minimo AND almacen.depto=:depto',
+          {
             depto: Deptos.BARRA,
-          });
+          },
+        );
         break;
 
       default:
@@ -436,9 +418,29 @@ export class AlmacenService {
       .getMany();
 
     return {
-      data: data,
+      data: this.getAlmacenesByDepto(data),
       skip: options.skip,
       totalItems: count,
+    };
+  }
+
+  getAlmacenesByDepto(almacenes: AlmacenEntity[]): any {
+    const insumoCocina = [];
+    const insumoBarra = [];
+    const insumoAlmacen = [];
+    almacenes.forEach((almacen) => {
+      if (almacen.depto === Deptos.COCINA) {
+        insumoCocina.push(almacen);
+      } else if (almacen.depto === Deptos.BARRA) {
+        insumoBarra.push(almacen);
+      } else if (almacen.depto === Deptos.ALMACEN) {
+        insumoAlmacen.push(almacen);
+      }
+    });
+    return {
+      insumoCocina,
+      insumoBarra,
+      insumoAlmacen,
     };
   }
 }
