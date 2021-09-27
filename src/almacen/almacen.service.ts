@@ -417,25 +417,14 @@ export class AlmacenService {
       .orderBy(options.sort, options.direction)
       .getMany();
 
-    if (
-      user.profile == ProfileTypes.COMPRAS ||
-      user.profile == ProfileTypes.ALMACEN_GENERAL
-    ) {
-      return {
-        data: this.getAlmacenesByDepto(data),
-        skip: options.skip,
-        totalItems: count,
-      };
-    }
-
     return {
-      data: data,
+      data: this.getAlmacenesByDepto(user, data),
       skip: options.skip,
       totalItems: count,
     };
   }
 
-  getAlmacenesByDepto(almacenes: AlmacenEntity[]): any {
+  getAlmacenesByDepto(user: LoginIdentityDTO, almacenes: AlmacenEntity[]): any {
     const insumoCocina = [];
     const insumoBarra = [];
     const insumoAlmacen = [];
@@ -448,10 +437,24 @@ export class AlmacenService {
         insumoAlmacen.push(almacen);
       }
     });
-    return {
-      insumoCocina,
-      insumoBarra,
-      insumoAlmacen,
-    };
+
+    if (
+      user.profile == ProfileTypes.ALMACEN_GENERAL ||
+      user.profile == ProfileTypes.COMPRAS
+    ) {
+      return {
+        insumoCocina,
+        insumoBarra,
+        insumoAlmacen,
+      };
+    } else if (user.profile == ProfileTypes.COCINA) {
+      return {
+        insumoCocina,
+      };
+    } else {
+      return {
+        insumoBarra,
+      };
+    }
   }
 }
