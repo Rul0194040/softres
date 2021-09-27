@@ -173,6 +173,12 @@ export class AlmacenService {
           term2: value,
         });
       }
+
+      if (key === 'depto') {
+        dataQuery.andWhere('( almacen.depto = :term3 )', {
+          term3: value,
+        });
+      }
     });
 
     if (options.sort === undefined || !Object.keys(options.sort).length) {

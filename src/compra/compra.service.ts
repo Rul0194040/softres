@@ -169,7 +169,10 @@ export class CompraService {
       .createQueryBuilder('solicitud')
       .leftJoin('solicitud.usuario', 'usuario')
       .select([
-        'solicitud',
+        'solicitud.id',
+        'solicitud.folio',
+        'solicitud.fecha',
+        'solicitud.status',
         'usuario.id',
         'usuario.firstName',
         'usuario.lastName',
@@ -179,6 +182,12 @@ export class CompraService {
       if (key === 'folio') {
         dataQuery.andWhere('( solicitud.folio LIKE :term )', {
           term: `%${value.split(' ').join('%')}%`,
+        });
+      }
+
+      if (key === 'depto') {
+        dataQuery.andWhere('( solicitud.depto = :term2 )', {
+          term2: value,
         });
       }
     });
