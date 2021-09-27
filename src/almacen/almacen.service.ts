@@ -417,8 +417,19 @@ export class AlmacenService {
       .orderBy(options.sort, options.direction)
       .getMany();
 
+    if (
+      user.profile == ProfileTypes.COMPRAS ||
+      user.profile == ProfileTypes.ALMACEN_GENERAL
+    ) {
+      return {
+        data: this.getAlmacenesByDepto(data),
+        skip: options.skip,
+        totalItems: count,
+      };
+    }
+
     return {
-      data: this.getAlmacenesByDepto(data),
+      data: data,
       skip: options.skip,
       totalItems: count,
     };
