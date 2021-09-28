@@ -1,4 +1,3 @@
-import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
 import { CreateSolicitudDTO } from './dto/create-solicitud.dto';
 import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';

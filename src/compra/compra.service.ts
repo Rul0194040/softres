@@ -1,4 +1,3 @@
-import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
 import { CompraDetalleEntity } from './entities/compraDetalles.entity';
 import { CompraEntity } from './entities/compra.entity';
 import { CotizacionDetalleEntity } from '@softres/cotizacion/entitys/cotizacionDetalle.entity';
@@ -111,7 +110,6 @@ export class CompraService {
    */
 
   async createSolicitud(
-    user: LoginIdentityDTO,
     solicitud: CreateSolicitudDTO,
     user: LoginIdentityDTO,
   ): Promise<InformeSolicitud> {
