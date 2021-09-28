@@ -15,6 +15,9 @@ import { SolicitudDetalleEntity } from './entities/solicitudDetalle.entity';
 import { SolicitudEntity } from './entities/solicitud.entity';
 import { UpdateCompraDto } from './dto/update-compra.dto';
 import * as moment from 'moment';
+import { LoginIdentityDTO } from '@softres/auth/DTOs/loginIdentity.dto';
+import { ProfileTypes } from '@softres/user/profileTypes.enum';
+import { Deptos } from '@softres/almacen/enums/deptos.enum';
 
 @Injectable()
 export class CompraService {
@@ -108,7 +111,18 @@ export class CompraService {
 
   async createSolicitud(
     solicitud: CreateSolicitudDTO,
+    user: LoginIdentityDTO,
   ): Promise<InformeSolicitud> {
+    if (user.profile === ProfileTypes.COCINA) {
+      solicitud.depto = Deptos.COCINA;
+    } else if (user.profile === ProfileTypes.BARRA) {
+      solicitud.depto = Deptos.BARRA;
+    } else {
+      solicitud.depto = Deptos.ALMACEN;
+    }
+
+    solicitud.usuarioId = user.id;
+
     const solicitudToCreate: SolicitudEntity = {
       usuarioId: solicitud.usuarioId,
       fecha: solicitud.fecha ? new Date(solicitud.fecha) : moment().toDate(),
@@ -164,7 +178,16 @@ export class CompraService {
       .getOne();
   }
 
-  async paginate(options: PaginationOptions): Promise<PaginationPrimeNgResult> {
+  async paginate(
+    options: PaginationOptions,
+    user: LoginIdentityDTO,
+  ): Promise<PaginationPrimeNgResult> {
+    if (user.profile === ProfileTypes.COCINA) {
+      options.filters.depto = Deptos.COCINA;
+    } else if (user.profile === ProfileTypes.BARRA) {
+      options.filters.depto = Deptos.BARRA;
+    }
+
     const dataQuery = getRepository(SolicitudEntity)
       .createQueryBuilder('solicitud')
       .leftJoin('solicitud.usuario', 'usuario')
