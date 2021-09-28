@@ -11,7 +11,6 @@ export class CreateSolicitudDetallesDTO {
 
 export class CreateSolicitudDTO {
   @ApiProperty({ nullable: true })
-  @IsOptional()
   usuarioId?: number;
 
   @ApiProperty({ nullable: true })

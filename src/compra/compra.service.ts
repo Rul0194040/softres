@@ -1,3 +1,4 @@
+import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
 import { CompraDetalleEntity } from './entities/compraDetalles.entity';
 import { CompraEntity } from './entities/compra.entity';
 import { CotizacionDetalleEntity } from '@softres/cotizacion/entitys/cotizacionDetalle.entity';
@@ -110,6 +111,7 @@ export class CompraService {
    */
 
   async createSolicitud(
+    user: LoginIdentityDTO,
     solicitud: CreateSolicitudDTO,
     user: LoginIdentityDTO,
   ): Promise<InformeSolicitud> {
@@ -124,7 +126,7 @@ export class CompraService {
     solicitud.usuarioId = user.id;
 
     const solicitudToCreate: SolicitudEntity = {
-      usuarioId: solicitud.usuarioId,
+      usuarioId: user.id,
       fecha: solicitud.fecha ? new Date(solicitud.fecha) : moment().toDate(),
       folio: `${moment().format('DDMMYYYY')}${solicitud.depto.substr(0, 2)}`,
       depto: solicitud.depto,
