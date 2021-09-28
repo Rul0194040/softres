@@ -1,25 +1,20 @@
-import { Deptos } from './enums/deptos.enum';
-import { ProfileTypes } from './../user/profileTypes.enum';
-import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
-import { CreateDetalleDTO } from './DTOs/createDetalleDTO.dto';
-import { InsumoEntity } from '@softres/insumo/insumo.entity';
-import { CreateAlmacenDTO } from './DTOs/createAlmacenDTO.dto';
+import { AlmacenDetalleEntity } from './entitys/almacenDetalle.entity';
 import { AlmacenEntity } from './entitys/almacen.entity';
+import { AlmacenInformeDTO } from './DTOs/almacenInforneDTO.dto';
+import { CreateAlmacenDTO } from './DTOs/createAlmacenDTO.dto';
+import { CreateDetalleDTO } from './DTOs/createDetalleDTO.dto';
+import { DeleteResult, getRepository, UpdateResult } from 'typeorm';
+import { Deptos } from './enums/deptos.enum';
+import { forIn } from 'lodash';
 import { Injectable } from '@nestjs/common';
-import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
-import {
-  DeleteResult,
-  getRepository,
-  SelectQueryBuilder,
-  UpdateResult,
-} from 'typeorm';
+import { InsumoEntity } from '@softres/insumo/insumo.entity';
+import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
-import { forIn } from 'lodash';
-import { AlmacenInformeDTO } from './DTOs/almacenInforneDTO.dto';
-import { AlmacenDetalleEntity } from './entitys/almacenDetalle.entity';
-import * as moment from 'moment';
+import { ProfileTypes } from './../user/profileTypes.enum';
+import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
 import * as Excel from 'exceljs';
+import * as moment from 'moment';
 
 const toFloat = (num: string | number): number => parseFloat(num + '');
 
@@ -418,43 +413,29 @@ export class AlmacenService {
       .getMany();
 
     return {
-      data: this.getAlmacenesByDepto(user, data),
+      data: this.getAlmacenesByDepto(data),
       skip: options.skip,
       totalItems: count,
     };
   }
 
-  getAlmacenesByDepto(user: LoginIdentityDTO, almacenes: AlmacenEntity[]): any {
-    const insumoCocina = [];
-    const insumoBarra = [];
-    const insumoAlmacen = [];
-    almacenes.forEach((almacen) => {
-      if (almacen.depto === Deptos.COCINA) {
-        insumoCocina.push(almacen);
-      } else if (almacen.depto === Deptos.BARRA) {
-        insumoBarra.push(almacen);
-      } else if (almacen.depto === Deptos.ALMACEN) {
-        insumoAlmacen.push(almacen);
+  getAlmacenesByDepto(almacenes: AlmacenEntity[]): any {
+    const cocina: InsumoEntity[] = [];
+    const barra: InsumoEntity[] = [];
+    const almacen: InsumoEntity[] = [];
+    almacenes.forEach((alm) => {
+      if (alm.depto === Deptos.COCINA) {
+        cocina.push(alm.insumo);
+      } else if (alm.depto === Deptos.BARRA) {
+        barra.push(alm.insumo);
+      } else if (alm.depto === Deptos.ALMACEN) {
+        almacen.push(alm.insumo);
       }
     });
-
-    if (
-      user.profile == ProfileTypes.ALMACEN_GENERAL ||
-      user.profile == ProfileTypes.COMPRAS
-    ) {
-      return {
-        insumoCocina,
-        insumoBarra,
-        insumoAlmacen,
-      };
-    } else if (user.profile == ProfileTypes.COCINA) {
-      return {
-        insumoCocina,
-      };
-    } else {
-      return {
-        insumoBarra,
-      };
-    }
+    return {
+      cocina,
+      barra,
+      almacen,
+    };
   }
 }
