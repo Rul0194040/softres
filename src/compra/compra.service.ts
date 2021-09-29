@@ -18,9 +18,13 @@ import * as moment from 'moment';
 import { LoginIdentityDTO } from '@softres/auth/DTOs/loginIdentity.dto';
 import { ProfileTypes } from '@softres/user/profileTypes.enum';
 import { Deptos } from '@softres/almacen/enums/deptos.enum';
+import { AlmacenEntity } from '@softres/almacen/entitys/almacen.entity';
+import { AlmacenService } from '@softres/almacen/almacen.service';
 
 @Injectable()
 export class CompraService {
+  private readonly almacenService: AlmacenService = new AlmacenService();
+
   /**
  * 
 ..######...#######..##.....##.########..########.....###.....######.
@@ -143,6 +147,7 @@ export class CompraService {
         cantidad: registro.cantidad,
         insumoId: registro.insumoId,
         solicitudId: createdSolicitud.id,
+        abastecido: false,
       };
 
       detalles[idx] = await getRepository(SolicitudDetalleEntity).save(
@@ -232,5 +237,26 @@ export class CompraService {
       skip: options.skip,
       totalItems: count,
     };
+  }
+
+  async abastecerAlmacenes(idSolicitud: number): Promise<UpdateResult> {
+    const solicitud = await getRepository(SolicitudEntity).findOne(idSolicitud);
+    const detalles: SolicitudDetalleEntity[] = await getRepository(
+      SolicitudDetalleEntity,
+    ).find({ where: { solicitudId: idSolicitud } });
+    detalles.forEach(async (detalle) => {
+      const almacen = await getRepository(AlmacenEntity).findOne({
+        where: { insumoId: detalle.insumoId, depto: solicitud.depto },
+      });
+      if (almacen.total >= detalle.cantidad) {
+        this.almacenService.createDetalle(almacen.id, [
+          {
+            salidas: detalle.cantidad,
+            almacenId: almacen.id,
+          },
+        ]);
+      }
+    });
+    return null;
   }
 }

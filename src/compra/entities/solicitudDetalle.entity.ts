@@ -20,6 +20,13 @@ export class SolicitudDetalleEntity extends CommonEntity {
   })
   cantidad: number;
 
+  @Column({
+    type: 'boolean',
+    nullable: true,
+    default: false,
+  })
+  abastecido: boolean;
+
   @ManyToOne(() => InsumoEntity, { nullable: true })
   insumo?: InsumoEntity;
 
