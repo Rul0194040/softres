@@ -1,24 +1,24 @@
-import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
-import { Injectable } from '@nestjs/common';
-import { AlmacenService } from '@softres/almacen/almacen.service';
-import { AlmacenEntity } from '@softres/almacen/entitys/almacen.entity';
 import { AlmacenDetalleEntity } from '@softres/almacen/entitys/almacenDetalle.entity';
+import { AlmacenEntity } from '@softres/almacen/entitys/almacen.entity';
+import { AlmacenService } from '@softres/almacen/almacen.service';
+import { CreateRecetaDTO } from './DTO/create-receta.dto';
+import { DashboardDTO } from './../dashboard/DTOs/dashboard.dto';
 import { Deptos } from '@softres/almacen/enums/deptos.enum';
-import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
-import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
-import { InsumoEntity } from '@softres/insumo/insumo.entity';
-import { plainToClass } from 'class-transformer';
 import { forIn } from 'lodash';
 import { getRepository, UpdateResult } from 'typeorm';
-import { DashboardDTO } from './../dashboard/DTOs/dashboard.dto';
-import { MenuEntity } from './../menu/entitys/menu.entity';
-import { CreateRecetaDTO } from './DTO/create-receta.dto';
-import { UpdateRecetaDTO } from './DTO/update-receta.dto';
-import { RecetaEntity } from './entities/receta.entity';
-import { RecetaDetalleEntity } from './entities/recetaDetalle.entity';
 import { GrupoReceta } from './enums/grupoReceta.enum';
-import { RecipeValues } from './enums/recipeValues.enum';
+import { Injectable } from '@nestjs/common';
+import { InsumoEntity } from '@softres/insumo/insumo.entity';
+import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
+import { MenuEntity } from './../menu/entitys/menu.entity';
+import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
+import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
+import { plainToClass } from 'class-transformer';
 import { ProfileTypes } from '@softres/user/profileTypes.enum';
+import { RecetaDetalleEntity } from './entities/recetaDetalle.entity';
+import { RecetaEntity } from './entities/receta.entity';
+import { RecipeValues } from './enums/recipeValues.enum';
+import { UpdateRecetaDTO } from './DTO/update-receta.dto';
 
 @Injectable()
 export class RecetaService {
@@ -115,7 +115,7 @@ export class RecetaService {
   }
 
   async getById(id: number): Promise<any> {
-    return getRepository(RecetaEntity).findOne(id);
+    return getRepository(RecetaEntity).findOne(id, { relations: ['children'] });
   }
 
   async delete(id: number): Promise<any> {
