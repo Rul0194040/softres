@@ -24,7 +24,7 @@ export class AlmacenService {
     almacen: CreateAlmacenDTO,
   ): Promise<AlmacenInformeDTO | AlmacenEntity> {
     const insumo = await getRepository(InsumoEntity).findOne(almacen.insumoId);
-
+    const total = almacen.cantidad * insumo.pesoNeto;
     const almacenToCreate: CreateAlmacenDTO = {
       cantidad: almacen.cantidad,
       depto: almacen.depto,
@@ -32,12 +32,21 @@ export class AlmacenService {
       insumoId: almacen.insumoId,
       maximo: almacen.maximo,
       minimo: almacen.minimo,
-      total: 0,
+      total,
       type: almacen.type,
     };
     const createdAlmacen = await getRepository(AlmacenEntity).save(
       almacenToCreate,
     );
+
+    if (almacen.cantidad && almacen.cantidad > 0) {
+      almacen.detalles.push({
+        almacenId: createdAlmacen.id,
+        entradas: total,
+        precioUnitario: insumo.precioUnitario,
+        cargo: almacen.cantidad * insumo.precioUnitario,
+      });
+    }
 
     if (almacen.detalles && almacen.detalles.length !== 0) {
       const createdDetalle: AlmacenDetalleEntity[] = await this.createDetalle(
@@ -99,7 +108,7 @@ export class AlmacenService {
         precioUnitario: detalle.precioUnitario,
         cargo,
         abono,
-        saldo: detalle.saldo + entradas,
+        saldo: 0,
       };
       const createdDetalle = await getRepository(AlmacenDetalleEntity).save(
         detalleToCreate,
@@ -278,10 +287,15 @@ export class AlmacenService {
     return await this.updateTablaContable(detalleId);
   }
 
+  // detalleId es el id del detalle desde donde va a empezar a actualizar la tabla
   async updateTablaContable(detalleId: number): Promise<UpdateResult> {
     const mainDetalle: AlmacenDetalleEntity = await getRepository(
       AlmacenDetalleEntity,
     ).findOne({ id: detalleId });
+    const almacen = await getRepository(AlmacenEntity).findOne(
+      mainDetalle.almacenId,
+      { select: ['insumo'], relations: ['insumo'] },
+    );
     const detalleArray: AlmacenDetalleEntity[] = await getRepository(
       AlmacenDetalleEntity,
     )
@@ -311,6 +325,7 @@ export class AlmacenService {
 
     return getRepository(AlmacenEntity).update(mainDetalle.almacenId, {
       total: stock,
+      cantidad: Math.ceil((stock * 1.0) / almacen.insumo.pesoNeto),
     });
   }
 
