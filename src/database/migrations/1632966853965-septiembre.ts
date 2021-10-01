@@ -1,11 +1,14 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class solicitud1632157028219 implements MigrationInterface {
-  name = 'solicitud1632157028219';
+export class septiembre1632966853965 implements MigrationInterface {
+  name = 'septiembre1632966853965';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `CREATE TABLE \`softres\`.\`solicitudDetalle\` (\`id\` int NOT NULL AUTO_INCREMENT, \`uuid\` char(36) NOT NULL, \`createdAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`active\` tinyint NOT NULL DEFAULT 1, \`solicitudId\` int NOT NULL, \`cantidad\` int NOT NULL, \`insumoId\` int NULL, UNIQUE INDEX \`IDX_047844d787ae4285998c456bfe\` (\`uuid\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`,
+      `CREATE TABLE \`softres\`.\`proveedor\` (\`id\` int NOT NULL AUTO_INCREMENT, \`uuid\` char(36) NOT NULL, \`createdAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`active\` tinyint NOT NULL DEFAULT 1, \`nombre\` varchar(100) NOT NULL, \`email\` varchar(100) NULL DEFAULT '', \`telefono\` varchar(20) NULL DEFAULT '', \`descripcion\` varchar(200) NULL DEFAULT '', \`direccion\` varchar(350) NULL, \`contacto\` varchar(100) NULL, UNIQUE INDEX \`IDX_fbffe17281fe5563591eb900c9\` (\`uuid\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE \`softres\`.\`solicitudDetalle\` (\`id\` int NOT NULL AUTO_INCREMENT, \`uuid\` char(36) NOT NULL, \`createdAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`active\` tinyint NOT NULL DEFAULT 1, \`solicitudId\` int NOT NULL, \`cantidad\` int NOT NULL, \`abastecido\` tinyint NULL DEFAULT 0, \`insumoId\` int NULL, UNIQUE INDEX \`IDX_047844d787ae4285998c456bfe\` (\`uuid\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`,
     );
     await queryRunner.query(
       `CREATE TABLE \`softres\`.\`solicitud\` (\`id\` int NOT NULL AUTO_INCREMENT, \`uuid\` char(36) NOT NULL, \`createdAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`active\` tinyint NOT NULL DEFAULT 1, \`usuarioId\` int NOT NULL, \`fecha\` date NOT NULL, \`folio\` text NOT NULL, \`depto\` enum ('COCINA', 'BARRA', 'ALMACÉN') NOT NULL DEFAULT 'COCINA', \`status\` enum ('generada', 'revision', 'completada') NULL DEFAULT 'generada', UNIQUE INDEX \`IDX_d817112cdf0f7e406f60b883c4\` (\`uuid\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`,
@@ -20,10 +23,52 @@ export class solicitud1632157028219 implements MigrationInterface {
       `CREATE TABLE \`softres\`.\`comprasDetalle\` (\`id\` int NOT NULL AUTO_INCREMENT, \`uuid\` char(36) NOT NULL, \`createdAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`active\` tinyint NOT NULL DEFAULT 1, \`total\` decimal NOT NULL DEFAULT '0', \`cantidad\` decimal(10,2) NOT NULL DEFAULT '0.00', \`proveedorId\` int NOT NULL, \`insumoId\` int NOT NULL, \`compraId\` int NOT NULL, UNIQUE INDEX \`IDX_8beeb3e413ead9af9d55d5d0fa\` (\`uuid\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`,
     );
     await queryRunner.query(
+      `CREATE TABLE \`softres\`.\`recetasDetalle\` (\`id\` int NOT NULL AUTO_INCREMENT, \`uuid\` char(36) NOT NULL, \`createdAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`active\` tinyint NOT NULL DEFAULT 1, \`cantReal\` mediumint NULL, \`cantReceta\` mediumint NOT NULL, \`costoUnitarioIngrediente\` mediumint NOT NULL, \`insumoId\` int NULL, \`parentId\` int NOT NULL, UNIQUE INDEX \`IDX_fe86a44f968e34233fd51dce81\` (\`uuid\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE \`softres\`.\`recetas\` (\`id\` int NOT NULL AUTO_INCREMENT, \`uuid\` char(36) NOT NULL, \`createdAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`active\` tinyint NOT NULL DEFAULT 1, \`nombre\` varchar(100) NOT NULL, \`depto\` enum ('COCINA', 'BARRA', 'ALMACÉN') NOT NULL DEFAULT 'COCINA', \`descripcion\` varchar(100) NULL, \`numPorciones\` mediumint NULL, \`costoXporcion\` mediumint NULL, \`rendimiento\` mediumint NULL, \`costoTotal\` mediumint NULL, \`costoUnitarioReceta\` mediumint NULL, \`mermaReceta\` mediumint NULL, \`iva\` mediumint NULL, \`costoIva\` mediumint NULL, \`costoSinIva\` mediumint NULL, \`precioSugeridoCarta\` mediumint NULL, \`haschildren\` tinyint NOT NULL, \`grupo\` enum ('fuerte', 'complemento', 'extra', 'subreceta', 'extra/subreceta', 'complemento/subreceta') NULL, \`imagen\` varchar(20) NULL, \`existencia\` decimal NOT NULL DEFAULT '0', \`parentId\` int NULL, \`seccionId\` int NULL, UNIQUE INDEX \`IDX_9c6bbb025a661bb198e0d91e0b\` (\`uuid\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`,
+    );
+    await queryRunner.query(
       `CREATE TABLE \`softres\`.\`secciones\` (\`id\` int NOT NULL AUTO_INCREMENT, \`uuid\` char(36) NOT NULL, \`createdAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`active\` tinyint NOT NULL DEFAULT 1, \`nombre\` varchar(100) NOT NULL, \`menuId\` int NOT NULL, UNIQUE INDEX \`IDX_e67bd8ef94c717102a93f58f4d\` (\`uuid\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`,
     );
     await queryRunner.query(
-      `CREATE TABLE \`softres\`.\`menus\` (\`id\` int NOT NULL AUTO_INCREMENT, \`uuid\` char(36) NOT NULL, \`createdAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`active\` tinyint NOT NULL DEFAULT 1, \`nombre\` varchar(100) NOT NULL, UNIQUE INDEX \`IDX_69aca9e46979f8eff3286c739c\` (\`uuid\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`,
+      `CREATE TABLE \`softres\`.\`menus\` (\`id\` int NOT NULL AUTO_INCREMENT, \`uuid\` char(36) NOT NULL, \`createdAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`active\` tinyint NOT NULL DEFAULT 1, \`nombre\` varchar(100) NOT NULL, \`depto\` enum ('COCINA', 'BARRA', 'ALMACÉN') NOT NULL DEFAULT 'COCINA', UNIQUE INDEX \`IDX_69aca9e46979f8eff3286c739c\` (\`uuid\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`almacen\` DROP COLUMN \`capacidad\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`almacen\` DROP COLUMN \`costoVenta\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`categorias\` ADD \`parentCatId\` int NULL`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`insumos\` ADD \`pesoNeto\` decimal(10,2) NOT NULL`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`insumos\` ADD \`pesoDrenado\` decimal(10,2) NULL`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`insumos\` ADD \`precioKilo\` decimal(10,2) NOT NULL`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`insumos\` ADD \`merma\` decimal(10,2) NULL`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`insumos\` ADD \`mermaPorcentaje\` decimal(10,2) NOT NULL`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`insumos\` ADD \`proveedorId\` int NULL`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`insumos\` ADD \`subCategoriaId\` int NULL`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`almacen\` ADD \`maximo\` int NULL DEFAULT '0'`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`almacen\` ADD \`minimo\` int NULL DEFAULT '0'`,
     );
     await queryRunner.query(
       `ALTER TABLE \`softres\`.\`compras\` ADD \`fecha\` date NOT NULL`,
@@ -38,22 +83,25 @@ export class solicitud1632157028219 implements MigrationInterface {
       `ALTER TABLE \`softres\`.\`compras\` ADD \`cotizacionId\` int NOT NULL`,
     );
     await queryRunner.query(
-      `ALTER TABLE \`softres\`.\`recetas\` ADD \`descripcion\` varchar(100) NULL`,
+      `ALTER TABLE \`softres\`.\`insumos\` CHANGE \`medida\` \`medida\` enum ('ml', 'gr') NULL`,
     );
     await queryRunner.query(
-      `ALTER TABLE \`softres\`.\`recetas\` ADD \`imagen\` varchar(20) NULL`,
+      `ALTER TABLE \`softres\`.\`insumos\` DROP COLUMN \`precioUnitario\``,
     );
     await queryRunner.query(
-      `ALTER TABLE \`softres\`.\`recetas\` ADD \`existencia\` decimal NOT NULL DEFAULT '0'`,
+      `ALTER TABLE \`softres\`.\`insumos\` ADD \`precioUnitario\` decimal(10,2) NOT NULL`,
     );
     await queryRunner.query(
-      `ALTER TABLE \`softres\`.\`recetas\` ADD \`seccionId\` int NULL`,
+      `ALTER TABLE \`softres\`.\`almacen\` CHANGE \`depto\` \`depto\` enum ('COCINA', 'BARRA', 'ALMACÉN') NOT NULL DEFAULT 'COCINA'`,
     );
     await queryRunner.query(
-      `ALTER TABLE \`softres\`.\`almacen\` CHANGE \`maximo\` \`maximo\` int NULL DEFAULT '0'`,
+      `ALTER TABLE \`softres\`.\`categorias\` ADD CONSTRAINT \`FK_17629404357ca8b22b27a3c3692\` FOREIGN KEY (\`parentCatId\`) REFERENCES \`softres\`.\`categorias\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
     await queryRunner.query(
-      `ALTER TABLE \`softres\`.\`almacen\` CHANGE \`minimo\` \`minimo\` int NULL DEFAULT '0'`,
+      `ALTER TABLE \`softres\`.\`insumos\` ADD CONSTRAINT \`FK_8868e4cb08cfb3515bfaeef0880\` FOREIGN KEY (\`proveedorId\`) REFERENCES \`softres\`.\`proveedor\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`insumos\` ADD CONSTRAINT \`FK_cf78f903e02e388f5e8508643f2\` FOREIGN KEY (\`subCategoriaId\`) REFERENCES \`softres\`.\`categorias\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
     await queryRunner.query(
       `ALTER TABLE \`softres\`.\`solicitudDetalle\` ADD CONSTRAINT \`FK_d29377336faa636ba9e93c684ef\` FOREIGN KEY (\`solicitudId\`) REFERENCES \`softres\`.\`solicitud\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`,
@@ -104,6 +152,15 @@ export class solicitud1632157028219 implements MigrationInterface {
       `ALTER TABLE \`softres\`.\`compras\` ADD CONSTRAINT \`FK_3237c20b916be0b19192f2c5ce5\` FOREIGN KEY (\`cotizacionId\`) REFERENCES \`softres\`.\`cotizacion\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
     await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`recetasDetalle\` ADD CONSTRAINT \`FK_f4a52e7383478fff0821b47277c\` FOREIGN KEY (\`insumoId\`) REFERENCES \`softres\`.\`insumos\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`recetasDetalle\` ADD CONSTRAINT \`FK_2bd07cecede0803d81ee1c8f443\` FOREIGN KEY (\`parentId\`) REFERENCES \`softres\`.\`recetas\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`recetas\` ADD CONSTRAINT \`FK_a6283aa9ded0655f8559993531f\` FOREIGN KEY (\`parentId\`) REFERENCES \`softres\`.\`recetas\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
       `ALTER TABLE \`softres\`.\`recetas\` ADD CONSTRAINT \`FK_6fadd691458b08709415b7e58d0\` FOREIGN KEY (\`seccionId\`) REFERENCES \`softres\`.\`secciones\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
     await queryRunner.query(
@@ -117,6 +174,15 @@ export class solicitud1632157028219 implements MigrationInterface {
     );
     await queryRunner.query(
       `ALTER TABLE \`softres\`.\`recetas\` DROP FOREIGN KEY \`FK_6fadd691458b08709415b7e58d0\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`recetas\` DROP FOREIGN KEY \`FK_a6283aa9ded0655f8559993531f\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`recetasDetalle\` DROP FOREIGN KEY \`FK_2bd07cecede0803d81ee1c8f443\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`recetasDetalle\` DROP FOREIGN KEY \`FK_f4a52e7383478fff0821b47277c\``,
     );
     await queryRunner.query(
       `ALTER TABLE \`softres\`.\`compras\` DROP FOREIGN KEY \`FK_3237c20b916be0b19192f2c5ce5\``,
@@ -167,22 +233,25 @@ export class solicitud1632157028219 implements MigrationInterface {
       `ALTER TABLE \`softres\`.\`solicitudDetalle\` DROP FOREIGN KEY \`FK_d29377336faa636ba9e93c684ef\``,
     );
     await queryRunner.query(
-      `ALTER TABLE \`softres\`.\`almacen\` CHANGE \`minimo\` \`minimo\` int NOT NULL`,
+      `ALTER TABLE \`softres\`.\`insumos\` DROP FOREIGN KEY \`FK_cf78f903e02e388f5e8508643f2\``,
     );
     await queryRunner.query(
-      `ALTER TABLE \`softres\`.\`almacen\` CHANGE \`maximo\` \`maximo\` int NOT NULL`,
+      `ALTER TABLE \`softres\`.\`insumos\` DROP FOREIGN KEY \`FK_8868e4cb08cfb3515bfaeef0880\``,
     );
     await queryRunner.query(
-      `ALTER TABLE \`softres\`.\`recetas\` DROP COLUMN \`seccionId\``,
+      `ALTER TABLE \`softres\`.\`categorias\` DROP FOREIGN KEY \`FK_17629404357ca8b22b27a3c3692\``,
     );
     await queryRunner.query(
-      `ALTER TABLE \`softres\`.\`recetas\` DROP COLUMN \`existencia\``,
+      `ALTER TABLE \`softres\`.\`almacen\` CHANGE \`depto\` \`depto\` enum ('COCINA', 'BARRA') NOT NULL DEFAULT 'COCINA'`,
     );
     await queryRunner.query(
-      `ALTER TABLE \`softres\`.\`recetas\` DROP COLUMN \`imagen\``,
+      `ALTER TABLE \`softres\`.\`insumos\` DROP COLUMN \`precioUnitario\``,
     );
     await queryRunner.query(
-      `ALTER TABLE \`softres\`.\`recetas\` DROP COLUMN \`descripcion\``,
+      `ALTER TABLE \`softres\`.\`insumos\` ADD \`precioUnitario\` mediumint NOT NULL`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`insumos\` CHANGE \`medida\` \`medida\` enum ('Lt', 'pza', 'kg', 'ml', 'gr') NULL`,
     );
     await queryRunner.query(
       `ALTER TABLE \`softres\`.\`compras\` DROP COLUMN \`cotizacionId\``,
@@ -197,6 +266,42 @@ export class solicitud1632157028219 implements MigrationInterface {
       `ALTER TABLE \`softres\`.\`compras\` DROP COLUMN \`fecha\``,
     );
     await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`almacen\` DROP COLUMN \`minimo\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`almacen\` DROP COLUMN \`maximo\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`insumos\` DROP COLUMN \`subCategoriaId\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`insumos\` DROP COLUMN \`proveedorId\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`insumos\` DROP COLUMN \`mermaPorcentaje\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`insumos\` DROP COLUMN \`merma\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`insumos\` DROP COLUMN \`precioKilo\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`insumos\` DROP COLUMN \`pesoDrenado\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`insumos\` DROP COLUMN \`pesoNeto\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`categorias\` DROP COLUMN \`parentCatId\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`almacen\` ADD \`costoVenta\` mediumint NULL`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`softres\`.\`almacen\` ADD \`capacidad\` decimal(10,0) NOT NULL DEFAULT '0'`,
+    );
+    await queryRunner.query(
       `DROP INDEX \`IDX_69aca9e46979f8eff3286c739c\` ON \`softres\`.\`menus\``,
     );
     await queryRunner.query(`DROP TABLE \`softres\`.\`menus\``);
@@ -204,6 +309,14 @@ export class solicitud1632157028219 implements MigrationInterface {
       `DROP INDEX \`IDX_e67bd8ef94c717102a93f58f4d\` ON \`softres\`.\`secciones\``,
     );
     await queryRunner.query(`DROP TABLE \`softres\`.\`secciones\``);
+    await queryRunner.query(
+      `DROP INDEX \`IDX_9c6bbb025a661bb198e0d91e0b\` ON \`softres\`.\`recetas\``,
+    );
+    await queryRunner.query(`DROP TABLE \`softres\`.\`recetas\``);
+    await queryRunner.query(
+      `DROP INDEX \`IDX_fe86a44f968e34233fd51dce81\` ON \`softres\`.\`recetasDetalle\``,
+    );
+    await queryRunner.query(`DROP TABLE \`softres\`.\`recetasDetalle\``);
     await queryRunner.query(
       `DROP INDEX \`IDX_8beeb3e413ead9af9d55d5d0fa\` ON \`softres\`.\`comprasDetalle\``,
     );
@@ -224,5 +337,9 @@ export class solicitud1632157028219 implements MigrationInterface {
       `DROP INDEX \`IDX_047844d787ae4285998c456bfe\` ON \`softres\`.\`solicitudDetalle\``,
     );
     await queryRunner.query(`DROP TABLE \`softres\`.\`solicitudDetalle\``);
+    await queryRunner.query(
+      `DROP INDEX \`IDX_fbffe17281fe5563591eb900c9\` ON \`softres\`.\`proveedor\``,
+    );
+    await queryRunner.query(`DROP TABLE \`softres\`.\`proveedor\``);
   }
 }

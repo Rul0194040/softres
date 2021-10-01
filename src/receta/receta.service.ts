@@ -22,7 +22,7 @@ import { UpdateRecetaDTO } from './DTO/update-receta.dto';
 
 @Injectable()
 export class RecetaService {
-  private readonly almacenService: AlmacenService = new AlmacenService();
+  constructor(private readonly almacenService: AlmacenService) {}
 
   async create(receta: CreateRecetaDTO): Promise<RecetaEntity> {
     const recetaTocreate = plainToClass(RecetaEntity, receta);
@@ -32,6 +32,7 @@ export class RecetaService {
         receta.children,
         {
           where: [
+            { hasChildren: false, grupo: GrupoReceta.COMPLEMENTO },
             { hasChildren: false, grupo: GrupoReceta.SUBRECETA },
             { hasChildren: false, grupo: GrupoReceta.EXSUBRES },
           ],

@@ -21,7 +21,7 @@ export class RecetaDetalleEntity extends CommonEntity {
 
   @Column({
     type: 'mediumint',
-    name: 'costoUnitarioReceta',
+    name: 'costoUnitarioIngrediente',
     nullable: false,
   })
   costoUnitarioIngrediente: number;
