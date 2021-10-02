@@ -317,7 +317,7 @@ export class AlmacenService {
           toFloat(stock) + toFloat(detalle.entradas) - toFloat(detalle.salidas);
         detalle.saldo =
           toFloat(preSaldo) + toFloat(detalle.cargo) - toFloat(detalle.abono);
-        detalle.precioMedio = preSaldo / (stock || 1 * 1.0);
+        detalle.precioMedio = preSaldo / (stock || 1.0);
 
         stock = detalle.existencias;
         preSaldo = toFloat(detalle.saldo);
@@ -349,13 +349,13 @@ export class AlmacenService {
           almacenId: almacenId,
           fecha: new Date(row.getCell('A').value.toString()) ?? null,
           entradas: row.getCell('B').value
-            ? parseKilo(Number(row.getCell('B').value))
+            ? Number(row.getCell('B').value)
             : 0.0,
           salidas: row.getCell('C').value
-            ? parseKilo(Number(row.getCell('C').value))
+            ? Number(row.getCell('C').value)
             : 0.0,
           existencias: row.getCell('D').value
-            ? parseKilo(Number(row.getCell('D').value))
+            ? Number(row.getCell('D').value)
             : 0.0,
           precioUnitario: row.getCell('E').value
             ? Number(row.getCell('E').value)

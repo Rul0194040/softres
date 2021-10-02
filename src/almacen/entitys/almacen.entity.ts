@@ -1,7 +1,7 @@
 import { AlmacenDetalleEntity } from './almacenDetalle.entity';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { AlmacenType } from '../enums/almacenTypes.enum';
 import { Deptos } from '../enums/deptos.enum';
 
@@ -55,7 +55,7 @@ export class AlmacenEntity extends CommonEntity {
   })
   total: number;
 
-  @OneToOne(() => InsumoEntity, { nullable: false })
+  @ManyToOne(() => InsumoEntity, { nullable: false })
   @JoinColumn()
   insumo: InsumoEntity;
 
