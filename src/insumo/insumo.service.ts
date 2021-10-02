@@ -9,14 +9,20 @@ import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
 import { CategoriaEntity } from '@softres/categoria/categoria.entity';
 
+const parseKilo = (gr: number): number => gr / 1000.0;
+const parseGramos = (kg: number): number => kg * 1000.0;
+
 @Injectable()
 export class InsumoService {
   async create(insumo: CreateInsumoDTO): Promise<InsumoEntity> {
-    insumo.merma = insumo.pesoNeto * (insumo.mermaPorcentaje / 100.0);
-    insumo.pesoDrenado = insumo.pesoNeto - insumo.merma;
-    insumo.precioKilo = (insumo.precioUnitario * 1000) / insumo.pesoDrenado;
+    insumo.pesoNeto = parseKilo(insumo.pesoNeto);
 
     const insumoToCreate = plainToClass(InsumoEntity, insumo);
+    insumoToCreate.merma = insumo.pesoNeto * (insumo.mermaPorcentaje / 100.0);
+    insumoToCreate.pesoDrenado = insumo.pesoNeto - insumoToCreate.merma;
+    insumoToCreate.precioKilo =
+      (insumo.precioUnitario * 1000) / parseGramos(insumoToCreate.pesoDrenado);
+
     insumoToCreate.categoria = await getRepository(CategoriaEntity).findOne(
       insumo.categoriaId,
     );
@@ -41,9 +47,11 @@ export class InsumoService {
     insumoId: number,
     insumo: UpdateInsumoDTO,
   ): Promise<InsumoEntity> {
+    insumo.pesoNeto = parseKilo(insumo.pesoNeto);
     insumo.merma = insumo.pesoNeto * (insumo.mermaPorcentaje / 100.0);
     insumo.pesoDrenado = insumo.pesoNeto - insumo.merma;
-    insumo.precioKilo = (insumo.precioUnitario * 1000) / insumo.pesoDrenado;
+    insumo.precioKilo =
+      (insumo.precioUnitario * 1000) / parseGramos(insumo.pesoDrenado);
 
     await getRepository(InsumoEntity).update(insumoId, insumo);
 
