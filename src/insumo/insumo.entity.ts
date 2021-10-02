@@ -52,18 +52,16 @@ export class InsumoEntity extends CommonEntity {
 
   @Column({
     type: 'decimal',
-    precision: 10,
-    scale: 2,
-    name: 'pesoNeto',
+    precision: 6,
+    scale: 3,
     nullable: false,
   })
   pesoNeto: number;
 
   @Column({
     type: 'decimal',
-    precision: 10,
-    scale: 2,
-    name: 'pesoDrenado',
+    precision: 6,
+    scale: 3,
     nullable: true,
   })
   pesoDrenado?: number;
@@ -79,9 +77,8 @@ export class InsumoEntity extends CommonEntity {
 
   @Column({
     type: 'decimal',
-    precision: 10,
-    scale: 2,
-    name: 'merma',
+    precision: 6,
+    scale: 3,
     nullable: true,
   })
   merma?: number;
@@ -90,7 +87,6 @@ export class InsumoEntity extends CommonEntity {
     type: 'decimal',
     precision: 10,
     scale: 2,
-    name: 'mermaPorcentaje',
     nullable: false,
   })
   mermaPorcentaje: number;

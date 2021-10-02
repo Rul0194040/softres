@@ -23,30 +23,35 @@ export class AlmacenEntity extends CommonEntity {
   depto: Deptos;
 
   @Column({
-    type: 'integer',
+    type: 'decimal',
     nullable: true,
-    default: 0,
+    precision: 6,
+    scale: 3,
+    default: 0.0,
   })
   maximo: number;
 
   @Column({
-    type: 'integer',
+    type: 'decimal',
     nullable: true,
-    default: 0,
+    precision: 6,
+    scale: 3,
+    default: 0.0,
   })
   minimo: number;
 
   @Column({
     type: 'decimal',
-    precision: 10,
-    scale: 2,
+    precision: 6,
+    scale: 3,
     default: 0,
   })
   cantidad: number;
 
   @Column({
-    type: 'mediumint',
-    name: 'total',
+    type: 'decimal',
+    precision: 6,
+    scale: 3,
     nullable: false,
   })
   total: number;
