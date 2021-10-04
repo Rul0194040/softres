@@ -437,29 +437,22 @@ export class AlmacenService {
   }
 
   getAlmacenesByDepto(almacenes: AlmacenEntity[]): any {
-    almacenes
-      .filter(
-        async (a) =>
-          !(await getRepository(SolicitudDetalleEntity).findOne(a.id)),
-      )
-      .map((alm) => {
-        const cocina: InsumoEntity[] = [];
-        const barra: InsumoEntity[] = [];
-        const almacen: InsumoEntity[] = [];
-
-        if (alm.depto === Deptos.COCINA) {
-          cocina.push(alm.insumo);
-        } else if (alm.depto === Deptos.BARRA) {
-          barra.push(alm.insumo);
-        } else if (alm.depto === Deptos.ALMACEN) {
-          almacen.push(alm.insumo);
-        }
-
-        return {
-          cocina,
-          barra,
-          almacen,
-        };
-      });
+    const cocina: InsumoEntity[] = [];
+    const barra: InsumoEntity[] = [];
+    const almacen: InsumoEntity[] = [];
+    almacenes.forEach((alm) => {
+      if (alm.depto === Deptos.COCINA) {
+        cocina.push(alm.insumo);
+      } else if (alm.depto === Deptos.BARRA) {
+        barra.push(alm.insumo);
+      } else if (alm.depto === Deptos.ALMACEN) {
+        almacen.push(alm.insumo);
+      }
+    });
+    return {
+      cocina,
+      barra,
+      almacen,
+    };
   }
 }
