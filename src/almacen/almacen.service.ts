@@ -1,4 +1,3 @@
-import { SolicitudDetalleEntity } from './../compra/entities/solicitudDetalle.entity';
 import { AlmacenDetalleEntity } from './entitys/almacenDetalle.entity';
 import { AlmacenEntity } from './entitys/almacen.entity';
 import { AlmacenInformeDTO } from './DTOs/almacenInforneDTO.dto';
@@ -16,6 +15,7 @@ import { ProfileTypes } from './../user/profileTypes.enum';
 import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
 import * as Excel from 'exceljs';
 import * as moment from 'moment';
+import { SolicitudDetalleEntity } from '@softres/compra/entities/solicitudDetalle.entity';
 
 const toFloat = (num: string | number): number => parseFloat(num + '');
 const parseKilo = (gr: number): number => gr / 1000.0;
@@ -437,25 +437,53 @@ export class AlmacenService {
       .getMany();
 
     return {
-      data: this.getAlmacenesByDepto(data),
+      data: await this.getAlmacenesByDepto(data),
       skip: options.skip,
       totalItems: count,
     };
   }
 
-  getAlmacenesByDepto(almacenes: AlmacenEntity[]): any {
+  async getAlmacenesByDepto(almacenes: AlmacenEntity[]): Promise<any> {
     const cocina: InsumoEntity[] = [];
     const barra: InsumoEntity[] = [];
     const almacen: InsumoEntity[] = [];
-    almacenes.forEach((alm) => {
-      if (alm.depto === Deptos.COCINA) {
-        cocina.push(alm.insumo);
-      } else if (alm.depto === Deptos.BARRA) {
-        barra.push(alm.insumo);
-      } else if (alm.depto === Deptos.ALMACEN) {
-        almacen.push(alm.insumo);
+
+    const minimosIds = almacenes.map((a) => a.insumo.id);
+    const inSolicitados = await getRepository(SolicitudDetalleEntity)
+      .createQueryBuilder('solicitudes')
+      .leftJoin('solicitudes.insumo', 'insumo')
+      .where('insumo.id IN (:...ids)', { ids: minimosIds })
+      .getMany();
+    const solicitadosIds = inSolicitados.map((ins) => ins.insumoId);
+    const arrUno = minimosIds.sort((a, b) => a - b);
+    const arrDos = solicitadosIds.sort((a, b) => a - b);
+
+    const realMinimos = arrUno.filter((minimo) => {
+      if (!arrDos.includes(minimo)) {
+        return minimo;
       }
     });
+
+    almacenes.forEach((alm) => {
+      if (realMinimos.includes(alm.insumo.id)) {
+        switch (alm.depto) {
+          case Deptos.COCINA:
+            cocina.push(alm.insumo);
+            break;
+          case Deptos.BARRA:
+            barra.push(alm.insumo);
+
+            break;
+          case Deptos.ALMACEN:
+            almacen.push(alm.insumo);
+            break;
+
+          default:
+            break;
+        }
+      }
+    });
+
     return {
       cocina,
       barra,
