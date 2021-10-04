@@ -11,7 +11,6 @@ import { CategoriaEntity } from '@softres/categoria/categoria.entity';
 import { ProveedorEntity } from '@softres/proveedor/entity/proveedor.entity';
 
 const parseKilo = (gr: number): number => gr / 1000.0;
-const parseGramos = (kg: number): number => kg * 1000.0;
 
 @Injectable()
 export class InsumoService {
@@ -49,8 +48,7 @@ export class InsumoService {
     insumo.pesoNeto = parseKilo(insumo.pesoNeto);
     insumo.merma = insumo.pesoNeto * (insumo.mermaPorcentaje / 100.0);
     insumo.pesoDrenado = insumo.pesoNeto - insumo.merma;
-    insumo.precioKilo =
-      (insumo.precioUnitario * 1000) / parseGramos(insumo.pesoDrenado);
+    insumo.precioKilo = (insumo.precioUnitario * 1000) / insumo.pesoDrenado;
 
     await getRepository(InsumoEntity).update(insumoId, insumo);
 

@@ -7,9 +7,6 @@ import { insumosToCreate } from './insumo.collection';
 import { plainToClass } from 'class-transformer';
 import { CategoriaEntity } from '@softres/categoria/categoria.entity';
 
-const parseKilo = (gr: number): number => gr / 1000.0;
-const parseGramos = (kg: number): number => kg * 1000;
-
 /**
  * @ignore
  */
@@ -20,7 +17,6 @@ export class InsumosSeeder implements Seeder {
    */
   async seed(): Promise<any> {
     for (const insumo of insumosToCreate) {
-      insumo.pesoNeto = parseKilo(insumo.pesoNeto);
       const insumoToCreate = plainToClass(InsumoEntity, insumo);
       insumoToCreate.categoria = await getRepository(CategoriaEntity).findOne(
         insumo.categoriaId,
@@ -36,11 +32,11 @@ export class InsumosSeeder implements Seeder {
 
       insumoToCreate.merma =
         insumoToCreate.pesoNeto * (insumoToCreate.mermaPorcentaje / 100.0);
+
       insumoToCreate.pesoDrenado =
         insumoToCreate.pesoNeto - insumoToCreate.merma;
       insumoToCreate.precioKilo =
-        (insumoToCreate.precioUnitario * 1000) /
-        parseGramos(insumoToCreate.pesoDrenado);
+        (insumoToCreate.precioUnitario * 1000) / insumoToCreate.pesoDrenado;
 
       await getRepository(InsumoEntity).save(insumoToCreate);
     }

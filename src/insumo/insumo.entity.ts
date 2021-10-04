@@ -58,7 +58,7 @@ export class InsumoEntity extends CommonEntity {
 
   @Column({
     type: 'numeric',
-    precision: 6,
+    precision: 8,
     scale: 3,
     nullable: true,
   })
@@ -74,7 +74,7 @@ export class InsumoEntity extends CommonEntity {
 
   @Column({
     type: 'numeric',
-    precision: 6,
+    precision: 7,
     scale: 3,
     nullable: true,
   })
