@@ -16,6 +16,8 @@ import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
 import * as Excel from 'exceljs';
 import * as moment from 'moment';
 import { SolicitudDetalleEntity } from '@softres/compra/entities/solicitudDetalle.entity';
+import { SolicitudEntity } from '@softres/compra/entities/solicitud.entity';
+import { SolicitudEstados } from '@softres/compra/enum/solicitud-estados.enum';
 
 const toFloat = (num: string | number): number => parseFloat(num + '');
 const parseKilo = (gr: number): number => gr / 1000.0;
@@ -448,42 +450,48 @@ export class AlmacenService {
     const cocina: InsumoEntity[] = [];
     const barra: InsumoEntity[] = [];
     const almacen: InsumoEntity[] = [];
+    if (almacenes.length !== 0) {
+      const minimosIds = almacenes.map((a) => a.insumo.id);
+      const inSolicitados = await getRepository(SolicitudDetalleEntity)
+        .createQueryBuilder('detalle')
+        .leftJoin('detalle.solicitud', 'solicitud')
+        .leftJoin('detalle.insumo', 'insumo')
+        .where('solicitud.status IN (:status)', {
+          status: [SolicitudEstados.GENERADA, SolicitudEstados.REVISION],
+        })
+        .where('insumo.id IN (:...ids)', { ids: minimosIds })
+        .select(['detalle.insumoId'])
+        .getMany();
+      const solicitadosIds = inSolicitados.map((ins) => ins.insumoId);
+      const arrUno = minimosIds.sort((a, b) => a - b);
+      const arrDos = solicitadosIds.sort((a, b) => a - b);
 
-    const minimosIds = almacenes.map((a) => a.insumo.id);
-    const inSolicitados = await getRepository(SolicitudDetalleEntity)
-      .createQueryBuilder('solicitudes')
-      .leftJoin('solicitudes.insumo', 'insumo')
-      .where('insumo.id IN (:...ids)', { ids: minimosIds })
-      .getMany();
-    const solicitadosIds = inSolicitados.map((ins) => ins.insumoId);
-    const arrUno = minimosIds.sort((a, b) => a - b);
-    const arrDos = solicitadosIds.sort((a, b) => a - b);
-
-    const realMinimos = arrUno.filter((minimo) => {
-      if (!arrDos.includes(minimo)) {
-        return minimo;
-      }
-    });
-
-    almacenes.forEach((alm) => {
-      if (realMinimos.includes(alm.insumo.id)) {
-        switch (alm.depto) {
-          case Deptos.COCINA:
-            cocina.push(alm.insumo);
-            break;
-          case Deptos.BARRA:
-            barra.push(alm.insumo);
-
-            break;
-          case Deptos.ALMACEN:
-            almacen.push(alm.insumo);
-            break;
-
-          default:
-            break;
+      const realMinimos = arrUno.filter((minimo) => {
+        if (!arrDos.includes(minimo)) {
+          return minimo;
         }
-      }
-    });
+      });
+
+      almacenes.forEach((alm) => {
+        if (realMinimos.includes(alm.insumo.id)) {
+          switch (alm.depto) {
+            case Deptos.COCINA:
+              cocina.push(alm.insumo);
+              break;
+            case Deptos.BARRA:
+              barra.push(alm.insumo);
+
+              break;
+            case Deptos.ALMACEN:
+              almacen.push(alm.insumo);
+              break;
+
+            default:
+              break;
+          }
+        }
+      });
+    }
 
     return {
       cocina,
