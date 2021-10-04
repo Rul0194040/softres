@@ -388,6 +388,7 @@ export class AlmacenService {
         'almacen.depto',
         'insumo.id',
         'insumo.nombre',
+        'insumo.medida',
       ]);
 
     switch (user.profile) {
