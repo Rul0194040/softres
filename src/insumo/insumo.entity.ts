@@ -51,17 +51,13 @@ export class InsumoEntity extends CommonEntity {
   precioUnitario: number;
 
   @Column({
-    type: 'decimal',
-    precision: 6,
-    scale: 3,
+    type: 'int',
     nullable: false,
   })
   pesoNeto: number;
 
   @Column({
-    type: 'decimal',
-    precision: 6,
-    scale: 3,
+    type: 'int',
     nullable: true,
   })
   pesoDrenado?: number;
@@ -76,9 +72,7 @@ export class InsumoEntity extends CommonEntity {
   precioKilo: number;
 
   @Column({
-    type: 'decimal',
-    precision: 6,
-    scale: 3,
+    type: 'int',
     nullable: true,
   })
   merma?: number;

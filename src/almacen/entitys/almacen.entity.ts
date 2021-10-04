@@ -40,9 +40,7 @@ export class AlmacenEntity extends CommonEntity {
   minimo: number;
 
   @Column({
-    type: 'decimal',
-    precision: 6,
-    scale: 3,
+    type: 'int',
     default: 0,
   })
   cantidad: number;

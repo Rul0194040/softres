@@ -18,7 +18,6 @@ import * as moment from 'moment';
 
 const toFloat = (num: string | number): number => parseFloat(num + '');
 const parseKilo = (gr: number): number => gr / 1000.0;
-const parseGramos = (kg: number): number => kg * 1000.0;
 
 @Injectable()
 export class AlmacenService {
@@ -26,7 +25,7 @@ export class AlmacenService {
     almacen: CreateAlmacenDTO,
   ): Promise<AlmacenInformeDTO | AlmacenEntity> {
     const insumo = await getRepository(InsumoEntity).findOne(almacen.insumoId);
-    const total = almacen.cantidad * parseGramos(insumo.pesoNeto);
+    const total = almacen.cantidad * insumo.pesoNeto;
 
     const almacenToCreate: CreateAlmacenDTO = {
       cantidad: almacen.cantidad,
