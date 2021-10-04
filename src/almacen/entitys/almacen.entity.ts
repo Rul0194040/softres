@@ -1,11 +1,12 @@
 import { AlmacenDetalleEntity } from './almacenDetalle.entity';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
 import { AlmacenType } from '../enums/almacenTypes.enum';
 import { Deptos } from '../enums/deptos.enum';
 
 @Entity('almacen')
+@Index(['insumoId', 'depto'], { unique: true })
 export class AlmacenEntity extends CommonEntity {
   @Column({
     type: 'enum',
@@ -50,8 +51,7 @@ export class AlmacenEntity extends CommonEntity {
   })
   total: number;
 
-  @OneToOne(() => InsumoEntity, { nullable: false })
-  @JoinColumn()
+  @ManyToOne(() => InsumoEntity, { nullable: false })
   insumo: InsumoEntity;
 
   @Column({ type: 'mediumint', nullable: false })

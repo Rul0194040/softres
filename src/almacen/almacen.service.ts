@@ -1,3 +1,4 @@
+import { SolicitudDetalleEntity } from './../compra/entities/solicitudDetalle.entity';
 import { AlmacenDetalleEntity } from './entitys/almacenDetalle.entity';
 import { AlmacenEntity } from './entitys/almacen.entity';
 import { AlmacenInformeDTO } from './DTOs/almacenInforneDTO.dto';
@@ -313,7 +314,7 @@ export class AlmacenService {
           toFloat(stock) + toFloat(detalle.entradas) - toFloat(detalle.salidas);
         detalle.saldo =
           toFloat(preSaldo) + toFloat(detalle.cargo) - toFloat(detalle.abono);
-        detalle.precioMedio = preSaldo / (stock || 1 * 1.0);
+        detalle.precioMedio = preSaldo / (stock / 1000 || 1 * 1.0);
 
         stock = detalle.existencias;
         preSaldo = toFloat(detalle.saldo);
@@ -436,22 +437,29 @@ export class AlmacenService {
   }
 
   getAlmacenesByDepto(almacenes: AlmacenEntity[]): any {
-    const cocina: InsumoEntity[] = [];
-    const barra: InsumoEntity[] = [];
-    const almacen: InsumoEntity[] = [];
-    almacenes.forEach((alm) => {
-      if (alm.depto === Deptos.COCINA) {
-        cocina.push(alm.insumo);
-      } else if (alm.depto === Deptos.BARRA) {
-        barra.push(alm.insumo);
-      } else if (alm.depto === Deptos.ALMACEN) {
-        almacen.push(alm.insumo);
-      }
-    });
-    return {
-      cocina,
-      barra,
-      almacen,
-    };
+    almacenes
+      .filter(
+        async (a) =>
+          !(await getRepository(SolicitudDetalleEntity).findOne(a.id)),
+      )
+      .map((alm) => {
+        const cocina: InsumoEntity[] = [];
+        const barra: InsumoEntity[] = [];
+        const almacen: InsumoEntity[] = [];
+
+        if (alm.depto === Deptos.COCINA) {
+          cocina.push(alm.insumo);
+        } else if (alm.depto === Deptos.BARRA) {
+          barra.push(alm.insumo);
+        } else if (alm.depto === Deptos.ALMACEN) {
+          almacen.push(alm.insumo);
+        }
+
+        return {
+          cocina,
+          barra,
+          almacen,
+        };
+      });
   }
 }
