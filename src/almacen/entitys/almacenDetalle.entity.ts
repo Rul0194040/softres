@@ -29,25 +29,25 @@ export class AlmacenDetalleEntity extends CommonEntity {
 
   @Column({
     type: 'decimal',
-    precision: 10,
-    scale: 2,
-    default: 0,
+    precision: 6,
+    scale: 3,
+    default: 0.0,
   })
   entradas: number;
 
   @Column({
     type: 'decimal',
-    precision: 10,
-    scale: 2,
-    default: 0,
+    precision: 6,
+    scale: 3,
+    default: 0.0,
   })
   salidas: number;
 
   @Column({
     type: 'decimal',
-    precision: 10,
-    scale: 2,
-    default: 0,
+    precision: 6,
+    scale: 3,
+    default: 0.0,
   })
   existencias: number;
 

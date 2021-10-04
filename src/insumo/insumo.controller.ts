@@ -16,6 +16,7 @@ import { InsumoService } from './insumo.service';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { ProveedorEntity } from '@softres/proveedor/entity/proveedor.entity';
 
 @Controller('insumo')
 @ApiTags('Insumo')
@@ -25,6 +26,11 @@ export class InsumoController {
   @Post()
   createInsumo(@Body() insumo: CreateInsumoDTO): Promise<InsumoEntity> {
     return this.insumoService.create(insumo);
+  }
+
+  @Get('proveedores')
+  getProveedores(): Promise<ProveedorEntity[]> {
+    return this.insumoService.getProveedores();
   }
 
   @Get(':id')

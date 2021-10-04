@@ -18,6 +18,7 @@ import * as Excel from 'exceljs';
 import * as moment from 'moment';
 
 const toFloat = (num: string | number): number => parseFloat(num + '');
+const parseKilo = (gr: number): number => gr / 1000.0;
 
 @Injectable()
 export class AlmacenService {
@@ -32,9 +33,9 @@ export class AlmacenService {
       depto: almacen.depto,
       insumo,
       insumoId: almacen.insumoId,
-      maximo: almacen.maximo,
-      minimo: almacen.minimo,
-      total,
+      maximo: parseKilo(almacen.maximo),
+      minimo: parseKilo(almacen.minimo),
+      total: parseKilo(total),
       type: almacen.type,
     };
     const createdAlmacen = await getRepository(AlmacenEntity).save(
@@ -75,8 +76,8 @@ export class AlmacenService {
 
     for (let i = 0; i < almacenDetalle.length; i++) {
       const detalle = almacenDetalle[i];
-      let entradas = 0,
-        salidas = 0,
+      let entradas = 0.0,
+        salidas = 0.0,
         cargo = 0,
         abono = 0,
         referencia: string;
@@ -86,7 +87,7 @@ export class AlmacenService {
       if (
         detalle.entradas !== null &&
         detalle.entradas !== undefined &&
-        detalle.entradas !== 0
+        detalle.entradas !== 0.0
       ) {
         referencia = `E-${moment(fecha).format('DDMMYYYY')}`;
         entradas = detalle.entradas;
@@ -105,8 +106,8 @@ export class AlmacenService {
         almacenId: almacenParent.id,
         fecha,
         referencia,
-        entradas,
-        salidas,
+        entradas: parseKilo(entradas),
+        salidas: parseKilo(salidas),
         precioUnitario: detalle.precioUnitario,
         cargo,
         abono,
@@ -272,16 +273,18 @@ export class AlmacenService {
     detalleId: number,
     detalle: CreateDetalleDTO,
   ): Promise<any> {
+    if (detalle.salidas) detalle.salidas = parseKilo(detalle.salidas);
+    if (detalle.entradas) detalle.entradas = parseKilo(detalle.entradas);
     if (
       detalle.entradas !== null &&
       detalle.entradas !== undefined &&
-      detalle.entradas !== 0
+      detalle.entradas !== 0.0
     ) {
-      detalle.salidas = 0;
+      detalle.salidas = 0.0;
       detalle.abono = 0;
       detalle.referencia = `E-${moment(detalle.fecha).format('DDMMYYYY')}`;
     } else {
-      detalle.entradas = 0;
+      detalle.entradas = 0.0;
       detalle.cargo = 0;
       detalle.referencia = `S-${moment(detalle.fecha).format('DDMMYYYY')}`;
     }
@@ -314,7 +317,7 @@ export class AlmacenService {
           toFloat(stock) + toFloat(detalle.entradas) - toFloat(detalle.salidas);
         detalle.saldo =
           toFloat(preSaldo) + toFloat(detalle.cargo) - toFloat(detalle.abono);
-        detalle.precioMedio = preSaldo / (stock / 1000 || 1 * 1.0);
+        detalle.precioMedio = preSaldo / (stock || 1.0);
 
         stock = detalle.existencias;
         preSaldo = toFloat(detalle.saldo);
@@ -345,11 +348,15 @@ export class AlmacenService {
         const record: CreateDetalleDTO = {
           almacenId: almacenId,
           fecha: new Date(row.getCell('A').value.toString()) ?? null,
-          entradas: row.getCell('B').value ? Number(row.getCell('B').value) : 0,
-          salidas: row.getCell('C').value ? Number(row.getCell('C').value) : 0,
+          entradas: row.getCell('B').value
+            ? Number(row.getCell('B').value)
+            : 0.0,
+          salidas: row.getCell('C').value
+            ? Number(row.getCell('C').value)
+            : 0.0,
           existencias: row.getCell('D').value
             ? Number(row.getCell('D').value)
-            : 0,
+            : 0.0,
           precioUnitario: row.getCell('E').value
             ? Number(row.getCell('E').value)
             : 0,

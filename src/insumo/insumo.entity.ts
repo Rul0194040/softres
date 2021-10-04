@@ -51,19 +51,15 @@ export class InsumoEntity extends CommonEntity {
   precioUnitario: number;
 
   @Column({
-    type: 'decimal',
-    precision: 10,
-    scale: 2,
-    name: 'pesoNeto',
+    type: 'int',
     nullable: false,
   })
   pesoNeto: number;
 
   @Column({
-    type: 'decimal',
-    precision: 10,
-    scale: 2,
-    name: 'pesoDrenado',
+    type: 'numeric',
+    precision: 8,
+    scale: 3,
     nullable: true,
   })
   pesoDrenado?: number;
@@ -72,16 +68,14 @@ export class InsumoEntity extends CommonEntity {
     type: 'decimal',
     precision: 10,
     scale: 2,
-    name: 'precioKilo',
     nullable: false,
   })
   precioKilo: number;
 
   @Column({
-    type: 'decimal',
-    precision: 10,
-    scale: 2,
-    name: 'merma',
+    type: 'numeric',
+    precision: 7,
+    scale: 3,
     nullable: true,
   })
   merma?: number;
@@ -90,7 +84,6 @@ export class InsumoEntity extends CommonEntity {
     type: 'decimal',
     precision: 10,
     scale: 2,
-    name: 'mermaPorcentaje',
     nullable: false,
   })
   mermaPorcentaje: number;

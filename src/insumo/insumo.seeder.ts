@@ -32,6 +32,7 @@ export class InsumosSeeder implements Seeder {
 
       insumoToCreate.merma =
         insumoToCreate.pesoNeto * (insumoToCreate.mermaPorcentaje / 100.0);
+
       insumoToCreate.pesoDrenado =
         insumoToCreate.pesoNeto - insumoToCreate.merma;
       insumoToCreate.precioKilo =
