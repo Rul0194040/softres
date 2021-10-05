@@ -141,6 +141,7 @@ export class RecetaService {
         'insumo.pesoNeto',
         'insumo.precioKilo',
       ])
+      .where('receta.id=:id', { id })
       .getMany();
   }
 
