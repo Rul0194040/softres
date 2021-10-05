@@ -116,7 +116,20 @@ export class RecetaService {
   }
 
   async getById(id: number): Promise<any> {
-    return getRepository(RecetaEntity).findOne(id, { relations: ['children'] });
+    return getRepository(RecetaEntity)
+      .createQueryBuilder('receta')
+      .leftJoin('receta.detalleReceta', 'det')
+      .leftJoin('det.insumo', 'insumo')
+      .select([
+        'receta.id',
+        'receta.nombre',
+        'receta.depto',
+        'det.id',
+        'det.cantReceta',
+        'insumo.id',
+        'insumo.nombre',
+      ])
+      .getMany();
   }
 
   async delete(id: number): Promise<any> {
