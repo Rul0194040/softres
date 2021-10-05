@@ -118,16 +118,28 @@ export class RecetaService {
   async getById(id: number): Promise<any> {
     return getRepository(RecetaEntity)
       .createQueryBuilder('receta')
+      .leftJoin('receta.children', 'children')
       .leftJoin('receta.detalleReceta', 'det')
       .leftJoin('det.insumo', 'insumo')
       .select([
         'receta.id',
+        'receta.uuid',
         'receta.nombre',
         'receta.depto',
+        'receta.numPorciones',
+        'children.id',
+        'children.nombre',
+        'receta.hasChildren',
+        'receta.imagen',
+        'receta.grupo',
         'det.id',
+        'det.insumoId',
         'det.cantReceta',
         'insumo.id',
         'insumo.nombre',
+        'insumo.medida',
+        'insumo.pesoNeto',
+        'insumo.precioKilo',
       ])
       .getMany();
   }
