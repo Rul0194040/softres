@@ -147,7 +147,11 @@ export class RecetaController {
   })
   async updateExistencia(
     @Param('recetaId', ParseIntPipe) recetaId: number,
-  ): Promise<any> {
-    return this.recetaService.updateExistencias(recetaId);
+  ): Promise<UpdateResult> {
+    if (await this.recetaService.validarExistencias(recetaId)) {
+      return this.recetaService.updateExistencias(recetaId);
+    }
+
+    return null;
   }
 }

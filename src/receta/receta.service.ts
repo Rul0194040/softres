@@ -20,6 +20,8 @@ import { RecetaEntity } from './entities/receta.entity';
 import { RecipeValues } from './enums/recipeValues.enum';
 import { UpdateRecetaDTO } from './DTO/update-receta.dto';
 
+const parseGramos = (kg: number) => kg * 1000;
+
 @Injectable()
 export class RecetaService {
   constructor(private readonly almacenService: AlmacenService) {}
@@ -279,7 +281,7 @@ export class RecetaService {
     return getRepository(RecetaEntity).update(recetaId, { imagen: path });
   }
 
-  async updateExistencias(recetaId: number): Promise<UpdateResult> {
+  async updateExistencias(recetaId: number): Promise<UpdateResult | null> {
     const receta = await getRepository(RecetaEntity).findOne(recetaId, {
       relations: ['children', 'detalleReceta'],
     });
@@ -303,5 +305,27 @@ export class RecetaService {
     return getRepository(RecetaEntity).update(receta.id, {
       existencia: parseInt(receta.existencia + '') + 1,
     });
+  }
+
+  async validarExistencias(recetaId: number): Promise<boolean> {
+    let valid = true;
+    const receta = await getRepository(RecetaEntity).findOne(recetaId, {
+      relations: ['children', 'detalleReceta'],
+    });
+    receta.children.forEach(async (subreceta) => {
+      valid = await this.validarExistencias(subreceta.id);
+    });
+
+    if (valid) {
+      receta.detalleReceta.forEach(async (detalle) => {
+        const almacen = await getRepository(AlmacenEntity).findOne({
+          where: { depto: Deptos.COCINA, insumoId: detalle.insumoId },
+        });
+        if (parseGramos(almacen.total) < detalle.cantReceta) {
+          valid = false;
+        }
+      });
+    }
+    return valid;
   }
 }
