@@ -28,7 +28,7 @@ export class CreateRecetaDTO {
   @ApiProperty()
   numPorciones?: number;
   @ApiProperty()
-  numXporcion?: number;
+  costoXporcion?: number;
   @ApiProperty()
   @IsOptional()
   costoTotal?: number;
@@ -54,5 +54,5 @@ export class CreateRecetaDTO {
   @IsOptional()
   children?: number[];
   @ApiProperty({ nullable: false, type: [CreateDetalleRecetaDTO] })
-  detalles?: CreateDetalleRecetaDTO[];
+  detalleReceta?: CreateDetalleRecetaDTO[];
 }

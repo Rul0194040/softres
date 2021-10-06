@@ -32,9 +32,9 @@ export class RecetaService {
         receta.children,
         {
           where: [
-            { hasChildren: false, grupo: GrupoReceta.COMPLEMENTO },
             { hasChildren: false, grupo: GrupoReceta.SUBRECETA },
-            { hasChildren: false, grupo: GrupoReceta.EXSUBRES },
+            { hasChildren: false, grupo: GrupoReceta.COMPLEMENTO },
+            { hasChildren: false, grupo: GrupoReceta.EXTRA },
           ],
         },
       );
@@ -45,14 +45,14 @@ export class RecetaService {
       recetaTocreate,
     );
 
-    if (receta.detalles.length) {
+    if (receta.detalleReceta) {
       let rendimiento = 0;
       let totalCosto = 0;
       let cantReal = 0;
       let unitarioIngrediente = 0;
 
-      for (let idx = 0; idx < receta.detalles.length; idx++) {
-        const record = receta.detalles[idx];
+      for (let idx = 0; idx < receta.detalleReceta.length; idx++) {
+        const record = receta.detalleReceta[idx];
         const insumo = await getRepository(InsumoEntity).findOne(
           record.insumoId,
         );
@@ -101,7 +101,8 @@ export class RecetaService {
         {
           where: [
             { hasChildren: false, grupo: GrupoReceta.SUBRECETA },
-            { hasChildren: false, grupo: GrupoReceta.EXSUBRES },
+            { hasChildren: false, grupo: GrupoReceta.COMPLEMENTO },
+            { hasChildren: false, grupo: GrupoReceta.EXTRA },
           ],
         },
       );
@@ -111,6 +112,10 @@ export class RecetaService {
     }
 
     return await getRepository(RecetaEntity).update(id, {
+      nombre: receta.nombre,
+      grupo: receta.grupo,
+      numPorciones: receta.numPorciones,
+      costoXporcion: receta.costoXporcion,
       precioSugeridoCarta: receta.precioSugeridoCarta,
     });
   }
