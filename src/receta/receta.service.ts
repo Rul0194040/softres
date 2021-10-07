@@ -1,3 +1,4 @@
+import { BadChild } from './DTO/badChild.dto';
 import { AlmacenDetalleEntity } from '@softres/almacen/entitys/almacenDetalle.entity';
 import { AlmacenEntity } from '@softres/almacen/entitys/almacen.entity';
 import { AlmacenService } from '@softres/almacen/almacen.service';
@@ -7,7 +8,7 @@ import { Deptos } from '@softres/almacen/enums/deptos.enum';
 import { forIn } from 'lodash';
 import { getRepository, UpdateResult } from 'typeorm';
 import { GrupoReceta } from './enums/grupoReceta.enum';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
 import { MenuEntity } from './../menu/entitys/menu.entity';
@@ -281,51 +282,96 @@ export class RecetaService {
     return getRepository(RecetaEntity).update(recetaId, { imagen: path });
   }
 
-  async updateExistencias(recetaId: number): Promise<UpdateResult | null> {
-    const receta = await getRepository(RecetaEntity).findOne(recetaId, {
-      relations: ['children', 'detalleReceta'],
-    });
-    receta.children.forEach((subreceta) => {
-      this.updateExistencias(subreceta.id);
-    });
-    receta.detalleReceta.forEach(async (detalle) => {
-      const almacen = await getRepository(AlmacenEntity).findOne({
-        insumoId: detalle.insumoId,
-      });
+  async cocinar(recetaId: number): Promise<HttpStatus> {
+    const receta = await getRepository(RecetaEntity)
+      .createQueryBuilder('receta')
+      .leftJoin('receta.children', 'subRecetas')
+      .leftJoin('receta.detalleReceta', 'detalle')
+      .select([
+        'receta.id',
+        'receta.depto',
+        'receta.hasChildren',
+        'subRecetas.id',
+        'subRecetas.nombre',
+        'subRecetas.grupo',
+        'detalle.id',
+        'detalle.insumoId',
+        'detalle.cantReceta',
+        'detalle.costoUnitarioIngrediente',
+      ])
+      .where('receta.id=:id', { id: recetaId })
+      .getOne();
 
-      const detalleToCreate = getRepository(AlmacenDetalleEntity).create({
-        salidas: detalle.cantReceta,
-        abono: detalle.costoUnitarioIngrediente,
-        precioUnitario: 0,
-        saldo: 0,
-      });
+    const isInsuficiente = await this.cocinarDetalles(receta);
+    const recetasInsuficientes: BadChild[] = [];
 
-      this.almacenService.createDetalle(almacen.id, [detalleToCreate]);
-    });
-    return getRepository(RecetaEntity).update(receta.id, {
-      existencia: parseInt(receta.existencia + '') + 1,
-    });
+    if (isInsuficiente) {
+      throw new HttpException(
+        `los insumos ${isInsuficiente} no nos permiten cocinar
+           porque son insuficientes`,
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    if (receta.hasChildren) {
+      for (let idx = 0; idx < receta.children.length; idx++) {
+        const child = receta.children[idx];
+        const badchild = await this.cocinarDetalles(child);
+
+        if (badchild) {
+          const resume = {
+            id: child.id,
+            insumos: badchild,
+          };
+          recetasInsuficientes.push(resume);
+        }
+      }
+
+      if (recetasInsuficientes) {
+        throw new HttpException(
+          `las recetas ${recetasInsuficientes} no nos permiten cocinar
+             porque faltan insumos`,
+          HttpStatus.CONFLICT,
+        );
+      }
+    }
+
+    if (!isInsuficiente && !recetasInsuficientes) {
+      return HttpStatus.OK;
+    }
   }
 
-  async validarExistencias(recetaId: number): Promise<boolean> {
-    let valid = true;
-    const receta = await getRepository(RecetaEntity).findOne(recetaId, {
-      relations: ['children', 'detalleReceta'],
-    });
-    receta.children.forEach(async (subreceta) => {
-      valid = await this.validarExistencias(subreceta.id);
-    });
+  async cocinarDetalles(receta: RecetaEntity): Promise<RecetaDetalleEntity[]> {
+    const insuficientes: RecetaDetalleEntity[] = [];
 
-    if (valid) {
-      receta.detalleReceta.forEach(async (detalle) => {
-        const almacen = await getRepository(AlmacenEntity).findOne({
-          where: { depto: Deptos.COCINA, insumoId: detalle.insumoId },
-        });
-        if (parseGramos(almacen.total) < detalle.cantReceta) {
-          valid = false;
-        }
+    for (let idx = 0; idx < receta.detalleReceta.length; idx++) {
+      const detalle = receta.detalleReceta[idx];
+      const almacen = await getRepository(AlmacenEntity).findOne({
+        depto: receta.depto,
+        insumoId: detalle.insumoId,
       });
+      const cocinado = parseGramos(almacen.total) - detalle.cantReceta;
+      const falta =
+        parseGramos(almacen.total) <= detalle.cantReceta ||
+        almacen.minimo <= cocinado;
+
+      if (!falta) {
+        const detalleToCreate = getRepository(AlmacenDetalleEntity).create({
+          salidas: detalle.cantReceta,
+          abono: detalle.costoUnitarioIngrediente,
+          precioUnitario: 0,
+          saldo: 0,
+        });
+        await this.almacenService.createDetalle(almacen.id, [detalleToCreate]);
+        await getRepository(RecetaEntity).update(receta.id, {
+          existencia: parseInt(receta.existencia + '') + 1,
+        });
+      } else {
+        insuficientes.push(detalle);
+      }
     }
-    return valid;
+    if (insuficientes.length) {
+      return insuficientes;
+    }
   }
 }
