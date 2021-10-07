@@ -145,6 +145,8 @@ export class RecetaService {
         'receta.nombre',
         'receta.depto',
         'receta.numPorciones',
+        'receta.costoXporcion',
+        'receta.precioSugeridoCarta',
         'children.id',
         'children.nombre',
         'receta.hasChildren',
