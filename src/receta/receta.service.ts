@@ -217,6 +217,11 @@ export class RecetaService {
           term: `%${value.split(' ').join('%')}%`,
         });
       }
+      if (key === 'grupo') {
+        dataQuery.andWhere('( receta.grupo == :term )', {
+          term: value,
+        });
+      }
     });
 
     if (options.sort === undefined || !Object.keys(options.sort).length) {
