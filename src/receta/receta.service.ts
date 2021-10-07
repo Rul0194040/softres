@@ -218,7 +218,7 @@ export class RecetaService {
         });
       }
       if (key === 'grupo') {
-        dataQuery.andWhere('( receta.grupo == :term )', {
+        dataQuery.andWhere('( receta.grupo = :term )', {
           term: value,
         });
       }
