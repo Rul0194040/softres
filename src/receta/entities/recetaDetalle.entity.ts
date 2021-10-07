@@ -26,12 +26,15 @@ export class RecetaDetalleEntity extends CommonEntity {
   })
   costoUnitarioIngrediente: number;
 
-  @ManyToOne(() => InsumoEntity, { nullable: false })
+  @ManyToOne(() => InsumoEntity, { nullable: true })
   insumo: InsumoEntity;
 
-  @Column({ type: 'mediumint', nullable: true })
+  @Column({ type: 'mediumint', nullable: false })
   insumoId?: number;
 
-  @ManyToOne(() => RecetaEntity, { nullable: false })
+  @ManyToOne(() => RecetaEntity, { nullable: true })
   parent: RecetaEntity;
+
+  @Column({ type: 'mediumint', nullable: false })
+  parentId?: number;
 }

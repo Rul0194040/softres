@@ -1,7 +1,10 @@
 import { AlmacenDetalleEntity } from '@softres/almacen/entitys/almacenDetalle.entity';
 import { AlmacenEntity } from '@softres/almacen/entitys/almacen.entity';
 import { AlmacenService } from '@softres/almacen/almacen.service';
-import { CreateRecetaDTO } from './DTO/create-receta.dto';
+import {
+  CreateDetalleRecetaDTO,
+  CreateRecetaDTO,
+} from './DTO/create-receta.dto';
 import { DashboardDTO } from './../dashboard/DTOs/dashboard.dto';
 import { Deptos } from '@softres/almacen/enums/deptos.enum';
 import { forIn } from 'lodash';
@@ -41,60 +44,66 @@ export class RecetaService {
       recetaTocreate.children = children;
     }
 
-    const CreatedReceta = await getRepository(RecetaEntity).save(
+    const createdReceta = await getRepository(RecetaEntity).save(
       recetaTocreate,
     );
 
     if (receta.detalleReceta) {
-      let rendimiento = 0;
-      let totalCosto = 0;
-      let cantReal = 0;
-      let unitarioIngrediente = 0;
-
-      for (let idx = 0; idx < receta.detalleReceta.length; idx++) {
-        const record = receta.detalleReceta[idx];
-        const insumo = await getRepository(InsumoEntity).findOne(
-          record.insumoId,
-        );
-
-        cantReal = (record.cantReceta * 100) / (100 - insumo.mermaPorcentaje);
-        unitarioIngrediente =
-          (cantReal * insumo.precioKilo) / RecipeValues.KILO;
-
-        const recipeDetail: RecetaDetalleEntity = {
-          cantReceta: record.cantReceta,
-          insumo,
-          insumoId: insumo.id,
-          cantReal: Number(cantReal.toFixed(2)),
-          costoUnitarioIngrediente: Number(unitarioIngrediente.toFixed(2)),
-          parent: CreatedReceta,
-        };
-
-        totalCosto += recipeDetail.costoUnitarioIngrediente;
-        rendimiento += record.cantReceta;
-
-        await getRepository(RecetaDetalleEntity).save(recipeDetail);
-      }
-
-      const mermaReceta = totalCosto * RecipeValues.DEFAULTMERMA;
-      const costoSinIva = (mermaReceta + totalCosto) * RecipeValues.FACTOR;
-      const costoIva = costoSinIva + costoSinIva * RecipeValues.IVA;
-
-      await getRepository(RecetaEntity).update(CreatedReceta.id, {
-        costoTotal: Number(totalCosto.toFixed(3)),
-        rendimiento: Number(rendimiento.toFixed(3)),
-        mermaReceta: Number(mermaReceta.toFixed(3)),
-        costoUnitarioReceta: mermaReceta + totalCosto,
-        costoSinIva: Number(costoSinIva.toFixed(3)),
-        iva: costoSinIva * RecipeValues.IVA,
-        costoIva: Number(costoIva.toFixed(3)),
-      });
-
-      return CreatedReceta;
+      this.createDetalle(createdReceta.id, receta.detalleReceta);
     }
+
+    return createdReceta;
+  }
+
+  async createDetalle(recetaId: number, detalles: CreateDetalleRecetaDTO[]) {
+    let rendimiento = 0;
+    let totalCosto = 0;
+    let cantReal = 0;
+    let unitarioIngrediente = 0;
+    const receta = await getRepository(RecetaEntity).findOne(recetaId);
+    detalles.forEach(async (detalle) => {
+      const insumo = await getRepository(InsumoEntity).findOne(
+        detalle.insumoId,
+      );
+
+      cantReal = (detalle.cantReceta * 100) / (100.0 - insumo.mermaPorcentaje);
+      unitarioIngrediente = (cantReal * insumo.precioKilo) / RecipeValues.KILO;
+
+      const recipeDetail: RecetaDetalleEntity = {
+        cantReceta: detalle.cantReceta,
+        insumo,
+        insumoId: insumo.id,
+        cantReal: Number(cantReal.toFixed(2)),
+        costoUnitarioIngrediente: Number(unitarioIngrediente.toFixed(2)),
+        parentId: recetaId,
+        parent: receta,
+      };
+
+      totalCosto += recipeDetail.costoUnitarioIngrediente;
+      rendimiento += detalle.cantReceta;
+      await getRepository(RecetaDetalleEntity).save(recipeDetail);
+    });
+
+    const mermaReceta = totalCosto * RecipeValues.DEFAULTMERMA;
+    const costoSinIva = (mermaReceta + totalCosto) * RecipeValues.FACTOR;
+    const costoIva = costoSinIva + costoSinIva * RecipeValues.IVA;
+
+    await getRepository(RecetaEntity).update(recetaId, {
+      costoTotal: Number(totalCosto.toFixed(3)),
+      rendimiento: Number(rendimiento.toFixed(3)),
+      mermaReceta: Number(mermaReceta.toFixed(3)),
+      costoUnitarioReceta: mermaReceta + totalCosto,
+      costoSinIva: Number(costoSinIva.toFixed(3)),
+      iva: costoSinIva * RecipeValues.IVA,
+      costoIva: Number(costoIva.toFixed(3)),
+    });
   }
 
   async update(id: number, receta: UpdateRecetaDTO): Promise<UpdateResult> {
+    await getRepository(RecetaEntity).update(
+      { parentId: id },
+      { parentId: null },
+    );
     if (receta.children) {
       const newChildren = await getRepository(RecetaEntity).findByIds(
         receta.children,
@@ -106,11 +115,15 @@ export class RecetaService {
           ],
         },
       );
-      return await getRepository(RecetaEntity).update(id, {
-        children: newChildren,
+      newChildren.forEach(async (child) => {
+        await getRepository(RecetaEntity).update(child.id, { parentId: id });
       });
     }
 
+    await getRepository(RecetaDetalleEntity).delete({ parentId: id });
+    if (receta.detalleReceta) {
+      this.createDetalle(id, receta.detalleReceta);
+    }
     return await getRepository(RecetaEntity).update(id, {
       nombre: receta.nombre,
       grupo: receta.grupo,
@@ -120,7 +133,7 @@ export class RecetaService {
     });
   }
 
-  async getById(id: number): Promise<any> {
+  async getById(id: number): Promise<RecetaEntity> {
     return getRepository(RecetaEntity)
       .createQueryBuilder('receta')
       .leftJoin('receta.children', 'children')
@@ -147,7 +160,7 @@ export class RecetaService {
         'insumo.precioKilo',
       ])
       .where('receta.id=:id', { id })
-      .getMany();
+      .getOne();
   }
 
   async delete(id: number): Promise<any> {
@@ -157,8 +170,6 @@ export class RecetaService {
   async dashboard(user: LoginIdentityDTO): Promise<DashboardDTO> {
     let numRecetas = 0,
       numMenu = 0;
-
-    console.log(user.profile);
 
     if (user.profile == ProfileTypes.COCINA) {
       numRecetas = await getRepository(RecetaEntity)
