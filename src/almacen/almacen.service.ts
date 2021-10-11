@@ -16,7 +16,6 @@ import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
 import * as Excel from 'exceljs';
 import * as moment from 'moment';
 import { SolicitudDetalleEntity } from '@softres/compra/entities/solicitudDetalle.entity';
-import { SolicitudEntity } from '@softres/compra/entities/solicitud.entity';
 import { SolicitudEstados } from '@softres/compra/enum/solicitud-estados.enum';
 
 const toFloat = (num: string | number): number => parseFloat(num + '');
@@ -209,13 +208,11 @@ export class AlmacenService {
   }
 
   async paginateContable(
-    insumoId: number,
+    almacenId: number,
     options: PaginationOptions,
   ): Promise<PaginationPrimeNgResult> {
     const dataQuery = getRepository(AlmacenDetalleEntity)
       .createQueryBuilder('almacenDet')
-      .leftJoin('almacenDet.almacen', 'almacen')
-      .leftJoin('almacen.insumo', 'insumo')
       .select([
         'almacenDet.id',
         'almacenDet.createdAt',
@@ -229,15 +226,8 @@ export class AlmacenService {
         'almacenDet.saldo',
         'almacenDet.existencias',
         'almacenDet.fecha',
-        'almacen.id',
-        'insumo.id',
-        'insumo.nombre',
-        'insumo.medida',
-        'insumo.unidad',
-        'insumo.precioUnitario',
-        'insumo.marca',
       ])
-      .where('insumo.id =:id', { id: insumoId });
+      .where('almacenDet.almacenId =:id', { id: almacenId });
 
     forIn(options.filters, (value, key) => {
       if (key === 'nombre') {

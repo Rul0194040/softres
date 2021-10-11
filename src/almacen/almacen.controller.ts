@@ -85,12 +85,6 @@ export class AlmacenController {
     return this.almacenService.delete(id);
   }
 
-  /**
-   * Paginate físico
-   *
-   * @param options Opciones de paginación
-   * @returns {PaginationPrimeNgResult}
-   */
   @Post('paginate')
   paginate(
     @Body() options: PaginationOptions,
@@ -98,18 +92,12 @@ export class AlmacenController {
     return this.almacenService.paginate(options);
   }
 
-  /**
-   * Paginate contable
-   *
-   * @param options opciones de paginacion
-   * @returns {PaginationPrimeNgResult}
-   */
-  @Post('paginate/contable/:insumoId')
+  @Post('paginate/contable/:almacenId')
   paginateContable(
-    @Param('insumoId', ParseIntPipe) insumoId: number,
+    @Param('almacenId', ParseIntPipe) almacenId: number,
     @Body() options: PaginationOptions,
   ): Promise<PaginationPrimeNgResult> {
-    return this.almacenService.paginateContable(insumoId, options);
+    return this.almacenService.paginateContable(almacenId, options);
   }
 
   /**
