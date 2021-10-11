@@ -141,7 +141,7 @@ export class RecetaController {
     return this.recetaService.updateImage(recetaId, file.filename);
   }
 
-  @Get('updateExistencia/:recetaId')
+  @Put('cocinar/:recetaId')
   @ApiOperation({
     description:
       'Actualiza las existencias de los almacenes de los insumos a utilizar en la receta',

@@ -302,13 +302,15 @@ export class RecetaService {
       .where('receta.id=:id', { id: recetaId })
       .getOne();
 
-    const isInsuficiente = await this.cocinarDetalles(receta);
+    const isInsuficiente: RecetaDetalleEntity[] = await this.cocinarDetalles(
+      receta,
+    );
     const recetasInsuficientes: BadChild[] = [];
 
     if (isInsuficiente) {
       throw new HttpException(
-        `los insumos ${isInsuficiente} no nos permiten cocinar
-           porque son insuficientes`,
+        `los insumos no nos permiten cocinar
+           porque no son suficientes`,
         HttpStatus.CONFLICT,
       );
     }
@@ -329,7 +331,7 @@ export class RecetaService {
 
       if (recetasInsuficientes) {
         throw new HttpException(
-          `las recetas ${recetasInsuficientes} no nos permiten cocinar
+          `las recetas no nos permiten cocinar
              porque faltan insumos`,
           HttpStatus.CONFLICT,
         );
