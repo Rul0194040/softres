@@ -1,5 +1,6 @@
 export enum SolicitudEstados {
+  BORRADOR = 'borrador',
   GENERADA = 'generada',
-  REVISION = 'revision',
+  PARA_COMPRAS = 'para_compras',
   COMPLETADA = 'completada',
 }

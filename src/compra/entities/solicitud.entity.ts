@@ -36,7 +36,7 @@ export class SolicitudEntity extends CommonEntity {
     type: 'enum',
     enum: SolicitudEstados,
     nullable: true,
-    default: SolicitudEstados.GENERADA,
+    default: SolicitudEstados.BORRADOR,
   })
   status?: SolicitudEstados;
 
