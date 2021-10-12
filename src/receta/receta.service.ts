@@ -343,7 +343,7 @@ export class RecetaService {
     }
   }
 
-  async cocinarDetalles(receta: RecetaEntity): Promise<RecetaDetalleEntity[]> {
+  async verificado(receta: RecetaEntity): Promise<RecetaDetalleEntity[]> {
     const insuficientes: RecetaDetalleEntity[] = [];
 
     for (let idx = 0; idx < receta.detalleReceta.length; idx++) {
@@ -356,8 +356,25 @@ export class RecetaService {
       const falta =
         parseGramos(almacen.total) <= detalle.cantReceta ||
         almacen.minimo <= cocinado;
+      if (falta) {
+        insuficientes.push(detalle);
+      }
+    }
 
-      if (!falta) {
+    return insuficientes;
+  }
+
+  async cocinarDetalles(receta: RecetaEntity): Promise<RecetaDetalleEntity[]> {
+    const insuficientes = this.verificado(receta);
+
+    if (!insuficientes) {
+      for (let idx = 0; idx < receta.detalleReceta.length; idx++) {
+        const detalle = receta.detalleReceta[idx];
+        const almacen = await getRepository(AlmacenEntity).findOne({
+          depto: receta.depto,
+          insumoId: detalle.insumoId,
+        });
+
         const detalleToCreate = getRepository(AlmacenDetalleEntity).create({
           salidas: detalle.cantReceta,
           abono: detalle.costoUnitarioIngrediente,
@@ -368,12 +385,8 @@ export class RecetaService {
         await getRepository(RecetaEntity).update(receta.id, {
           existencia: parseInt(receta.existencia + '') + 1,
         });
-      } else {
-        insuficientes.push(detalle);
       }
     }
-    if (insuficientes.length) {
-      return insuficientes;
-    }
+    return insuficientes;
   }
 }
