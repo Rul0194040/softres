@@ -5,6 +5,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Post,
@@ -140,14 +141,14 @@ export class RecetaController {
     return this.recetaService.updateImage(recetaId, file.filename);
   }
 
-  @Put('updateExistencia/:recetaId')
+  @Put('cocinar/:recetaId')
   @ApiOperation({
     description:
       'Actualiza las existencias de los almacenes de los insumos a utilizar en la receta',
   })
-  async updateExistencia(
+  async cocinar(
     @Param('recetaId', ParseIntPipe) recetaId: number,
-  ): Promise<any> {
-    return this.recetaService.updateExistencias(recetaId);
+  ): Promise<HttpStatus> {
+    return this.recetaService.cocinar(recetaId);
   }
 }
