@@ -447,7 +447,7 @@ export class AlmacenService {
         .leftJoin('detalle.solicitud', 'solicitud')
         .leftJoin('detalle.insumo', 'insumo')
         .where('solicitud.status IN (:status)', {
-          status: [SolicitudEstados.GENERADA, SolicitudEstados.REVISION],
+          status: [SolicitudEstados.GENERADA, SolicitudEstados.BORRADOR],
         })
         .where('insumo.id IN (:...ids)', { ids: minimosIds })
         .select(['detalle.insumoId'])
