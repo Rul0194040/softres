@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
 
-export class CreateDetalleDTO {
+export class CreateContableDetalleDTO {
   @ApiProperty({ nullable: true })
   @IsOptional()
   fecha?: Date;
@@ -20,17 +20,6 @@ export class CreateDetalleDTO {
 
   @ApiProperty({ nullable: true })
   @IsOptional()
-  existencias?: number;
-
-  @ApiProperty({ nullable: true })
-  @IsOptional()
-  precioMedio?: number;
-
-  @ApiProperty()
-  precioUnitario?: number;
-
-  @ApiProperty({ nullable: true })
-  @IsOptional()
   cargo?: number;
 
   @ApiProperty({ nullable: true })
@@ -39,8 +28,5 @@ export class CreateDetalleDTO {
 
   @ApiProperty({ nullable: true })
   @IsOptional()
-  saldo?: number;
-
-  @ApiProperty()
-  almacenId: number;
+  parentContable?: number;
 }

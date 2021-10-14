@@ -1,5 +1,5 @@
 import { BadChild } from './DTO/badChild.dto';
-import { AlmacenDetalleEntity } from '@softres/almacen/entitys/almacenDetalle.entity';
+import { AlmacenDetalleEntity } from '@softres/almacen/entitys/contable.entity';
 import { AlmacenEntity } from '@softres/almacen/entitys/almacen.entity';
 import { AlmacenService } from '@softres/almacen/almacen.service';
 import {

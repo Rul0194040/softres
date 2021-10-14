@@ -1,18 +1,9 @@
+import { ContableEntity } from './contable.entity';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
-import { Entity, ManyToOne, Column } from 'typeorm';
-import { AlmacenEntity } from './almacen.entity';
+import { Entity, Column, ManyToOne } from 'typeorm';
 
-@Entity('almacenDetalle')
-export class AlmacenDetalleEntity extends CommonEntity {
-  @ManyToOne(() => AlmacenEntity, { nullable: false })
-  almacen: AlmacenEntity;
-
-  @Column({
-    type: 'int',
-    nullable: false,
-  })
-  almacenId: number;
-
+@Entity('ContableDetalle')
+export class ContableDetalleEntity extends CommonEntity {
   @Column({
     type: 'date',
     nullable: true,
@@ -45,6 +36,22 @@ export class AlmacenDetalleEntity extends CommonEntity {
 
   @Column({
     type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+  })
+  cargo: number;
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+  })
+  abono: number;
+
+  @Column({
+    type: 'decimal',
     precision: 6,
     scale: 3,
     default: 0.0,
@@ -71,23 +78,13 @@ export class AlmacenDetalleEntity extends CommonEntity {
     type: 'decimal',
     precision: 10,
     scale: 2,
-    default: 0,
-  })
-  cargo: number;
-
-  @Column({
-    type: 'decimal',
-    precision: 10,
-    scale: 2,
-    default: 0,
-  })
-  abono: number;
-
-  @Column({
-    type: 'decimal',
-    precision: 10,
-    scale: 2,
     nullable: false,
   })
   saldo: number;
+
+  @ManyToOne(() => ContableEntity, { nullable: true })
+  parentContable: ContableEntity;
+
+  @Column({ type: 'mediumint', nullable: false })
+  parentContableId?: number;
 }
