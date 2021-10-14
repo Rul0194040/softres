@@ -1,5 +1,9 @@
 import { AlmacenEntity } from './entitys/almacen.entity';
+import { ContableDetalleEntity } from './entitys/contableDetalle.entity';
+import { ContableEntity } from './entitys/contable.entity';
 import { CreateAlmacenDTO } from './DTOs/createAlmacen.dto';
+import { CreateContableDetalleDTO } from './DTOs/contableDetalle.dto';
+import { CreateContableDTO } from './DTOs/createContable.dto';
 import { DeleteResult, getRepository, UpdateResult } from 'typeorm';
 import { Deptos } from './enums/deptos.enum';
 import { forIn } from 'lodash';
@@ -9,15 +13,11 @@ import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
 import { ProfileTypes } from './../user/profileTypes.enum';
+import { SolicitudDetalleEntity } from '@softres/compra/entities/solicitudDetalle.entity';
+import { SolicitudEstados } from '@softres/compra/enum/solicitud-estados.enum';
 import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
 import * as Excel from 'exceljs';
 import * as moment from 'moment';
-import { SolicitudDetalleEntity } from '@softres/compra/entities/solicitudDetalle.entity';
-import { SolicitudEstados } from '@softres/compra/enum/solicitud-estados.enum';
-import { ContableEntity } from './entitys/contable.entity';
-import { CreateContableDTO } from './DTOs/createContable.dto';
-import { CreateContableDetalleDTO } from './DTOs/contableDetalle.dto';
-import { ContableDetalleEntity } from './entitys/contableDetalle.entity';
 
 const toFloat = (num: string | number): number => parseFloat(num + '');
 const parseKilo = (gr: number): number => gr / 1000.0;
@@ -136,21 +136,15 @@ export class AlmacenService {
     const mainDetalle = await getRepository(ContableDetalleEntity).findOne({
       id: detalleId,
     });
-    const almacen = await getRepository(AlmacenEntity).findOne(
-      mainDetalle.almacenId,
-      { select: ['insumo'], relations: ['insumo'] },
+    const contable = await getRepository(ContableEntity).findOne(
+      mainDetalle.parentContableId,
+      { relations: ['insumo', 'detalle'] },
     );
-    const detalleArray: AlmacenDetalleEntity[] = await getRepository(
-      AlmacenDetalleEntity,
-    )
-      .createQueryBuilder('detalle')
-      .where('detalle.almacenId = :term', { term: mainDetalle.almacenId })
-      .getMany();
 
     let preSaldo = toFloat(0.0);
     let stock = toFloat(0.0);
 
-    detalleArray.forEach(async (detalle) => {
+    contable.detalle.forEach(async (detalle) => {
       if (detalle.createdAt >= mainDetalle.createdAt) {
         detalle.existencias =
           toFloat(stock) + toFloat(detalle.entradas) - toFloat(detalle.salidas);
@@ -161,16 +155,13 @@ export class AlmacenService {
         stock = detalle.existencias;
         preSaldo = toFloat(detalle.saldo);
 
-        await getRepository(AlmacenDetalleEntity).update(detalle.id, detalle);
+        await getRepository(ContableDetalleEntity).update(detalle.id, detalle);
       }
       stock += toFloat(detalle.entradas) - toFloat(detalle.salidas);
       preSaldo = toFloat(detalle.saldo);
     });
 
-    return getRepository(AlmacenEntity).update(mainDetalle.almacenId, {
-      total: stock,
-      cantidad: Math.ceil((stock * 1.0) / almacen.insumo.pesoNeto),
-    });
+    return null;
   }
 
   async getByid(almacenId: number): Promise<AlmacenEntity> {
