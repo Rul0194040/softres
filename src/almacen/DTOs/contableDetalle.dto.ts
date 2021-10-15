@@ -2,31 +2,32 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
 
 export class CreateContableDetalleDTO {
-  @ApiProperty({ nullable: true })
-  @IsOptional()
-  fecha?: Date;
-
-  @ApiProperty({ nullable: true })
+  @ApiProperty()
+  fecha: Date;
+  @ApiProperty()
   @IsOptional()
   referencia?: string;
-
-  @ApiProperty({ nullable: true })
+  @ApiProperty()
+  entradas: number;
+  @ApiProperty()
+  salidas: number;
+  @ApiProperty()
+  cargo: number;
+  @ApiProperty()
+  abono: number;
+  @ApiProperty()
   @IsOptional()
-  entradas?: number;
-
-  @ApiProperty({ nullable: true })
+  existencias?: number;
+  @ApiProperty()
   @IsOptional()
-  salidas?: number;
-
-  @ApiProperty({ nullable: true })
+  precioUnitario?: number;
+  @ApiProperty()
   @IsOptional()
-  cargo?: number;
-
-  @ApiProperty({ nullable: true })
+  precioMedio?: number;
+  @ApiProperty()
   @IsOptional()
-  abono?: number;
-
-  @ApiProperty({ nullable: true })
+  saldo?: number;
+  @ApiProperty()
   @IsOptional()
-  parentContable?: number;
+  parentContableId?: number;
 }

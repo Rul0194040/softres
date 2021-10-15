@@ -47,25 +47,21 @@ export class AlmacenService {
     return createdAlmacen;
   }
 
-  createDetalle(
-    almacenId: number,
-    almacen: any[],
-  ): Promise<ContableDetalleEntity[]> {
-    throw new Error('Method not implemented.');
-  }
+  // createDetalle(
+  //   almacenId: number,
+  //   infoContable: any[],
+  // ): Promise<ContableDetalleEntity[]> {
+  //   console.log(error);
+  // }
 
   async createContable(
     insumoId: number,
     infoContable: CreateContableDTO,
-  ): Promise<UpdateResult> {
+  ): Promise<ContableEntity> {
     let firstDetalleId = 0;
-    let existencias = 0;
-    let precioMedio = 0;
-    let saldo = 0;
 
     const hojaContable: CreateContableDTO = {
       insumoId,
-      precioUnitario: infoContable.precioUnitario,
     };
 
     const createdContable = await getRepository(ContableEntity).save(
@@ -89,24 +85,21 @@ export class AlmacenService {
       ) {
         referencia = `E-${moment(fecha).format('DDMMYYYY')}`;
         entradas = detalle.entradas;
-        existencias += entradas;
-        saldo += entradas;
         cargo = detalle.cargo
           ? detalle.cargo
-          : infoContable.precioUnitario * entradas;
+          : detalle.precioUnitario * entradas;
       } else {
         referencia = `S-${moment(fecha).format('DDMMYYYY')}`;
         salidas = detalle.salidas;
-        existencias -= salidas;
-        saldo -= salidas;
         abono = detalle.abono
           ? detalle.abono
-          : infoContable.precioUnitario * salidas;
+          : detalle.precioUnitario * salidas;
       }
 
       const detalleContableToCreate: CreateContableDetalleDTO = {
         fecha,
         referencia,
+        precioUnitario: detalle.precioUnitario,
         entradas: parseKilo(entradas),
         salidas: parseKilo(salidas),
         cargo,
@@ -115,27 +108,13 @@ export class AlmacenService {
       const createdDetalle = await getRepository(ContableDetalleEntity).save(
         detalleContableToCreate,
       );
-
-      if (firstDetalleId === 0 && createdDetalle.id === 1) {
+      if (firstDetalleId === 0) {
         firstDetalleId = createdDetalle.id;
-        saldo *= existencias;
-      } else {
-        saldo = createdDetalle.cargo
-          ? (saldo += createdDetalle.cargo)
-          : (saldo -= createdDetalle.abono);
-        precioMedio = createdDetalle.abono
-          ? (precioMedio =
-              (saldo + createdDetalle.abono) / (existencias + salidas))
-          : precioMedio;
       }
     }
-    this.updateTablaContable(firstDetalleId);
 
-    return await getRepository(ContableEntity).update(createdContable.id, {
-      existencias,
-      precioMedio,
-      saldo,
-    });
+    this.updateTablaContable(firstDetalleId);
+    return createdContable;
   }
 
   // detalleId es el id del detalle desde donde va a empezar a actualizar la tabla
@@ -339,7 +318,7 @@ export class AlmacenService {
         return;
       } else {
         const record: CreateContableDetalleDTO = {
-          parentContable: contableId,
+          parentContableId: contableId,
           fecha: new Date(row.getCell('A').value.toString()) ?? null,
           entradas: row.getCell('B').value
             ? Number(row.getCell('B').value)

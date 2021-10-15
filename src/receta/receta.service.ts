@@ -1,5 +1,4 @@
 import { BadChild } from './DTO/badChild.dto';
-import { AlmacenDetalleEntity } from '@softres/almacen/entitys/contable.entity';
 import { AlmacenEntity } from '@softres/almacen/entitys/almacen.entity';
 import { AlmacenService } from '@softres/almacen/almacen.service';
 import {
@@ -23,6 +22,7 @@ import { RecetaDetalleEntity } from './entities/recetaDetalle.entity';
 import { RecetaEntity } from './entities/receta.entity';
 import { RecipeValues } from './enums/recipeValues.enum';
 import { UpdateRecetaDTO } from './DTO/update-receta.dto';
+import { ContableDetalleEntity } from '@softres/almacen/entitys/contableDetalle.entity';
 
 const parseGramos = (kg: number) => kg * 1000;
 
@@ -398,7 +398,7 @@ export class RecetaService {
           insumoId: detalle.insumoId,
         });
 
-        const detalleToCreate = getRepository(AlmacenDetalleEntity).create({
+        const detalleToCreate = getRepository(ContableDetalleEntity).create({
           salidas: detalle.cantReceta,
           abono: detalle.costoUnitarioIngrediente,
           precioUnitario: 0,

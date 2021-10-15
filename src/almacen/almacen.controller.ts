@@ -1,7 +1,6 @@
 import { JwtAuthGuard } from './../auth/guards/jwt.guard';
 import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
 import { FileOptions } from './../common/DTOs/fileOptions.dto';
-import { CreateContableDetalleDTO } from './DTOs/contableDetalle.dto';
 import { AlmacenService } from './almacen.service';
 import { AlmacenEntity } from './entitys/almacen.entity';
 import {
@@ -23,13 +22,14 @@ import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgR
 import { UpdateResult, DeleteResult } from 'typeorm';
 import { CreateAlmacenDTO } from './DTOs/createAlmacen.dto';
 import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { existsSync, mkdirSync } from 'fs';
 import { extname } from 'path';
 import { User } from '@softres/user/DTO/user.decorator';
 import { ContableDetalleEntity } from './entitys/contableDetalle.entity';
+import { CreateContableDetalleDTO } from './DTOs/contableDetalle.dto';
 
 @Controller('almacen')
 @ApiTags('Almacén')
@@ -43,9 +43,6 @@ export class AlmacenController {
   }
 
   @Post('createDetalle/:almacenId')
-  @ApiBody({
-    type: [CreateContableDetalleDTO],
-  })
   createDetAlmacen(
     @Param('almacenId', ParseIntPipe) almacenId: number,
     @Body(new ParseArrayPipe({ items: CreateContableDetalleDTO }))
