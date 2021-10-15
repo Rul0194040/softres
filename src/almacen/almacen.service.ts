@@ -47,12 +47,67 @@ export class AlmacenService {
     return createdAlmacen;
   }
 
-  // createDetalle(
-  //   almacenId: number,
-  //   infoContable: any[],
-  // ): Promise<ContableDetalleEntity[]> {
-  //   console.log(error);
-  // }
+  async createDetalle(
+    almacenId: number,
+    infoContable: CreateContableDetalleDTO[],
+  ): Promise<ContableDetalleEntity[]> {
+    const almacen = await getRepository(AlmacenEntity).findOne(almacenId);
+    const detalles: ContableDetalleEntity[] = [];
+
+    for (let idx = 0; idx < infoContable.length; idx++) {
+      const detalle = infoContable[idx];
+
+      let entradas = 0.0,
+        salidas = 0.0,
+        cargo = 0,
+        abono = 0,
+        referencia: string;
+
+      const fecha: Date = detalle.fecha ? detalle.fecha : moment().toDate();
+
+      if (
+        detalle.entradas !== null &&
+        detalle.entradas !== undefined &&
+        detalle.entradas !== 0.0
+      ) {
+        referencia = `E-${moment(fecha).format('DDMMYYYY')}`;
+        entradas = detalle.entradas;
+        cargo = detalle.cargo
+          ? detalle.cargo
+          : detalle.precioUnitario * entradas;
+
+        await getRepository(AlmacenEntity).update(almacen.id, {
+          total: almacen.total + entradas,
+        });
+      } else {
+        referencia = `S-${moment(fecha).format('DDMMYYYY')}`;
+        salidas = detalle.salidas;
+        abono = detalle.abono
+          ? detalle.abono
+          : detalle.precioUnitario * salidas;
+        await getRepository(AlmacenEntity).update(almacen.id, {
+          total: almacen.total - salidas,
+        });
+      }
+
+      const detalleContableToCreate: CreateContableDetalleDTO = {
+        fecha,
+        referencia,
+        precioUnitario: detalle.precioUnitario,
+        entradas: parseKilo(entradas),
+        salidas: parseKilo(salidas),
+        cargo,
+        abono,
+      };
+      const createdDetalle = await getRepository(ContableDetalleEntity).save(
+        detalleContableToCreate,
+      );
+
+      detalles[idx] = createdDetalle;
+    }
+
+    return detalles;
+  }
 
   async createContable(
     insumoId: number,
@@ -307,7 +362,7 @@ export class AlmacenService {
   }
 
   async masiveAlmacen(
-    contableId: number,
+    almacenId: number,
     file: string,
   ): Promise<CreateContableDetalleDTO[]> {
     const response: CreateContableDetalleDTO[] = [];
@@ -318,7 +373,6 @@ export class AlmacenService {
         return;
       } else {
         const record: CreateContableDetalleDTO = {
-          parentContableId: contableId,
           fecha: new Date(row.getCell('A').value.toString()) ?? null,
           entradas: row.getCell('B').value
             ? Number(row.getCell('B').value)
