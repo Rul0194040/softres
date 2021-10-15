@@ -24,20 +24,20 @@ const parseKilo = (gr: number): number => gr / 1000.0;
 
 @Injectable()
 export class AlmacenService {
-  async create(almacen: CreateAlmacenDTO): Promise<AlmacenEntity> {
+  async createAlmacen(almacen: CreateAlmacenDTO): Promise<AlmacenEntity> {
     const insumo = await getRepository(InsumoEntity).findOne(almacen.insumoId);
     const total = almacen.cantidad * insumo.pesoNeto;
 
     const almacenToCreate: CreateAlmacenDTO = {
       cantidad: almacen.cantidad,
       depto: almacen.depto,
-      insumo,
       insumoId: almacen.insumoId,
       maximo: parseKilo(almacen.maximo),
       minimo: parseKilo(almacen.minimo),
       total: parseKilo(total),
       type: almacen.type,
     };
+
     const createdAlmacen = await getRepository(AlmacenEntity).save(
       almacenToCreate,
     );
@@ -45,6 +45,13 @@ export class AlmacenService {
     await this.createContable(almacen.insumoId, almacen.infoContable);
 
     return createdAlmacen;
+  }
+
+  createDetalle(
+    almacenId: number,
+    almacen: any[],
+  ): Promise<ContableDetalleEntity[]> {
+    throw new Error('Method not implemented.');
   }
 
   async createContable(
@@ -164,7 +171,7 @@ export class AlmacenService {
     return null;
   }
 
-  async getByid(almacenId: number): Promise<AlmacenEntity> {
+  async getById(almacenId: number): Promise<AlmacenEntity> {
     return await getRepository(AlmacenEntity)
       .createQueryBuilder('almacen')
       .leftJoinAndSelect('almacen.insumo', 'insumo')

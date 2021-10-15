@@ -53,7 +53,7 @@ export class AlmacenEntity extends CommonEntity {
   })
   total: number;
 
-  @ManyToOne(() => InsumoEntity, { nullable: false })
+  @ManyToOne(() => InsumoEntity, { nullable: true })
   @JoinColumn()
   insumo: InsumoEntity;
 
