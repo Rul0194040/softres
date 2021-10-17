@@ -3,7 +3,6 @@ import { ContableDetalleEntity } from './entitys/contableDetalle.entity';
 import { ContableEntity } from './entitys/contable.entity';
 import { CreateAlmacenDTO } from './DTOs/createAlmacen.dto';
 import { CreateContableDetalleDTO } from './DTOs/contableDetalle.dto';
-import { CreateContableDTO } from './DTOs/createContable.dto';
 import { DeleteResult, getRepository, UpdateResult } from 'typeorm';
 import { Deptos } from './enums/deptos.enum';
 import { forIn } from 'lodash';
@@ -26,7 +25,9 @@ const parseKilo = (gr: number): number => gr / 1000.0;
 export class AlmacenService {
   async createAlmacen(almacen: CreateAlmacenDTO): Promise<AlmacenEntity> {
     const insumo = await getRepository(InsumoEntity).findOne(almacen.insumoId);
-    const total = almacen.cantidad * insumo.pesoNeto;
+    const contable = await getRepository(ContableEntity).findOne({
+      where: { insumoId: almacen.insumoId },
+    });
 
     const almacenToCreate: CreateAlmacenDTO = {
       cantidad: almacen.cantidad,
@@ -34,7 +35,7 @@ export class AlmacenService {
       insumoId: almacen.insumoId,
       maximo: parseKilo(almacen.maximo),
       minimo: parseKilo(almacen.minimo),
-      total: parseKilo(total),
+      total: 0,
       type: almacen.type,
     };
 
@@ -42,20 +43,42 @@ export class AlmacenService {
       almacenToCreate,
     );
 
-    await this.createContable(almacen.insumoId, almacen.infoContable);
+    if (!contable) {
+      await getRepository(ContableEntity).save({
+        insumoId: almacen.insumoId,
+      });
+    }
+
+    if (almacen.detalleContable) {
+      await this.createDetalle(createdAlmacen.id, almacen.detalleContable);
+    }
+
+    if (almacen.cantidad !== 0) {
+      await this.createDetalle(createdAlmacen.id, [
+        {
+          entradas: almacen.cantidad * insumo.pesoNeto,
+          precioUnitario: insumo.precioUnitario,
+        },
+      ]);
+    }
 
     return createdAlmacen;
   }
 
   async createDetalle(
     almacenId: number,
-    infoContable: CreateContableDetalleDTO[],
+    detalles: CreateContableDetalleDTO[],
   ): Promise<ContableDetalleEntity[]> {
     const almacen = await getRepository(AlmacenEntity).findOne(almacenId);
-    const detalles: ContableDetalleEntity[] = [];
+    const contable = await getRepository(ContableEntity).findOne({
+      where: { insumoId: almacen.insumoId },
+    });
+    const createdDetalles = [];
+    let firstDetalleIndex = 0;
+    let total = toFloat(almacen.total);
 
-    for (let idx = 0; idx < infoContable.length; idx++) {
-      const detalle = infoContable[idx];
+    await detalles.reduce(async (memo, detalle) => {
+      await memo;
 
       let entradas = 0.0,
         salidas = 0.0,
@@ -76,18 +99,15 @@ export class AlmacenService {
           ? detalle.cargo
           : detalle.precioUnitario * entradas;
 
-        await getRepository(AlmacenEntity).update(almacen.id, {
-          total: almacen.total + entradas,
-        });
+        total += parseKilo(entradas);
       } else {
         referencia = `S-${moment(fecha).format('DDMMYYYY')}`;
         salidas = detalle.salidas;
         abono = detalle.abono
           ? detalle.abono
           : detalle.precioUnitario * salidas;
-        await getRepository(AlmacenEntity).update(almacen.id, {
-          total: almacen.total - salidas,
-        });
+
+        total -= parseKilo(salidas);
       }
 
       const detalleContableToCreate: CreateContableDetalleDTO = {
@@ -98,119 +118,75 @@ export class AlmacenService {
         salidas: parseKilo(salidas),
         cargo,
         abono,
+        contableId: contable.id,
       };
       const createdDetalle = await getRepository(ContableDetalleEntity).save(
         detalleContableToCreate,
       );
 
-      detalles[idx] = createdDetalle;
-    }
+      createdDetalles.push(createdDetalle);
+      if (firstDetalleIndex === 0) firstDetalleIndex = createdDetalle.id;
+      return memo;
+    }, Promise.resolve(null));
 
-    return detalles;
-  }
+    await getRepository(AlmacenEntity).update(almacen.id, { total });
 
-  async createContable(
-    insumoId: number,
-    infoContable: CreateContableDTO,
-  ): Promise<ContableEntity> {
-    let firstDetalleId = 0;
-
-    const hojaContable: CreateContableDTO = {
-      insumoId,
-    };
-
-    const createdContable = await getRepository(ContableEntity).save(
-      hojaContable,
-    );
-
-    for (let i = 0; i < infoContable.detalles.length; i++) {
-      const detalle = infoContable.detalles[i];
-      let entradas = 0.0,
-        salidas = 0.0,
-        cargo = 0,
-        abono = 0,
-        referencia: string;
-
-      const fecha: Date = detalle.fecha ? detalle.fecha : moment().toDate();
-
-      if (
-        detalle.entradas !== null &&
-        detalle.entradas !== undefined &&
-        detalle.entradas !== 0.0
-      ) {
-        referencia = `E-${moment(fecha).format('DDMMYYYY')}`;
-        entradas = detalle.entradas;
-        cargo = detalle.cargo
-          ? detalle.cargo
-          : detalle.precioUnitario * entradas;
-      } else {
-        referencia = `S-${moment(fecha).format('DDMMYYYY')}`;
-        salidas = detalle.salidas;
-        abono = detalle.abono
-          ? detalle.abono
-          : detalle.precioUnitario * salidas;
-      }
-
-      const detalleContableToCreate: CreateContableDetalleDTO = {
-        fecha,
-        referencia,
-        precioUnitario: detalle.precioUnitario,
-        entradas: parseKilo(entradas),
-        salidas: parseKilo(salidas),
-        cargo,
-        abono,
-      };
-      const createdDetalle = await getRepository(ContableDetalleEntity).save(
-        detalleContableToCreate,
-      );
-      if (firstDetalleId === 0) {
-        firstDetalleId = createdDetalle.id;
-      }
-    }
-
-    this.updateTablaContable(firstDetalleId);
-    return createdContable;
+    await this.updateTablaContable(firstDetalleIndex);
+    return createdDetalles;
   }
 
   // detalleId es el id del detalle desde donde va a empezar a actualizar la tabla
   async updateTablaContable(detalleId: number): Promise<UpdateResult> {
-    const mainDetalle = await getRepository(ContableDetalleEntity).findOne({
-      id: detalleId,
-    });
+    const mainDetalle = await getRepository(ContableDetalleEntity).findOne(
+      detalleId,
+    );
+
     const contable = await getRepository(ContableEntity).findOne(
-      mainDetalle.parentContableId,
+      mainDetalle.contableId,
       { relations: ['insumo', 'detalle'] },
     );
 
     let preSaldo = toFloat(0.0);
     let stock = toFloat(0.0);
 
-    contable.detalle.forEach(async (detalle) => {
-      if (detalle.createdAt >= mainDetalle.createdAt) {
-        detalle.existencias =
-          toFloat(stock) + toFloat(detalle.entradas) - toFloat(detalle.salidas);
-        detalle.saldo =
-          toFloat(preSaldo) + toFloat(detalle.cargo) - toFloat(detalle.abono);
-        detalle.precioMedio = preSaldo / (stock || 1.0);
+    Promise.all(
+      contable.detalle.map(async (detalle) => {
+        if (detalle.createdAt >= mainDetalle.createdAt) {
+          detalle.existencias =
+            toFloat(stock) +
+            toFloat(detalle.entradas) -
+            toFloat(detalle.salidas);
+          detalle.saldo =
+            toFloat(preSaldo) + toFloat(detalle.cargo) - toFloat(detalle.abono);
+          detalle.precioMedio = preSaldo / (stock || 1.0);
 
-        stock = detalle.existencias;
+          stock = detalle.existencias;
+          preSaldo = toFloat(detalle.saldo);
+
+          await getRepository(ContableDetalleEntity).update(
+            detalle.id,
+            detalle,
+          );
+        }
+        stock += toFloat(detalle.entradas) - toFloat(detalle.salidas);
         preSaldo = toFloat(detalle.saldo);
-
-        await getRepository(ContableDetalleEntity).update(detalle.id, detalle);
-      }
-      stock += toFloat(detalle.entradas) - toFloat(detalle.salidas);
-      preSaldo = toFloat(detalle.saldo);
-    });
+      }),
+    );
 
     return null;
   }
 
   async getById(almacenId: number): Promise<AlmacenEntity> {
-    return await getRepository(AlmacenEntity)
-      .createQueryBuilder('almacen')
-      .leftJoinAndSelect('almacen.insumo', 'insumo')
-      .where('almacen.id = :term', { term: almacenId })
-      .getOne();
+    return await getRepository(AlmacenEntity).findOne(almacenId, {
+      relations: ['insumo'],
+    });
+  }
+
+  getContableByInsumo(insumoId: number): Promise<ContableEntity> {
+    return getRepository(ContableEntity).findOne({
+      where: { insumoId },
+      relations: ['insumo'],
+    });
   }
 
   async update(
@@ -287,24 +263,26 @@ export class AlmacenService {
   }
 
   async paginateContable(
-    insumoId: number,
+    contableId: number,
     options: PaginationOptions,
   ): Promise<PaginationPrimeNgResult> {
-    const dataQuery = getRepository(ContableEntity)
-      .createQueryBuilder('contable')
-      .leftJoin('contable.detalle', 'detalle')
+    const dataQuery = getRepository(ContableDetalleEntity)
+      .createQueryBuilder('detalle')
       .select([
-        'contable.id',
-        'contable.createdAt',
-        'contable.insumoId',
+        'detalle.id',
         'detalle.fecha',
         'detalle.referencia',
-        'detalle.entrada',
-        'detalle.salida',
+        'detalle.entradas',
+        'detalle.salidas',
+        'detalle.existencias',
+        'detalle.precioUnitario',
+        'detalle.precioMedio',
         'detalle.cargo',
         'detalle.abono',
+        'detalle.saldo',
+        'detalle.contableId',
       ])
-      .where('contable.insumoId=:id', { id: insumoId });
+      .where('detalle.contableId=:contableId', { contableId });
 
     forIn(options.filters, (value, key) => {
       if (key === 'nombre') {
@@ -313,14 +291,14 @@ export class AlmacenService {
         });
       }
       if (key === 'fecha') {
-        dataQuery.andWhere('(monthname(almacenDet.fecha) = :mes)', {
+        dataQuery.andWhere('(monthname(detalle.fecha) = :mes)', {
           mes: value,
         });
       }
     });
 
     if (options.sort === undefined || !Object.keys(options.sort).length) {
-      options.sort = 'almacenDet.fecha';
+      options.sort = 'detalle.createdAt';
     }
 
     const data = await dataQuery
@@ -338,7 +316,7 @@ export class AlmacenService {
     };
   }
 
-  async updateAlmacenDetalle(
+  async updateDetalleContable(
     detalleId: number,
     detalle: CreateContableDetalleDTO,
   ): Promise<any> {
@@ -370,6 +348,7 @@ export class AlmacenService {
     const data = await workbook.xlsx.readFile(file);
     data.getWorksheet('carga-masiva').eachRow((row, idx) => {
       if (idx === 1) {
+        // Fila de encabezados
         return;
       } else {
         const record: CreateContableDetalleDTO = {
@@ -394,8 +373,9 @@ export class AlmacenService {
           saldo: row.getCell('I').value ? Number(row.getCell('I').value) : 0,
         };
         response.push(record);
-      } //Titulos
+      }
     });
+
     return this.createDetalle(almacenId, response);
   }
 

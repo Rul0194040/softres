@@ -30,6 +30,7 @@ import { extname } from 'path';
 import { User } from '@softres/user/DTO/user.decorator';
 import { ContableDetalleEntity } from './entitys/contableDetalle.entity';
 import { CreateContableDetalleDTO } from './DTOs/contableDetalle.dto';
+import { ContableEntity } from './entitys/contable.entity';
 
 @Controller('almacen')
 @ApiTags('Almacén')
@@ -43,12 +44,12 @@ export class AlmacenController {
   }
 
   @Post('createDetalle/:almacenId')
-  createDetAlmacen(
+  createDetContable(
     @Param('almacenId', ParseIntPipe) almacenId: number,
     @Body(new ParseArrayPipe({ items: CreateContableDetalleDTO }))
-    almacen: CreateContableDetalleDTO[],
+    detalles: CreateContableDetalleDTO[],
   ): Promise<ContableDetalleEntity[]> {
-    return this.almacenService.createDetalle(almacenId, almacen);
+    return this.almacenService.createDetalle(almacenId, detalles);
   }
 
   @Post('insumos-minimos')
@@ -64,6 +65,13 @@ export class AlmacenController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<AlmacenEntity> {
     return this.almacenService.getById(id);
+  }
+
+  @Get('/contable/:insumoId')
+  getContableById(
+    @Param('insumoId', ParseIntPipe) insumoId: number,
+  ): Promise<ContableEntity> {
+    return this.almacenService.getContableByInsumo(insumoId);
   }
 
   @Put(':id')
@@ -86,12 +94,12 @@ export class AlmacenController {
     return this.almacenService.paginate(options);
   }
 
-  @Post('paginate/contable/:almacenId')
+  @Post('paginate/contable/:contableId')
   paginateContable(
-    @Param('almacenId', ParseIntPipe) almacenId: number,
+    @Param('contableId', ParseIntPipe) contableId: number,
     @Body() options: PaginationOptions,
   ): Promise<PaginationPrimeNgResult> {
-    return this.almacenService.paginateContable(almacenId, options);
+    return this.almacenService.paginateContable(contableId, options);
   }
 
   /**
@@ -101,11 +109,11 @@ export class AlmacenController {
    * @returns Regresa stock actual y costo venta (suma de los abonos)
    */
   @Put('updateAlmacenDetalle/:detalleId')
-  updateAlmacenDetalle(
+  updateDetalleContable(
     @Param('detalleId', ParseIntPipe) detalleId: number,
     @Body() detalle: CreateContableDetalleDTO,
   ): Promise<any> {
-    return this.almacenService.updateAlmacenDetalle(detalleId, detalle);
+    return this.almacenService.updateDetalleContable(detalleId, detalle);
   }
 
   @Post('carga-masiva/:almacenId')

@@ -4,6 +4,8 @@ import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { AlmacenType } from '../enums/almacenTypes.enum';
+import { CreateDetalleRecetaDTO } from '@softres/receta/DTO/create-receta.dto';
+import { CreateContableDetalleDTO } from './contableDetalle.dto';
 
 export class CreateAlmacenDTO {
   @ApiProperty({ nullable: true })
@@ -24,6 +26,6 @@ export class CreateAlmacenDTO {
   depto: Deptos;
   @ApiProperty({ enum: AlmacenType })
   type: AlmacenType;
-  @ApiProperty()
-  infoContable?: CreateContableDTO;
+  @ApiProperty({ nullable: true, type: [CreateContableDetalleDTO] })
+  detalleContable?: CreateContableDetalleDTO[];
 }

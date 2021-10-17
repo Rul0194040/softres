@@ -2,7 +2,7 @@ import { ContableEntity } from './contable.entity';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
 import { Entity, Column, ManyToOne } from 'typeorm';
 
-@Entity('ContableDetalle')
+@Entity('contableDetalle')
 export class ContableDetalleEntity extends CommonEntity {
   @Column({
     type: 'date',
@@ -36,22 +36,6 @@ export class ContableDetalleEntity extends CommonEntity {
 
   @Column({
     type: 'decimal',
-    precision: 10,
-    scale: 2,
-    default: 0,
-  })
-  cargo: number;
-
-  @Column({
-    type: 'decimal',
-    precision: 10,
-    scale: 2,
-    default: 0,
-  })
-  abono: number;
-
-  @Column({
-    type: 'decimal',
     precision: 6,
     scale: 3,
     default: 0.0,
@@ -78,13 +62,30 @@ export class ContableDetalleEntity extends CommonEntity {
     type: 'decimal',
     precision: 10,
     scale: 2,
+    default: 0,
+  })
+  cargo: number;
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+  })
+  abono: number;
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
     nullable: false,
+    default: 0,
   })
   saldo: number;
 
   @ManyToOne(() => ContableEntity, { nullable: true })
-  parentContable: ContableEntity;
+  contable: ContableEntity;
 
   @Column({ type: 'mediumint', nullable: false })
-  parentContableId?: number;
+  contableId?: number;
 }

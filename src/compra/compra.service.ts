@@ -252,7 +252,6 @@ export class CompraService {
         this.almacenService.createDetalle(almacen.id, [
           {
             salidas: detalle.cantidad,
-            almacenId: almacen.id,
           },
         ]);
       }

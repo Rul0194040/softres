@@ -3,18 +3,18 @@ import { IsOptional } from 'class-validator';
 
 export class CreateContableDetalleDTO {
   @ApiProperty()
-  fecha: Date;
+  fecha?: Date;
   @ApiProperty()
   @IsOptional()
   referencia?: string;
   @ApiProperty()
-  entradas: number;
+  entradas?: number;
   @ApiProperty()
-  salidas: number;
+  salidas?: number;
   @ApiProperty()
-  cargo: number;
+  cargo?: number;
   @ApiProperty()
-  abono: number;
+  abono?: number;
   @ApiProperty()
   @IsOptional()
   existencias?: number;
@@ -27,7 +27,7 @@ export class CreateContableDetalleDTO {
   @ApiProperty()
   @IsOptional()
   saldo?: number;
-  @ApiProperty()
+  @ApiProperty({ nullable: true })
   @IsOptional()
-  parentContableId?: number;
+  contableId?: number;
 }

@@ -33,14 +33,14 @@ export class RecetaService {
   async create(receta: CreateRecetaDTO): Promise<RecetaEntity> {
     const recetaTocreate = plainToClass(RecetaEntity, receta);
 
-    if (receta.hasChildren && receta.children.length) {
+    if (receta.children && receta.children.length !== 0) {
       const children = await getRepository(RecetaEntity).findByIds(
         receta.children,
         {
           where: [
-            { hasChildren: false, grupo: GrupoReceta.SUBRECETA },
-            { hasChildren: false, grupo: GrupoReceta.COMPLEMENTO },
-            { hasChildren: false, grupo: GrupoReceta.EXTRA },
+            { grupo: GrupoReceta.SUBRECETA },
+            { grupo: GrupoReceta.COMPLEMENTO },
+            { grupo: GrupoReceta.EXTRA },
           ],
         },
       );
@@ -51,8 +51,8 @@ export class RecetaService {
       recetaTocreate,
     );
 
-    if (receta.detalleReceta) {
-      this.createDetalle(createdReceta.id, receta.detalleReceta);
+    if (receta.detalle) {
+      this.createDetalle(createdReceta.id, receta.detalle);
     }
 
     return createdReceta;
@@ -112,9 +112,9 @@ export class RecetaService {
         receta.children,
         {
           where: [
-            { hasChildren: false, grupo: GrupoReceta.SUBRECETA },
-            { hasChildren: false, grupo: GrupoReceta.COMPLEMENTO },
-            { hasChildren: false, grupo: GrupoReceta.EXTRA },
+            { grupo: GrupoReceta.SUBRECETA },
+            { grupo: GrupoReceta.COMPLEMENTO },
+            { grupo: GrupoReceta.EXTRA },
           ],
         },
       );
@@ -124,8 +124,8 @@ export class RecetaService {
     }
 
     await getRepository(RecetaDetalleEntity).delete({ parentId: id });
-    if (receta.detalleReceta) {
-      this.createDetalle(id, receta.detalleReceta);
+    if (receta.detalle) {
+      this.createDetalle(id, receta.detalle);
     }
     return await getRepository(RecetaEntity).update(id, {
       nombre: receta.nombre,
@@ -140,7 +140,7 @@ export class RecetaService {
     return getRepository(RecetaEntity)
       .createQueryBuilder('receta')
       .leftJoin('receta.children', 'children')
-      .leftJoin('receta.detalleReceta', 'det')
+      .leftJoin('receta.detalle', 'det')
       .leftJoin('det.insumo', 'insumo')
       .select([
         'receta.id',
@@ -152,7 +152,6 @@ export class RecetaService {
         'receta.precioSugeridoCarta',
         'children.id',
         'children.nombre',
-        'receta.hasChildren',
         'receta.imagen',
         'receta.grupo',
         'det.id',
@@ -309,11 +308,10 @@ export class RecetaService {
     const receta = await getRepository(RecetaEntity)
       .createQueryBuilder('receta')
       .leftJoin('receta.children', 'subRecetas')
-      .leftJoin('receta.detalleReceta', 'detalle')
+      .leftJoin('receta.detalle', 'detalle')
       .select([
         'receta.id',
         'receta.depto',
-        'receta.hasChildren',
         'subRecetas.id',
         'subRecetas.nombre',
         'subRecetas.grupo',
@@ -338,7 +336,7 @@ export class RecetaService {
       );
     }
 
-    if (receta.hasChildren) {
+    if (receta.detalle && receta.detalle.length !== 0) {
       for (let idx = 0; idx < receta.children.length; idx++) {
         const child = receta.children[idx];
         const badchild = await this.cocinarDetalles(child);
@@ -369,8 +367,8 @@ export class RecetaService {
   async verificado(receta: RecetaEntity): Promise<RecetaDetalleEntity[]> {
     const insuficientes: RecetaDetalleEntity[] = [];
 
-    for (let idx = 0; idx < receta.detalleReceta.length; idx++) {
-      const detalle = receta.detalleReceta[idx];
+    for (let idx = 0; idx < receta.detalle.length; idx++) {
+      const detalle = receta.detalle[idx];
       const almacen = await getRepository(AlmacenEntity).findOne({
         depto: receta.depto,
         insumoId: detalle.insumoId,
@@ -391,8 +389,8 @@ export class RecetaService {
     const insuficientes = this.verificado(receta);
 
     if (!insuficientes) {
-      for (let idx = 0; idx < receta.detalleReceta.length; idx++) {
-        const detalle = receta.detalleReceta[idx];
+      for (let idx = 0; idx < receta.detalle.length; idx++) {
+        const detalle = receta.detalle[idx];
         const almacen = await getRepository(AlmacenEntity).findOne({
           depto: receta.depto,
           insumoId: detalle.insumoId,
