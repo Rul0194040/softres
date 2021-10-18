@@ -410,4 +410,39 @@ export class RecetaService {
     }
     return insuficientes;
   }
+
+  async validarExistencias(recetaId: number): Promise<boolean> {
+    let validator = true;
+    const receta = await getRepository(RecetaEntity).findOne(recetaId, {
+      relations: ['children', 'detalle'],
+    });
+
+    validator = await receta.children.reduce(async (memo, subreceta) => {
+      const preValue = await memo;
+      const value = await this.validarExistencias(subreceta.id);
+      console.log('Subreceta' + subreceta.id + ':' + value);
+      return value && preValue;
+    }, Promise.resolve(validator));
+
+    console.log(recetaId + ' Validado AllSub:' + validator);
+
+    if (validator) {
+      validator = await receta.detalle.reduce(async (memo, detalle) => {
+        const preValue = await memo;
+        const almacen = await getRepository(AlmacenEntity).findOne({
+          depto: receta.depto,
+          insumoId: detalle.insumoId,
+        });
+        console.log(parseGramos(almacen.total) + 'y' + detalle.cantReceta);
+
+        const cocinado = parseGramos(almacen.total) - detalle.cantReceta;
+        console.log(detalle.id + 'validado');
+        console.log(cocinado >= 0);
+        return cocinado >= 0 && preValue;
+      }, Promise.resolve(validator));
+    }
+    console.log(recetaId + ' Validado All:' + validator);
+
+    return validator;
+  }
 }

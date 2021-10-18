@@ -20,6 +20,7 @@ import * as moment from 'moment';
 
 const toFloat = (num: string | number): number => parseFloat(num + '');
 const parseKilo = (gr: number): number => gr / 1000.0;
+const parseGramos = (kg: number): number => kg * 1000.0;
 
 @Injectable()
 export class AlmacenService {
@@ -69,7 +70,9 @@ export class AlmacenService {
     almacenId: number,
     detalles: CreateContableDetalleDTO[],
   ): Promise<ContableDetalleEntity[]> {
-    const almacen = await getRepository(AlmacenEntity).findOne(almacenId);
+    const almacen = await getRepository(AlmacenEntity).findOne(almacenId, {
+      relations: ['insumo'],
+    });
     const contable = await getRepository(ContableEntity).findOne({
       where: { insumoId: almacen.insumoId },
     });
@@ -129,7 +132,10 @@ export class AlmacenService {
       return memo;
     }, Promise.resolve(null));
 
-    await getRepository(AlmacenEntity).update(almacen.id, { total });
+    await getRepository(AlmacenEntity).update(almacen.id, {
+      cantidad: Math.ceil(parseGramos(total) / almacen.insumo.pesoNeto),
+      total,
+    });
 
     await this.updateTablaContable(firstDetalleIndex);
     return createdDetalles;
