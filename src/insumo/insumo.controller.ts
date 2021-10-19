@@ -16,7 +16,6 @@ import { InsumoService } from './insumo.service';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { ProveedorEntity } from '@softres/proveedor/entity/proveedor.entity';
 
 @Controller('insumo')
 @ApiTags('Insumo')
@@ -33,16 +32,22 @@ export class InsumoController {
     return this.insumoService.create(insumo);
   }
 
-  @Get('proveedores')
-  getProveedores(): Promise<ProveedorEntity[]> {
-    return this.insumoService.getProveedores();
-  }
-
+  /**
+   * Retorna un insumo por id
+   * @param insumoId id del insumo
+   * @returns {InsumoEntity}
+   */
   @Get(':id')
   GetInsumoById(@Param('id', ParseIntPipe) id: number): Promise<InsumoEntity> {
     return this.insumoService.getByid(id);
   }
 
+  /**
+   * Actualiza objeto insumo por id
+   * @param id id del insumo
+   * @param insumo objeto insumo para actualizar
+   * @returns {UpdateResult}
+   */
   @Put(':id')
   updateInsumo(
     @Param('id', ParseIntPipe) id: number,
@@ -51,13 +56,18 @@ export class InsumoController {
     return this.insumoService.update(id, insumo);
   }
 
+  /**
+   * Borra insumo por id
+   * @param id id del insumo
+   * @returns {DeleteResult}
+   */
   @Delete(':id')
   deleteInsumo(@Param('id') id: number): Promise<DeleteResult> {
     return this.insumoService.delete(id);
   }
 
   /**
-   * Paginate
+   * Paginate de objetos insumo
    *
    * @param options opciones de paginacion
    * @returns {PaginationPrimeNgResult}
