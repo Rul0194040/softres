@@ -38,6 +38,11 @@ import { User } from '@softres/user/DTO/user.decorator';
 export class AlmacenController {
   constructor(private readonly almacenService: AlmacenService) {}
 
+  /**
+   * Crea una entrada de almacen digital
+   * @param almacen @type {CreateAlmacenDTO}
+   * @returns {AlmacenInformeDTO|AlmacenEntity}
+   */
   @Post()
   createAlmacen(
     @Body() almacen: CreateAlmacenDTO,

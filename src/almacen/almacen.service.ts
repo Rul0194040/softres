@@ -23,6 +23,13 @@ const parseKilo = (gr: number): number => gr / 1000.0;
 
 @Injectable()
 export class AlmacenService {
+  /**
+   * crea un almacen digital con la funcion
+   * @type crearDetalle(almacenId: number,
+    almacenDetalle: CreateDetalleDTO[]):AlmacenDetalleEntity[]
+   * @param almacen @type {CreateAlmacenDTO}
+   * @returns {AlmacenInformeDTO|AlmacenEntity}
+   */
   async create(
     almacen: CreateAlmacenDTO,
   ): Promise<AlmacenInformeDTO | AlmacenEntity> {
