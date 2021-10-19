@@ -22,11 +22,21 @@ import { ApiTags } from '@nestjs/swagger';
 export class CategoriaController {
   constructor(private readonly categoriaService: CategoriaService) {}
 
+  /**
+   * crear una entidad categoria
+   * @param categoria @type {CreateCatDTO}
+   * @returns {CategoriaEntity}
+   */
   @Post()
   createCategoria(@Body() categoria: CreateCatDTO): Promise<CategoriaEntity> {
     return this.categoriaService.create(categoria);
   }
 
+  /**
+   * retorna una categoria por id
+   * @param id id de la categoria
+   * @returns {CategoriaEntity}
+   */
   @Get(':id')
   GetCategoriaById(
     @Param('id', ParseIntPipe) id: number,
@@ -34,6 +44,12 @@ export class CategoriaController {
     return this.categoriaService.getByid(id);
   }
 
+  /**
+   * actualizar un objeto categoria
+   * @param id id de la categoria
+   * @param categoria @type {UpdateCatDTO} objeto para editar categoria
+   * @returns {UpdateResult}
+   */
   @Put(':id')
   updateCategoria(
     @Param('id', ParseIntPipe) id: number,
@@ -42,13 +58,18 @@ export class CategoriaController {
     return this.categoriaService.update(id, categoria);
   }
 
+  /**
+   * Borra una entidad categoria
+   * @param id id de la categoria
+   * @returns {DeleteResult}
+   */
   @Delete(':id')
   deleteCategoria(@Param('id') id: number): Promise<DeleteResult> {
     return this.categoriaService.delete(id);
   }
 
   /**
-   * Paginate
+   * Paginate de categorias
    *
    * @param options Opciones de paginación
    * @returns {PaginationPrimeNgResult}
@@ -61,7 +82,7 @@ export class CategoriaController {
   }
 
   /**
-   *
+   * Retorna subcategorias por id de categoria
    * @param id Id de categoría que se quiere buscar sus subcategorías
    * @returns Array con las subcategorías
    */

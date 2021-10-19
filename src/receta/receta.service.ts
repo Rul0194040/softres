@@ -207,43 +207,6 @@ export class RecetaService {
   }
 
   /**
-   * funcion que retorna los menus y recetas creadas
-   * dependiendo del usuario en sesion
-   * @param user @type {LoginIdentityDTO} usuario en sesion
-   * @returns @type {DashboardDTO} sumas de menu y recetas existentes
-   */
-  async dashboard(user: LoginIdentityDTO): Promise<DashboardDTO> {
-    let numRecetas = 0,
-      numMenu = 0;
-
-    if (user.profile == ProfileTypes.COCINA) {
-      numRecetas = await getRepository(RecetaEntity)
-        .createQueryBuilder('receta')
-        .where('receta.depto=:depto', { depto: Deptos.COCINA })
-        .getCount();
-      numMenu = await getRepository(MenuEntity).count({
-        where: { depto: Deptos.COCINA },
-      });
-    }
-
-    if (user.profile == ProfileTypes.BARRA) {
-      numRecetas = await getRepository(RecetaEntity).count({
-        where: { depto: Deptos.BARRA },
-      });
-      numMenu = await getRepository(MenuEntity).count({
-        where: { depto: Deptos.BARRA },
-      });
-    }
-
-    const result = {
-      recetas: numRecetas,
-      menus: numMenu,
-    };
-
-    return result;
-  }
-
-  /**
    * funcion que retorna un array de recetas
    * filters [nombre,departamento, grupo]
    * @param options opciones de paginacion

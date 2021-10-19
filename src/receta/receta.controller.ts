@@ -1,3 +1,4 @@
+import { DashboardService } from './../dashboard/dashboard.service';
 import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
 import { DashboardDTO } from './../dashboard/DTOs/dashboard.dto';
 import {
@@ -35,7 +36,10 @@ import { JwtAuthGuard } from '@softres/auth/guards/jwt.guard';
 @ApiTags('Receta')
 @UseGuards(JwtAuthGuard)
 export class RecetaController {
-  constructor(private readonly recetaService: RecetaService) {}
+  constructor(
+    private readonly recetaService: RecetaService,
+    private readonly dashboardService: DashboardService,
+  ) {}
 
   /**
    *  Crea una receta
@@ -55,7 +59,7 @@ export class RecetaController {
    */
   @Get('dashboard')
   GetDash(@User() user: LoginIdentityDTO): Promise<DashboardDTO> {
-    return this.recetaService.dashboard(user);
+    return this.dashboardService.GetDashboard(user);
   }
 
   /**
