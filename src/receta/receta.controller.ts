@@ -154,6 +154,7 @@ export class RecetaController {
     @Param('recetaId', ParseIntPipe) recetaId: number,
   ): Promise<HttpStatus> {
     return this.recetaService.cocinar(recetaId);
+    //return this.recetaService.validarExistencias(recetaId);
   }
 
   /**
