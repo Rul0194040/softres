@@ -1,3 +1,5 @@
+import { ContableDetalleEntity } from './almacen/entitys/contableDetalle.entity';
+import { ContableEntity } from './almacen/entitys/contable.entity';
 import { SolicitudDetalleEntity } from './compra/entities/solicitudDetalle.entity';
 import { SolicitudEntity } from './compra/entities/solicitud.entity';
 import { AppController } from './app.controller';
@@ -29,7 +31,6 @@ import { CompraEntity } from './compra/entities/compra.entity';
 import { CompraDetalleEntity } from './compra/entities/compraDetalles.entity';
 import { AlmacenModule } from './almacen/almacen.module';
 import { AlmacenEntity } from './almacen/entitys/almacen.entity';
-import { AlmacenDetalleEntity } from './almacen/entitys/almacenDetalle.entity';
 import { AppConfig } from './app.config';
 import { CotizacionModule } from './cotizacion/cotizacion.module';
 import { CategoriaModule } from './categoria/categoria.module';
@@ -62,7 +63,8 @@ import { DashboardModule } from './dashboard/dashboard.module';
           InsumoEntity,
           CategoriaEntity,
           AlmacenEntity,
-          AlmacenDetalleEntity,
+          ContableEntity,
+          ContableDetalleEntity,
           RecetaEntity,
           RecetaDetalleEntity,
           ProveedorEntity,

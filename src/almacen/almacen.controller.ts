@@ -1,8 +1,6 @@
 import { JwtAuthGuard } from './../auth/guards/jwt.guard';
 import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
 import { FileOptions } from './../common/DTOs/fileOptions.dto';
-import { CreateDetalleDTO } from './DTOs/createDetalleDTO.dto';
-import { AlmacenInformeDTO } from './DTOs/almacenInforneDTO.dto';
 import { AlmacenService } from './almacen.service';
 import { AlmacenEntity } from './entitys/almacen.entity';
 import {
@@ -22,15 +20,17 @@ import {
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
 import { UpdateResult, DeleteResult } from 'typeorm';
-import { CreateAlmacenDTO } from './DTOs/createAlmacenDTO.dto';
+import { CreateAlmacenDTO } from './DTOs/createAlmacen.dto';
 import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
-import { AlmacenDetalleEntity } from './entitys/almacenDetalle.entity';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { existsSync, mkdirSync } from 'fs';
 import { extname } from 'path';
 import { User } from '@softres/user/DTO/user.decorator';
+import { ContableDetalleEntity } from './entitys/contableDetalle.entity';
+import { CreateContableDetalleDTO } from './DTOs/contableDetalle.dto';
+import { ContableEntity } from './entitys/contable.entity';
 
 @Controller('almacen')
 @ApiTags('Almacén')
@@ -39,22 +39,17 @@ export class AlmacenController {
   constructor(private readonly almacenService: AlmacenService) {}
 
   @Post()
-  createAlmacen(
-    @Body() almacen: CreateAlmacenDTO,
-  ): Promise<AlmacenInformeDTO | AlmacenEntity> {
-    return this.almacenService.create(almacen);
+  createAlmacen(@Body() almacen: CreateAlmacenDTO): Promise<AlmacenEntity> {
+    return this.almacenService.createAlmacen(almacen);
   }
 
   @Post('createDetalle/:almacenId')
-  @ApiBody({
-    type: [CreateDetalleDTO],
-  })
-  createDetAlmacen(
+  createDetContable(
     @Param('almacenId', ParseIntPipe) almacenId: number,
-    @Body(new ParseArrayPipe({ items: CreateDetalleDTO }))
-    almacen: CreateDetalleDTO[],
-  ): Promise<AlmacenDetalleEntity[]> {
-    return this.almacenService.createDetalle(almacenId, almacen);
+    @Body(new ParseArrayPipe({ items: CreateContableDetalleDTO }))
+    detalles: CreateContableDetalleDTO[],
+  ): Promise<ContableDetalleEntity[]> {
+    return this.almacenService.createDetalle(almacenId, detalles);
   }
 
   @Post('insumos-minimos')
@@ -69,7 +64,14 @@ export class AlmacenController {
   GetAlmacenById(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<AlmacenEntity> {
-    return this.almacenService.getByid(id);
+    return this.almacenService.getById(id);
+  }
+
+  @Get('/contable/:insumoId')
+  getContableById(
+    @Param('insumoId', ParseIntPipe) insumoId: number,
+  ): Promise<ContableEntity> {
+    return this.almacenService.getContableByInsumo(insumoId);
   }
 
   @Put(':id')
@@ -92,12 +94,12 @@ export class AlmacenController {
     return this.almacenService.paginate(options);
   }
 
-  @Post('paginate/contable/:almacenId')
+  @Post('paginate/contable/:contableId')
   paginateContable(
-    @Param('almacenId', ParseIntPipe) almacenId: number,
+    @Param('contableId', ParseIntPipe) contableId: number,
     @Body() options: PaginationOptions,
   ): Promise<PaginationPrimeNgResult> {
-    return this.almacenService.paginateContable(almacenId, options);
+    return this.almacenService.paginateContable(contableId, options);
   }
 
   /**
@@ -107,11 +109,11 @@ export class AlmacenController {
    * @returns Regresa stock actual y costo venta (suma de los abonos)
    */
   @Put('updateAlmacenDetalle/:detalleId')
-  updateAlmacenDetalle(
+  updateDetalleContable(
     @Param('detalleId', ParseIntPipe) detalleId: number,
-    @Body() detalle: CreateDetalleDTO,
+    @Body() detalle: CreateContableDetalleDTO,
   ): Promise<any> {
-    return this.almacenService.updateAlmacenDetalle(detalleId, detalle);
+    return this.almacenService.updateDetalleContable(detalleId, detalle);
   }
 
   @Post('carga-masiva/:almacenId')
@@ -157,7 +159,7 @@ export class AlmacenController {
   async cargaMasiva(
     @Param('almacenId', ParseIntPipe) almacenId: number,
     @UploadedFile() file: FileOptions,
-  ): Promise<CreateDetalleDTO[]> {
+  ): Promise<CreateContableDetalleDTO[]> {
     return await this.almacenService.masiveAlmacen(almacenId, file.path);
   }
 }
