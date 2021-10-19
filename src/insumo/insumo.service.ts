@@ -14,6 +14,11 @@ const parseKilo = (gr: number): number => gr / 1000.0;
 
 @Injectable()
 export class InsumoService {
+  /**
+   * crea un insumo
+   * @param insumo @type {CreateInsumoDTO}
+   * @returns {InsumoEntity}
+   */
   async create(insumo: CreateInsumoDTO): Promise<InsumoEntity> {
     const insumoToCreate = plainToClass(InsumoEntity, insumo);
     insumoToCreate.merma = insumo.pesoNeto * (insumo.mermaPorcentaje / 100.0);
@@ -30,8 +35,7 @@ export class InsumoService {
       ).findOne(insumo.subCategoriaId);
     }
 
-    const created = await getRepository(InsumoEntity).save(insumoToCreate);
-    return created;
+    return await getRepository(InsumoEntity).save(insumoToCreate);
   }
 
   async getByid(insumoId: number): Promise<InsumoEntity> {

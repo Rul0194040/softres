@@ -23,6 +23,11 @@ import { ProveedorEntity } from '@softres/proveedor/entity/proveedor.entity';
 export class InsumoController {
   constructor(private readonly insumoService: InsumoService) {}
 
+  /**
+   * crea una entidad insumo
+   * @param insumo @type {CreateInsumoDTO} objeto insumo a crear
+   * @returns {InsumoEntity}
+   */
   @Post()
   createInsumo(@Body() insumo: CreateInsumoDTO): Promise<InsumoEntity> {
     return this.insumoService.create(insumo);
