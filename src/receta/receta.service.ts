@@ -30,6 +30,15 @@ const parseGramos = (kg: number) => kg * 1000;
 export class RecetaService {
   constructor(private readonly almacenService: AlmacenService) {}
 
+  /**
+   * Crea una receta,tomamos el objeto que se provee
+   * convertimos dicho objeto en una entidad receta
+   * si el objeto tiene recetas hijas, las agregamos
+   * siempre y cuando esas recetas sean de tipo @enum {(2|3|4)} GrupoReceta
+   * luego creamos los detalle de la receta con la funcion de crear detalle
+   * @param receta @type {CreateRecetaDTO} receta que vamos a crear
+   * @returns @type {RecetaEntity} entidad receta
+   */
   async create(receta: CreateRecetaDTO): Promise<RecetaEntity> {
     const recetaTocreate = plainToClass(RecetaEntity, receta);
 
@@ -58,11 +67,20 @@ export class RecetaService {
     return createdReceta;
   }
 
+  /**
+   * se crean los detalles con determinado id de receta.
+   * Se busca la receta, luego recorremos los detalles de receta
+   * en cada detalle se busca el insumo,se crea el objeto detalle, se guarda
+   * por ultimo se dispara un update de la receta padre
+   * @param recetaId @type {number} receta con la que se relacionan los detalles
+   * @param detalles @type Array<{CreateDetalleRecetaDTO}> detalles de la receta
+   */
   async createDetalle(recetaId: number, detalles: CreateDetalleRecetaDTO[]) {
     let rendimiento = 0;
     let totalCosto = 0;
     let cantReal = 0;
     let unitarioIngrediente = 0;
+
     const receta = await getRepository(RecetaEntity).findOne(recetaId);
     detalles.forEach(async (detalle) => {
       const insumo = await getRepository(InsumoEntity).findOne(
@@ -102,6 +120,12 @@ export class RecetaService {
     });
   }
 
+  /**
+   * edita una receta por id
+   * @param id id de la receta
+   * @param receta @type {UpdateRecetaDto}
+   * @returns {UpdateResultDTO}
+   */
   async update(id: number, receta: UpdateRecetaDTO): Promise<UpdateResult> {
     await getRepository(RecetaEntity).update(
       { parentId: id },
@@ -136,6 +160,11 @@ export class RecetaService {
     });
   }
 
+  /**
+   * retorna una imagen por id
+   * @param id id de la receta
+   * @returns {RecetaEntity}
+   */
   async getById(id: number): Promise<RecetaEntity> {
     return getRepository(RecetaEntity)
       .createQueryBuilder('receta')
@@ -168,10 +197,21 @@ export class RecetaService {
       .getOne();
   }
 
+  /**
+   * Borra una receta por id
+   * @param id id de la receta
+   * @returns {DeleteResult}
+   */
   async delete(id: number): Promise<any> {
     return getRepository(RecetaEntity).delete(id);
   }
 
+  /**
+   * funcion que retorna los menus y recetas creadas
+   * dependiendo del usuario en sesion
+   * @param user @type {LoginIdentityDTO} usuario en sesion
+   * @returns @type {DashboardDTO} sumas de menu y recetas existentes
+   */
   async dashboard(user: LoginIdentityDTO): Promise<DashboardDTO> {
     let numRecetas = 0,
       numMenu = 0;
@@ -203,6 +243,12 @@ export class RecetaService {
     return result;
   }
 
+  /**
+   * funcion que retorna un array de recetas
+   * filters [nombre,departamento, grupo]
+   * @param options opciones de paginacion
+   * @returns @type {PaginationPrimeNgResult} recetas
+   */
   async paginate(options: PaginationOptions): Promise<PaginationPrimeNgResult> {
     const dataQuery = getRepository(RecetaEntity)
       .createQueryBuilder('receta')
@@ -246,6 +292,13 @@ export class RecetaService {
     };
   }
 
+  /**
+   * paginate de detalles de receta
+   * filtros [nombre]
+   * @param recetaId id de la receta
+   * @param options opciones de paginacion
+   * @returns @type {PaginationPrimeNgResult}
+   */
   async paginateDetalle(
     recetaId: number,
     options: PaginationOptions,
@@ -298,6 +351,12 @@ export class RecetaService {
     };
   }
 
+  /**
+   *funcion que guarda la cadena donde se aloja su img asociada
+   * @param recetaId @type {number} id de la receta
+   * @param path @type {string} cadena donde se guarda la imagen
+   * @returns {UpdateResult}
+   */
   updateImage(
     recetaId: number,
     path: string,
@@ -305,6 +364,12 @@ export class RecetaService {
     return getRepository(RecetaEntity).update(recetaId, { imagen: path });
   }
 
+  /**
+   * cocina las recetas y subrecetas usando una funcion
+   * llamada @type {cocinarDetalles(RecetaEntity):RecetaDetalleEntity[]}
+   * @param recetaId @type {number} id de la receta acocinar
+   * @returns {HttpStatus}
+   */
   async cocinar(recetaId: number): Promise<HttpStatus> {
     const receta = await getRepository(RecetaEntity)
       .createQueryBuilder('receta')
@@ -366,6 +431,14 @@ export class RecetaService {
     }
   }
 
+  /**
+   * toma una receta y la recorre para verificar que
+   * hay suficiente insumo para cocinar, de esa forma nos aseguramos
+   * que la funcion @type {cocinarDetalles(RecetaEntity):RecetaDetalleEntity[]}
+   * pueda ser invocada
+   * @param receta @type {RecetaEntity} receta
+   * @returns {RecetaDetalleEntity[]}
+   */
   async verificado(receta: RecetaEntity): Promise<RecetaDetalleEntity[]> {
     const insuficientes: RecetaDetalleEntity[] = [];
 
@@ -387,6 +460,11 @@ export class RecetaService {
     return insuficientes;
   }
 
+  /**
+   * funcion que cocina una receta o marca los insuficientes
+   * @param receta @type {RecetaEntity}
+   * @returns {RecetaDetalleEntity}
+   */
   async cocinarDetalles(receta: RecetaEntity): Promise<RecetaDetalleEntity[]> {
     const insuficientes = this.verificado(receta);
 
