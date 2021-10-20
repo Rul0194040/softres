@@ -31,6 +31,7 @@ import { User } from '@softres/user/DTO/user.decorator';
 import { ContableDetalleEntity } from './entitys/contableDetalle.entity';
 import { CreateContableDetalleDTO } from './DTOs/contableDetalle.dto';
 import { ContableEntity } from './entitys/contable.entity';
+import { CargaDTO } from './DTOs/carga.dto';
 
 @Controller('almacen')
 @ApiTags('Almacén')
@@ -161,8 +162,25 @@ export class AlmacenController {
   updateDetalleContable(
     @Param('detalleId', ParseIntPipe) detalleId: number,
     @Body() detalle: CreateContableDetalleDTO,
-  ): Promise<any> {
+  ): Promise<UpdateResult> {
     return this.almacenService.updateDetalleContable(detalleId, detalle);
+  }
+
+  /**
+   * funcion que que mueve la existencia de insumos de un origen a un destino
+   * dependiendo del tipo
+   * @param origenId id del almacen digital de donde sale la mercancia
+   * @param destinoId id del almacen digital de a donde va la mercancia
+   * @param ware el detalle de @type {CargaDTO} de la mercancia transportada
+   * @returns
+   */
+  @Put('movimiento/:origenId/:destinoId')
+  movimiento(
+    @Body() ware: CargaDTO,
+    @Param('origenId', ParseIntPipe) origenId: number,
+    @Param('destinoId', ParseIntPipe) destinoId?: number,
+  ): Promise<UpdateResult> {
+    return this.almacenService.createMovimiento(origenId, destinoId, ware);
   }
 
   /**

@@ -17,6 +17,8 @@ import { SolicitudEstados } from '@softres/compra/enum/solicitud-estados.enum';
 import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
 import * as Excel from 'exceljs';
 import * as moment from 'moment';
+import { CargaDTO } from './DTOs/carga.dto';
+import { TiposMov } from './enums/tiposMovimientos.enum';
 
 const toFloat = (num: string | number): number => parseFloat(num + '');
 const parseKilo = (gr: number): number => gr / 1000.0;
@@ -71,6 +73,33 @@ export class AlmacenService {
     }
 
     return createdAlmacen;
+  }
+
+  async createMovimiento(
+    origenId: number,
+    destinoId: number,
+    ware: CargaDTO,
+  ): Promise<UpdateResult> {
+    switch (ware.tipo) {
+      case TiposMov.TRANSFERENCIA:
+        this.transferencia();
+        break;
+      case TiposMov.COMPRA:
+        this.compra();
+        break;
+      case TiposMov.VENTA:
+        this.venta();
+        break;
+      case TiposMov.PRODUCCION:
+        this.cocinar();
+        break;
+      case TiposMov.MERMA:
+        this.merma();
+        break;
+
+      default:
+        break;
+    }
   }
 
   /**
@@ -381,7 +410,7 @@ export class AlmacenService {
   async updateDetalleContable(
     detalleId: number,
     detalle: CreateContableDetalleDTO,
-  ): Promise<any> {
+  ): Promise<UpdateResult> {
     if (detalle.salidas) detalle.salidas = parseKilo(detalle.salidas);
     if (detalle.entradas) detalle.entradas = parseKilo(detalle.entradas);
     if (
