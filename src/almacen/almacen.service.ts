@@ -1,4 +1,3 @@
-import { RecetaService } from './../receta/receta.service';
 import { AlmacenEntity } from './entitys/almacen.entity';
 import { ContableDetalleEntity } from './entitys/contableDetalle.entity';
 import { ContableEntity } from './entitys/contable.entity';
@@ -21,7 +20,6 @@ import * as moment from 'moment';
 import { CargaDTO } from './DTOs/carga.dto';
 import { MovType } from './enums/tiposMovimientos.enum';
 import { SolicitudEntity } from '@softres/compra/entities/solicitud.entity';
-import { MovType } from './enums/movTypes.enum';
 
 const toFloat = (num: string | number): number => parseFloat(num + '');
 const parseKilo = (gr: number): number => gr / 1000.0;
@@ -97,21 +95,26 @@ export class AlmacenService {
     destinoId: number,
     ware: CargaDTO,
   ): Promise<HttpStatus> {
+    //TODO hacer la funcion comprar
+    //TODO hacer la funcion venta
+    //TODO hacer la funcion cocinar (hacer que funcione)
+    //TODO hacer la funcion merma
+
     switch (ware.tipo) {
       case MovType.TRANSFERENCIA:
         return this.transferencia(origenId, destinoId, ware);
         break;
       case MovType.COMPRA:
-        return this.compra(origenId, ware);
+        //return this.compra(origenId, ware);
         break;
       case MovType.VENTA:
-        return this.venta(origenId, ware);
+        //return this.venta(origenId, ware);
         break;
       case MovType.PRODUCCION:
-        return this.cocinar(origenId, ware);
+        //return this.cocinar(origenId, ware);
         break;
       case MovType.MERMA:
-        return this.merma(origenId, ware);
+        //return this.merma(origenId, ware);
         break;
 
       default:
@@ -139,7 +142,7 @@ export class AlmacenService {
           almacenOrg.id,
           [
             {
-              salida: almacenOrg.cantidad * insumo.pesoNeto,
+              salidas: almacenOrg.cantidad * insumo.pesoNeto,
               precioUnitario: insumo.precioUnitario,
             },
           ],
@@ -150,7 +153,7 @@ export class AlmacenService {
           almacenDest.id,
           [
             {
-              entrada: almacenDest.cantidad * insumo.pesoNeto,
+              entradas: almacenDest.cantidad * insumo.pesoNeto,
               precioUnitario: insumo.precioUnitario,
             },
           ],
@@ -731,7 +734,7 @@ export class AlmacenService {
                 precioUnitario: 0,
               },
             ],
-            MovType.SALIDA_TRANS,
+            MovType.TRANSFERENCIA,
           );
           await this.createDetalle(
             almacenDepto.id,
@@ -741,7 +744,7 @@ export class AlmacenService {
                 precioUnitario: 0,
               },
             ],
-            MovType.ENTRADA_TRANS,
+            MovType.TRANSFERENCIA,
           );
           console.log('Entra para ' + detalle.id);
 

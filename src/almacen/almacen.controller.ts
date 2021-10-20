@@ -34,7 +34,7 @@ import { ContableDetalleEntity } from './entitys/contableDetalle.entity';
 import { CreateContableDetalleDTO } from './DTOs/contableDetalle.dto';
 import { ContableEntity } from './entitys/contable.entity';
 import { CargaDTO } from './DTOs/carga.dto';
-import { MovType } from './enums/movTypes.enum';
+import { MovType } from './enums/tiposMovimientos.enum';
 
 @Controller('almacen')
 @ApiTags('Almacén')
@@ -90,7 +90,7 @@ export class AlmacenController {
   @Post('createDetalle/:almacenId/:tipoMov')
   createDetContable(
     @Param('almacenId', ParseIntPipe) almacenId: number,
-    @Param('tipoMov', new ParseEnumPipe(MovType)) tipoMov: MovType,
+    @Param('tipoMov', ParseEnumPipe) tipoMov: MovType,
     @Body(new ParseArrayPipe({ items: CreateContableDetalleDTO }))
     detalles: CreateContableDetalleDTO[],
   ): Promise<ContableDetalleEntity[]> {

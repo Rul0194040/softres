@@ -5,25 +5,20 @@ import {
   CreateDetalleRecetaDTO,
   CreateRecetaDTO,
 } from './DTO/create-receta.dto';
-import { DashboardDTO } from './../dashboard/DTOs/dashboard.dto';
-import { Deptos } from '@softres/almacen/enums/deptos.enum';
 import { forIn } from 'lodash';
 import { getRepository, UpdateResult } from 'typeorm';
 import { GrupoReceta } from './enums/grupoReceta.enum';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
-import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
-import { MenuEntity } from './../menu/entitys/menu.entity';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
 import { plainToClass } from 'class-transformer';
-import { ProfileTypes } from '@softres/user/profileTypes.enum';
 import { RecetaDetalleEntity } from './entities/recetaDetalle.entity';
 import { RecetaEntity } from './entities/receta.entity';
 import { RecipeValues } from './enums/recipeValues.enum';
 import { UpdateRecetaDTO } from './DTO/update-receta.dto';
 import { ContableDetalleEntity } from '@softres/almacen/entitys/contableDetalle.entity';
-import { MovType } from '@softres/almacen/enums/movTypes.enum';
+import { MovType } from '@softres/almacen/enums/tiposMovimientos.enum';
 
 const parseGramos = (kg: number) => kg * 1000;
 
