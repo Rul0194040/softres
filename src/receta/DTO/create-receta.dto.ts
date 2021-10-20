@@ -24,8 +24,6 @@ export class CreateRecetaDTO {
   @ApiProperty({ enum: GrupoReceta })
   grupo: GrupoReceta;
   @ApiProperty()
-  hasChildren: boolean;
-  @ApiProperty()
   numPorciones?: number;
   @ApiProperty()
   costoXporcion?: number;
@@ -54,5 +52,5 @@ export class CreateRecetaDTO {
   @IsOptional()
   children?: number[];
   @ApiProperty({ nullable: false, type: [CreateDetalleRecetaDTO] })
-  detalleReceta?: CreateDetalleRecetaDTO[];
+  detalle?: CreateDetalleRecetaDTO[];
 }

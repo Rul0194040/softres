@@ -8,12 +8,16 @@ import { forIn } from 'lodash';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgResult.dto';
 import { CategoriaEntity } from '@softres/categoria/categoria.entity';
-import { ProveedorEntity } from '@softres/proveedor/entity/proveedor.entity';
 
 const parseKilo = (gr: number): number => gr / 1000.0;
 
 @Injectable()
 export class InsumoService {
+  /**
+   * crea una entidad insumo
+   * @param insumo @type {CreateInsumoDTO}
+   * @returns {InsumoEntity}
+   */
   async create(insumo: CreateInsumoDTO): Promise<InsumoEntity> {
     const insumoToCreate = plainToClass(InsumoEntity, insumo);
     insumoToCreate.merma = insumo.pesoNeto * (insumo.mermaPorcentaje / 100.0);
@@ -30,10 +34,14 @@ export class InsumoService {
       ).findOne(insumo.subCategoriaId);
     }
 
-    const created = await getRepository(InsumoEntity).save(insumoToCreate);
-    return created;
+    return await getRepository(InsumoEntity).save(insumoToCreate);
   }
 
+  /**
+   * Retorna un insumo por id
+   * @param insumoId id del insumo
+   * @returns {InsumoEntity}
+   */
   async getByid(insumoId: number): Promise<InsumoEntity> {
     return await getRepository(InsumoEntity)
       .createQueryBuilder('insumo')
@@ -41,6 +49,12 @@ export class InsumoService {
       .getOne();
   }
 
+  /**
+   * Actualiza objeto insumo por id
+   * @param id id del insumo
+   * @param insumo objeto insumo para actualizar
+   * @returns {UpdateResult}
+   */
   async update(
     insumoId: number,
     insumo: UpdateInsumoDTO,
@@ -60,10 +74,20 @@ export class InsumoService {
       .getOne();
   }
 
+  /**
+   * Borra insumo por id
+   * @param id id del insumo
+   * @returns {DeleteResult}
+   */
   async delete(insumoId: number): Promise<DeleteResult> {
     return await getRepository(InsumoEntity).delete(insumoId);
   }
 
+  /**
+   * Paginate de insumos
+   * @param options opciones de paginacion
+   * @returns {PaginationPrimeNgResult} array de insumos
+   */
   async paginate(options: PaginationOptions): Promise<PaginationPrimeNgResult> {
     const dataQuery = getRepository(InsumoEntity)
       .createQueryBuilder('insumo')
@@ -116,9 +140,5 @@ export class InsumoService {
       skip: options.skip,
       totalItems: count,
     };
-  }
-
-  getProveedores(): Promise<ProveedorEntity[]> {
-    return getRepository(ProveedorEntity).find({ select: ['id', 'nombre'] });
   }
 }

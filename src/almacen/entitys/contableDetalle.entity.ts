@@ -1,18 +1,9 @@
+import { ContableEntity } from './contable.entity';
 import { CommonEntity } from '@softres/common/commonEntity.abstract';
-import { Entity, ManyToOne, Column } from 'typeorm';
-import { AlmacenEntity } from './almacen.entity';
+import { Entity, Column, ManyToOne } from 'typeorm';
 
-@Entity('almacenDetalle')
-export class AlmacenDetalleEntity extends CommonEntity {
-  @ManyToOne(() => AlmacenEntity, { nullable: false })
-  almacen: AlmacenEntity;
-
-  @Column({
-    type: 'int',
-    nullable: false,
-  })
-  almacenId: number;
-
+@Entity('contableDetalle')
+export class ContableDetalleEntity extends CommonEntity {
   @Column({
     type: 'date',
     nullable: true,
@@ -88,6 +79,13 @@ export class AlmacenDetalleEntity extends CommonEntity {
     precision: 10,
     scale: 2,
     nullable: false,
+    default: 0,
   })
   saldo: number;
+
+  @ManyToOne(() => ContableEntity, { nullable: true })
+  contable: ContableEntity;
+
+  @Column({ type: 'mediumint', nullable: false })
+  contableId?: number;
 }

@@ -101,13 +101,6 @@ export class RecetaEntity extends CommonEntity {
   precioSugeridoCarta?: number;
 
   @Column({
-    type: 'boolean',
-    name: 'haschildren',
-    nullable: false,
-  })
-  hasChildren: boolean;
-
-  @Column({
     type: 'enum',
     name: 'grupo',
     enum: GrupoReceta,
@@ -139,7 +132,7 @@ export class RecetaEntity extends CommonEntity {
   parent: RecetaEntity;
 
   @OneToMany(() => RecetaDetalleEntity, (det) => det.parent, { nullable: true })
-  detalleReceta?: RecetaDetalleEntity[];
+  detalle?: RecetaDetalleEntity[];
 
   @ManyToOne(() => SeccionEntity, (seccion) => seccion.recetas, {
     nullable: true,

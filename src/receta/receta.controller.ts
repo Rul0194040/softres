@@ -1,3 +1,4 @@
+import { DashboardService } from './../dashboard/dashboard.service';
 import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
 import { DashboardDTO } from './../dashboard/DTOs/dashboard.dto';
 import {
@@ -35,46 +36,37 @@ import { JwtAuthGuard } from '@softres/auth/guards/jwt.guard';
 @ApiTags('Receta')
 @UseGuards(JwtAuthGuard)
 export class RecetaController {
-  constructor(private readonly recetaService: RecetaService) {}
+  constructor(
+    private readonly recetaService: RecetaService,
+    private readonly dashboardService: DashboardService,
+  ) {}
 
+  /**
+   *  Crea una receta
+   * @param receta @type {CreateRecetaDTO}
+   * @returns @type {RecetaEntity}
+   */
   @Post()
   createReceta(@Body() receta: CreateRecetaDTO): Promise<RecetaEntity> {
     return this.recetaService.create(receta);
   }
 
+  /**
+   * Retorna los resultados necesarios para mostrar el dashboard
+   * de recetas y menus existentes
+   * @param user @type {LoginIdentityDTO}
+   * @returns @type {DashboardDTO}
+   */
   @Get('dashboard')
   GetDash(@User() user: LoginIdentityDTO): Promise<DashboardDTO> {
-    return this.recetaService.dashboard(user);
-  }
-
-  @Get('imagen/:imgpath')
-  seeUploadedFile(@Param('imgpath') image, @Res() res) {
-    return res.sendFile(image, { root: './uploads/recetas' });
-  }
-
-  @Get(':id')
-  GetRecetaById(@Param('id', ParseIntPipe) id: number): Promise<RecetaEntity> {
-    return this.recetaService.getById(id);
-  }
-
-  @Put(':id')
-  updateReceta(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() receta: UpdateRecetaDTO,
-  ): Promise<UpdateResult> {
-    return this.recetaService.update(id, receta);
-  }
-
-  @Delete(':id')
-  deleteReceta(@Param('id') id: number): Promise<DeleteResult> {
-    return this.recetaService.delete(id);
+    return this.dashboardService.GetDashboard(user);
   }
 
   /**
-   * Paginate
+   * Paginate de recetas
    *
    * @param options opciones de paginacion
-   * @returns {PaginationPrimeNgResult}
+   * @returns {PaginationPrimeNgResult} recetas
    */
   @Post('paginate')
   paginate(
@@ -84,10 +76,11 @@ export class RecetaController {
   }
 
   /**
-   * Paginate
+   * Paginate de detalles de una receta
    *
    * @param options opciones de paginacion
-   * @returns {PaginationPrimeNgResult}
+   * @param recetaId id de la receta de la cual queremos los detalles
+   * @returns {PaginationPrimeNgResult} detalles de una receta
    */
   @Post('paginate/detreceta/:recetaId')
   paginateDetalle(
@@ -97,6 +90,12 @@ export class RecetaController {
     return this.recetaService.paginateDetalle(recetaid, options);
   }
 
+  /**
+   * funcion que guarda una imagen en el servidor
+   * @param recetaId  @type {number} id de la receta que tiene la imagen
+   * @param file @file  el file image
+   * @returns {UpdateResult}
+   */
   @Post('updateImagen/:recetaId')
   @UseInterceptors(
     FileInterceptor('image', {
@@ -141,6 +140,11 @@ export class RecetaController {
     return this.recetaService.updateImage(recetaId, file.filename);
   }
 
+  /**
+   * cocina una receta y sus subrecetas
+   * @param recetaId @type {number} id de la receta a cocinar
+   * @returns {HttpStatus}
+   */
   @Put('cocinar/:recetaId')
   @ApiOperation({
     description:
@@ -150,5 +154,50 @@ export class RecetaController {
     @Param('recetaId', ParseIntPipe) recetaId: number,
   ): Promise<HttpStatus> {
     return this.recetaService.cocinar(recetaId);
+    //return this.recetaService.validarExistencias(recetaId);
+  }
+
+  /**
+   * retorna la imagen del servidor
+   * @param image @type {string} cadena dende se ubica la imagen en el server
+   * @returns @file de tipo imagen
+   */
+  @Get('imagen/:imgpath')
+  seeUploadedFile(@Param('imgpath') image, @Res() res) {
+    return res.sendFile(image, { root: './uploads/recetas' });
+  }
+
+  /**
+   * get que retorna una receta por id
+   * @param id @type {number }id de la receta
+   * @returns {RecetaEntity}
+   */
+  @Get(':id')
+  GetRecetaById(@Param('id', ParseIntPipe) id: number): Promise<RecetaEntity> {
+    return this.recetaService.getById(id);
+  }
+
+  /**
+   * edita una receta por id
+   * @param id id de la receta
+   * @param receta @type {UpdateRecetaDTO} objeto con el que se edita
+   * @returns {UpdateResult}
+   */
+  @Put(':id')
+  updateReceta(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() receta: UpdateRecetaDTO,
+  ): Promise<UpdateResult> {
+    return this.recetaService.update(id, receta);
+  }
+
+  /**
+   * Borra una receta por id
+   * @param id id de la receta
+   * @returns {DeleteResullt}
+   */
+  @Delete(':id')
+  deleteReceta(@Param('id') id: number): Promise<DeleteResult> {
+    return this.recetaService.delete(id);
   }
 }

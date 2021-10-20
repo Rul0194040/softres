@@ -12,6 +12,11 @@ import { forIn } from 'lodash';
 
 @Injectable()
 export class MenuService {
+  /**
+   * crea el menu y sus secciones correspondientes
+   * @param menu @type {CreateMenuDTO} objeto menu a crear
+   * @returns {MenuEntity}
+   */
   async create(menu: CreateMenuDTO): Promise<MenuEntity> {
     const menuToCreate = plainToClass(MenuEntity, menu);
     const createdMenu = await getRepository(MenuEntity).save(menuToCreate);
@@ -31,10 +36,13 @@ export class MenuService {
     return createdMenu;
   }
 
-  async getByid(menuId: number): Promise<MenuEntity> {
-    return await getRepository(MenuEntity).findOne(menuId);
-  }
-
+  /**
+   * actualiza recetas en la seccion de un menu especifico
+   * @param menuId id del menu
+   * @param sectionId id de la seccion
+   * @param newRecetas array de id's de recetas
+   * @returns {UpdateResult}
+   */
   async updateSection(
     menuId: number,
     sectionId: number,
@@ -64,16 +72,41 @@ export class MenuService {
     });
   }
 
+  /**
+   * retorna una menu por id
+   * @param menuId id del menu
+   * @returns {MenuEntity}
+   */
+  async getByid(menuId: number): Promise<MenuEntity> {
+    return await getRepository(MenuEntity).findOne(menuId);
+  }
+
+  /**
+   * Edita un menu por id
+   * @param menuId id del meni
+   * @param menu objeto menu para editar
+   * @returns {UPdateResult}
+   */
   async update(menuId: number, menu: UpdateMenuDTO): Promise<UpdateResult> {
     return await getRepository(MenuEntity).update(menuId, {
       nombre: menu.nombre,
     });
   }
 
+  /**
+   * Borra un menu por id
+   * @param menuId id del menu
+   * @returns {DeleteResult}
+   */
   async delete(menuId: number): Promise<DeleteResult> {
     return await getRepository(MenuEntity).delete(menuId);
   }
 
+  /**
+   *  paginate de menus
+   * @param options opciones de paginacion
+   * @returns {PaginationPrimeNgResult} array de menus
+   */
   async paginate(options: PaginationOptions): Promise<PaginationPrimeNgResult> {
     const dataQuery = getRepository(MenuEntity)
       .createQueryBuilder('menu')

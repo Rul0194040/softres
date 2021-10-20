@@ -1,5 +1,4 @@
 import { BadChild } from './DTO/badChild.dto';
-import { AlmacenDetalleEntity } from '@softres/almacen/entitys/almacenDetalle.entity';
 import { AlmacenEntity } from '@softres/almacen/entitys/almacen.entity';
 import { AlmacenService } from '@softres/almacen/almacen.service';
 import {
@@ -23,6 +22,7 @@ import { RecetaDetalleEntity } from './entities/recetaDetalle.entity';
 import { RecetaEntity } from './entities/receta.entity';
 import { RecipeValues } from './enums/recipeValues.enum';
 import { UpdateRecetaDTO } from './DTO/update-receta.dto';
+import { ContableDetalleEntity } from '@softres/almacen/entitys/contableDetalle.entity';
 
 const parseGramos = (kg: number) => kg * 1000;
 
@@ -30,17 +30,26 @@ const parseGramos = (kg: number) => kg * 1000;
 export class RecetaService {
   constructor(private readonly almacenService: AlmacenService) {}
 
+  /**
+   * Crea una receta,tomamos el objeto que se provee
+   * convertimos dicho objeto en una entidad receta
+   * si el objeto tiene recetas hijas, las agregamos
+   * siempre y cuando esas recetas sean de tipo @enum {(2|3|4)} GrupoReceta
+   * luego creamos los detalle de la receta con la funcion de crear detalle
+   * @param receta @type {CreateRecetaDTO} receta que vamos a crear
+   * @returns @type {RecetaEntity} entidad receta
+   */
   async create(receta: CreateRecetaDTO): Promise<RecetaEntity> {
     const recetaTocreate = plainToClass(RecetaEntity, receta);
 
-    if (receta.hasChildren && receta.children.length) {
+    if (receta.children && receta.children.length !== 0) {
       const children = await getRepository(RecetaEntity).findByIds(
         receta.children,
         {
           where: [
-            { hasChildren: false, grupo: GrupoReceta.SUBRECETA },
-            { hasChildren: false, grupo: GrupoReceta.COMPLEMENTO },
-            { hasChildren: false, grupo: GrupoReceta.EXTRA },
+            { grupo: GrupoReceta.SUBRECETA },
+            { grupo: GrupoReceta.COMPLEMENTO },
+            { grupo: GrupoReceta.EXTRA },
           ],
         },
       );
@@ -51,18 +60,27 @@ export class RecetaService {
       recetaTocreate,
     );
 
-    if (receta.detalleReceta) {
-      this.createDetalle(createdReceta.id, receta.detalleReceta);
+    if (receta.detalle) {
+      this.createDetalle(createdReceta.id, receta.detalle);
     }
 
     return createdReceta;
   }
 
+  /**
+   * se crean los detalles con determinado id de receta.
+   * Se busca la receta, luego recorremos los detalles de receta
+   * en cada detalle se busca el insumo,se crea el objeto detalle, se guarda
+   * por ultimo se dispara un update de la receta padre
+   * @param recetaId @type {number} receta con la que se relacionan los detalles
+   * @param detalles @type Array<{CreateDetalleRecetaDTO}> detalles de la receta
+   */
   async createDetalle(recetaId: number, detalles: CreateDetalleRecetaDTO[]) {
     let rendimiento = 0;
     let totalCosto = 0;
     let cantReal = 0;
     let unitarioIngrediente = 0;
+
     const receta = await getRepository(RecetaEntity).findOne(recetaId);
     detalles.forEach(async (detalle) => {
       const insumo = await getRepository(InsumoEntity).findOne(
@@ -102,6 +120,12 @@ export class RecetaService {
     });
   }
 
+  /**
+   * edita una receta por id
+   * @param id id de la receta
+   * @param receta @type {UpdateRecetaDto}
+   * @returns {UpdateResultDTO}
+   */
   async update(id: number, receta: UpdateRecetaDTO): Promise<UpdateResult> {
     await getRepository(RecetaEntity).update(
       { parentId: id },
@@ -112,9 +136,9 @@ export class RecetaService {
         receta.children,
         {
           where: [
-            { hasChildren: false, grupo: GrupoReceta.SUBRECETA },
-            { hasChildren: false, grupo: GrupoReceta.COMPLEMENTO },
-            { hasChildren: false, grupo: GrupoReceta.EXTRA },
+            { grupo: GrupoReceta.SUBRECETA },
+            { grupo: GrupoReceta.COMPLEMENTO },
+            { grupo: GrupoReceta.EXTRA },
           ],
         },
       );
@@ -124,8 +148,8 @@ export class RecetaService {
     }
 
     await getRepository(RecetaDetalleEntity).delete({ parentId: id });
-    if (receta.detalleReceta) {
-      this.createDetalle(id, receta.detalleReceta);
+    if (receta.detalle) {
+      this.createDetalle(id, receta.detalle);
     }
     return await getRepository(RecetaEntity).update(id, {
       nombre: receta.nombre,
@@ -136,11 +160,16 @@ export class RecetaService {
     });
   }
 
+  /**
+   * retorna una imagen por id
+   * @param id id de la receta
+   * @returns {RecetaEntity}
+   */
   async getById(id: number): Promise<RecetaEntity> {
     return getRepository(RecetaEntity)
       .createQueryBuilder('receta')
       .leftJoin('receta.children', 'children')
-      .leftJoin('receta.detalleReceta', 'det')
+      .leftJoin('receta.detalle', 'det')
       .leftJoin('det.insumo', 'insumo')
       .select([
         'receta.id',
@@ -152,7 +181,6 @@ export class RecetaService {
         'receta.precioSugeridoCarta',
         'children.id',
         'children.nombre',
-        'receta.hasChildren',
         'receta.imagen',
         'receta.grupo',
         'det.id',
@@ -168,41 +196,21 @@ export class RecetaService {
       .getOne();
   }
 
+  /**
+   * Borra una receta por id
+   * @param id id de la receta
+   * @returns {DeleteResult}
+   */
   async delete(id: number): Promise<any> {
     return getRepository(RecetaEntity).delete(id);
   }
 
-  async dashboard(user: LoginIdentityDTO): Promise<DashboardDTO> {
-    let numRecetas = 0,
-      numMenu = 0;
-
-    if (user.profile == ProfileTypes.COCINA) {
-      numRecetas = await getRepository(RecetaEntity)
-        .createQueryBuilder('receta')
-        .where('receta.depto=:depto', { depto: Deptos.COCINA })
-        .getCount();
-      numMenu = await getRepository(MenuEntity).count({
-        where: { depto: Deptos.COCINA },
-      });
-    }
-
-    if (user.profile == ProfileTypes.BARRA) {
-      numRecetas = await getRepository(RecetaEntity).count({
-        where: { depto: Deptos.BARRA },
-      });
-      numMenu = await getRepository(MenuEntity).count({
-        where: { depto: Deptos.BARRA },
-      });
-    }
-
-    const result = {
-      recetas: numRecetas,
-      menus: numMenu,
-    };
-
-    return result;
-  }
-
+  /**
+   * funcion que retorna un array de recetas
+   * filters [nombre,departamento, grupo]
+   * @param options opciones de paginacion
+   * @returns @type {PaginationPrimeNgResult} recetas
+   */
   async paginate(options: PaginationOptions): Promise<PaginationPrimeNgResult> {
     const dataQuery = getRepository(RecetaEntity)
       .createQueryBuilder('receta')
@@ -246,6 +254,13 @@ export class RecetaService {
     };
   }
 
+  /**
+   * paginate de detalles de receta
+   * filtros [nombre]
+   * @param recetaId id de la receta
+   * @param options opciones de paginacion
+   * @returns @type {PaginationPrimeNgResult}
+   */
   async paginateDetalle(
     recetaId: number,
     options: PaginationOptions,
@@ -298,6 +313,12 @@ export class RecetaService {
     };
   }
 
+  /**
+   *funcion que guarda la cadena donde se aloja su img asociada
+   * @param recetaId @type {number} id de la receta
+   * @param path @type {string} cadena donde se guarda la imagen
+   * @returns {UpdateResult}
+   */
   updateImage(
     recetaId: number,
     path: string,
@@ -305,15 +326,20 @@ export class RecetaService {
     return getRepository(RecetaEntity).update(recetaId, { imagen: path });
   }
 
+  /**
+   * cocina las recetas y subrecetas usando una funcion
+   * llamada @type {cocinarDetalles(RecetaEntity):RecetaDetalleEntity[]}
+   * @param recetaId @type {number} id de la receta acocinar
+   * @returns {HttpStatus}
+   */
   async cocinar(recetaId: number): Promise<HttpStatus> {
     const receta = await getRepository(RecetaEntity)
       .createQueryBuilder('receta')
       .leftJoin('receta.children', 'subRecetas')
-      .leftJoin('receta.detalleReceta', 'detalle')
+      .leftJoin('receta.detalle', 'detalle')
       .select([
         'receta.id',
         'receta.depto',
-        'receta.hasChildren',
         'subRecetas.id',
         'subRecetas.nombre',
         'subRecetas.grupo',
@@ -338,7 +364,7 @@ export class RecetaService {
       );
     }
 
-    if (receta.hasChildren) {
+    if (receta.detalle && receta.detalle.length !== 0) {
       for (let idx = 0; idx < receta.children.length; idx++) {
         const child = receta.children[idx];
         const badchild = await this.cocinarDetalles(child);
@@ -366,11 +392,19 @@ export class RecetaService {
     }
   }
 
+  /**
+   * toma una receta y la recorre para verificar que
+   * hay suficiente insumo para cocinar, de esa forma nos aseguramos
+   * que la funcion @type {cocinarDetalles(RecetaEntity):RecetaDetalleEntity[]}
+   * pueda ser invocada
+   * @param receta @type {RecetaEntity} receta
+   * @returns {RecetaDetalleEntity[]}
+   */
   async verificado(receta: RecetaEntity): Promise<RecetaDetalleEntity[]> {
     const insuficientes: RecetaDetalleEntity[] = [];
 
-    for (let idx = 0; idx < receta.detalleReceta.length; idx++) {
-      const detalle = receta.detalleReceta[idx];
+    for (let idx = 0; idx < receta.detalle.length; idx++) {
+      const detalle = receta.detalle[idx];
       const almacen = await getRepository(AlmacenEntity).findOne({
         depto: receta.depto,
         insumoId: detalle.insumoId,
@@ -387,18 +421,23 @@ export class RecetaService {
     return insuficientes;
   }
 
+  /**
+   * funcion que cocina una receta o marca los insuficientes
+   * @param receta @type {RecetaEntity}
+   * @returns {RecetaDetalleEntity}
+   */
   async cocinarDetalles(receta: RecetaEntity): Promise<RecetaDetalleEntity[]> {
     const insuficientes = this.verificado(receta);
 
     if (!insuficientes) {
-      for (let idx = 0; idx < receta.detalleReceta.length; idx++) {
-        const detalle = receta.detalleReceta[idx];
+      for (let idx = 0; idx < receta.detalle.length; idx++) {
+        const detalle = receta.detalle[idx];
         const almacen = await getRepository(AlmacenEntity).findOne({
           depto: receta.depto,
           insumoId: detalle.insumoId,
         });
 
-        const detalleToCreate = getRepository(AlmacenDetalleEntity).create({
+        const detalleToCreate = getRepository(ContableDetalleEntity).create({
           salidas: detalle.cantReceta,
           abono: detalle.costoUnitarioIngrediente,
           precioUnitario: 0,
@@ -411,5 +450,40 @@ export class RecetaService {
       }
     }
     return insuficientes;
+  }
+
+  async validarExistencias(recetaId: number): Promise<boolean> {
+    let validator = true;
+    const receta = await getRepository(RecetaEntity).findOne(recetaId, {
+      relations: ['children', 'detalle'],
+    });
+
+    validator = await receta.children.reduce(async (memo, subreceta) => {
+      const preValue = await memo;
+      const value = await this.validarExistencias(subreceta.id);
+      console.log('Subreceta' + subreceta.id + ':' + value);
+      return value && preValue;
+    }, Promise.resolve(validator));
+
+    console.log(recetaId + ' Validado AllSub:' + validator);
+
+    if (validator) {
+      validator = await receta.detalle.reduce(async (memo, detalle) => {
+        const preValue = await memo;
+        const almacen = await getRepository(AlmacenEntity).findOne({
+          depto: receta.depto,
+          insumoId: detalle.insumoId,
+        });
+        console.log(parseGramos(almacen.total) + 'y' + detalle.cantReceta);
+
+        const cocinado = parseGramos(almacen.total) - detalle.cantReceta;
+        console.log(detalle.id + 'validado');
+        console.log(cocinado >= 0);
+        return cocinado >= 0 && preValue;
+      }, Promise.resolve(validator));
+    }
+    console.log(recetaId + ' Validado All:' + validator);
+
+    return validator;
   }
 }
