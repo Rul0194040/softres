@@ -48,6 +48,38 @@ export class AlmacenController {
     return this.almacenService.createAlmacen(almacen);
   }
 
+  /**
+   * Paginate de insumos minimos
+   * @param options opciones de paginacion
+   * @param user @type {LoginIdentityDTO} usuario en sesion
+   * @returns {PaginationPrimeNgResult}
+   */
+  @Post('insumos-minimos')
+  insumosMinimos(
+    @Body() options: PaginationOptions,
+    @User() user: LoginIdentityDTO,
+  ): Promise<PaginationPrimeNgResult> {
+    return this.almacenService.insMinimos(options, user);
+  }
+
+  /**
+   * paginate de almacenes
+   * @param options opciones de paginacion
+   * @returns {PaginationPrimeNgResult} array de entradas de almacen
+   */
+  @Post('paginate')
+  paginate(
+    @Body() options: PaginationOptions,
+  ): Promise<PaginationPrimeNgResult> {
+    return this.almacenService.paginate(options);
+  }
+
+  /**
+   * Crea detalles contables
+   * @param almacenId id del almacen
+   * @param detalles @type {CreateContableDetalleDTO} detalles contables
+   * @returns
+   */
   @Post('createDetalle/:almacenId')
   createDetContable(
     @Param('almacenId', ParseIntPipe) almacenId: number,
@@ -57,14 +89,11 @@ export class AlmacenController {
     return this.almacenService.createDetalle(almacenId, detalles);
   }
 
-  @Post('insumos-minimos')
-  insumosMinimos(
-    @Body() options: PaginationOptions,
-    @User() user: LoginIdentityDTO,
-  ): Promise<PaginationPrimeNgResult> {
-    return this.almacenService.insMinimos(options, user);
-  }
-
+  /**
+   * retorna una entrada de almacen por id
+   * @param id id de almacen
+   * @returns {AlmacenEntity}
+   */
   @Get(':id')
   GetAlmacenById(
     @Param('id', ParseIntPipe) id: number,
@@ -72,13 +101,24 @@ export class AlmacenController {
     return this.almacenService.getById(id);
   }
 
-  @Get('/contable/:insumoId')
+  /**
+   * retorna el almacen contable por insumo
+   * @param insumoId id de insumo
+   * @returns {ContableEntity}
+   */
+  @Get('contable/:insumoId')
   getContableById(
     @Param('insumoId', ParseIntPipe) insumoId: number,
   ): Promise<ContableEntity> {
     return this.almacenService.getContableByInsumo(insumoId);
   }
 
+  /**
+   * actualia entrada de alamcen
+   * @param id id de la entrada de almacen
+   * @param almacen objeto con el que se actualiza el registro
+   * @returns {UpdateResult}
+   */
   @Put(':id')
   updateAlmacen(
     @Param('id', ParseIntPipe) id: number,
@@ -87,18 +127,22 @@ export class AlmacenController {
     return this.almacenService.update(id, almacen);
   }
 
+  /**
+   * Borrar entrada de almacen
+   * @param id id de la entrada de almacen
+   * @returns {DeleteResult}
+   */
   @Delete(':id')
   deleteAlmacen(@Param('id') id: number): Promise<DeleteResult> {
     return this.almacenService.delete(id);
   }
 
-  @Post('paginate')
-  paginate(
-    @Body() options: PaginationOptions,
-  ): Promise<PaginationPrimeNgResult> {
-    return this.almacenService.paginate(options);
-  }
-
+  /**
+   * Paginate de movimientos contables
+   * filtros [nombre,fecha]
+   * @param options opciones de paginacion
+   * @returns {PaginationPrimeNgResult} movimientos contables
+   */
   @Post('paginate/contable/:contableId')
   paginateContable(
     @Param('contableId', ParseIntPipe) contableId: number,
@@ -121,6 +165,13 @@ export class AlmacenController {
     return this.almacenService.updateDetalleContable(detalleId, detalle);
   }
 
+  /**
+   * funcion que a traves de un archivo excel agrega
+   * los detalles contables a una entrada de almacen
+   * @param almacenId id de la entrada de almacen
+   * @param file file tipo xls para agregar detalles
+   * @returns {CreateContableDetalleDTO[]}
+   */
   @Post('carga-masiva/:almacenId')
   @UseInterceptors(
     FileInterceptor('carga', {

@@ -24,6 +24,13 @@ const parseGramos = (kg: number): number => kg * 1000.0;
 
 @Injectable()
 export class AlmacenService {
+  /**
+   * Crea una entidad almacen con su detalle contable
+   * usando la funcion @type createDetalle( almacenId: number,
+    detalles: CreateContableDetalleDTO[]):ContableDetalleEntity[]
+   * @param almacen @type {CreateAlmacenDTO} objeto a crear
+   * @returns @type {AlmacenEntity}
+   */
   async createAlmacen(almacen: CreateAlmacenDTO): Promise<AlmacenEntity> {
     const insumo = await getRepository(InsumoEntity).findOne(almacen.insumoId);
     const contable = await getRepository(ContableEntity).findOne({
@@ -66,6 +73,12 @@ export class AlmacenService {
     return createdAlmacen;
   }
 
+  /**
+   * funcion que crea detalles contables
+   * @param almacenId id del almacen
+   * @param detalles detalles contables de la entrada de almacen
+   * @returns {ContableDetalleEntity[]}
+   */
   async createDetalle(
     almacenId: number,
     detalles: CreateContableDetalleDTO[],
@@ -141,7 +154,11 @@ export class AlmacenService {
     return createdDetalles;
   }
 
-  // detalleId es el id del detalle desde donde va a empezar a actualizar la tabla
+  /**
+   * Actualiza la tabla contable de un insumo desde un detalle especifico
+   * @param detalleId id del detalle desde donde va a empezar a actualizar la tabla
+   * @returns {UpdateResult}
+   */
   async updateTablaContable(detalleId: number): Promise<UpdateResult> {
     const mainDetalle = await getRepository(ContableDetalleEntity).findOne(
       detalleId,
@@ -182,12 +199,22 @@ export class AlmacenService {
     return null;
   }
 
+  /**
+   * retorna una entrada de almacen por id
+   * @param almacenId id de entrada de almacen
+   * @returns {AlmacenEntity}
+   */
   async getById(almacenId: number): Promise<AlmacenEntity> {
     return await getRepository(AlmacenEntity).findOne(almacenId, {
       relations: ['insumo'],
     });
   }
 
+  /**
+   * retorna el almacen contable por insumo
+   * @param insumoId id de insumo
+   * @returns {ContableEntity}
+   */
   getContableByInsumo(insumoId: number): Promise<ContableEntity> {
     return getRepository(ContableEntity).findOne({
       where: { insumoId },
@@ -195,6 +222,12 @@ export class AlmacenService {
     });
   }
 
+  /**
+   * actualia entrada de alamcen
+   * @param id id de la entrada de almacen
+   * @param almacen objeto con el que se actualiza el registro
+   * @returns {UpdateResult}
+   */
   async update(
     almacenId: number,
     almacen: UpdateAlmacenDTO,
@@ -202,10 +235,21 @@ export class AlmacenService {
     return await getRepository(AlmacenEntity).update(almacenId, almacen);
   }
 
+  /**
+   * borra una entrada de almacen por id
+   * @param almacenId id de entrada de almacen
+   * @returns {DeleteResult}
+   */
   async delete(almacenId: number): Promise<DeleteResult> {
     return await getRepository(AlmacenEntity).delete(almacenId);
   }
 
+  /**
+   * Paginate de entradas de almacen
+   * filtros [nombre,categoria,depto]
+   * @param options opciones de paginacion
+   * @returns {PaginationPrimeNgResult} entradas de almacen
+   */
   async paginate(options: PaginationOptions): Promise<PaginationPrimeNgResult> {
     const dataQuery = getRepository(AlmacenEntity)
       .createQueryBuilder('almacen')
@@ -231,7 +275,7 @@ export class AlmacenService {
       ]);
 
     forIn(options.filters, (value, key) => {
-      if (key === 'buscar') {
+      if (key === 'nombre') {
         dataQuery.andWhere('( insumo.nombre LIKE :term )', {
           term: `%${value.split(' ').join('%')}%`,
         });
@@ -268,6 +312,12 @@ export class AlmacenService {
     };
   }
 
+  /**
+   * Paginate de movimientos contables
+   * filtros [nombre,fecha]
+   * @param options opciones de paginacion
+   * @returns {PaginationPrimeNgResult} movimientos contables
+   */
   async paginateContable(
     contableId: number,
     options: PaginationOptions,
@@ -322,6 +372,12 @@ export class AlmacenService {
     };
   }
 
+  /**
+   *
+   * @param detalleId Id del detalle ha actualizar
+   * @param detalle Acepta solo los campos: fecha, entradas?, salidas? y precioUnitario?
+   * @returns Regresa stock actual y costo venta (suma de los abonos)
+   */
   async updateDetalleContable(
     detalleId: number,
     detalle: CreateContableDetalleDTO,
@@ -345,6 +401,13 @@ export class AlmacenService {
     return await this.updateTablaContable(detalleId);
   }
 
+  /**
+   * funcion que a traves de un archivo excel agrega
+   * los detalles contables a una entrada de almacen
+   * @param almacenId id de la entrada de almacen
+   * @param file file tipo xls para agregar detalles
+   * @returns {CreateContableDetalleDTO[]}
+   */
   async masiveAlmacen(
     almacenId: number,
     file: string,
@@ -385,6 +448,13 @@ export class AlmacenService {
     return this.createDetalle(almacenId, response);
   }
 
+  /**
+   * Paginate de insumos minimos
+   * filtros [nombre]
+   * @param options opciones de paginacion
+   * @param user @type {LoginidentityDTO} usuario en sesion
+   * @returns {PaginationPrimeNgResult}
+   */
   async insMinimos(
     options: PaginationOptions,
     user: LoginIdentityDTO,
@@ -431,7 +501,7 @@ export class AlmacenService {
     }
 
     forIn(options.filters, (value, key) => {
-      if (key === 'buscar') {
+      if (key === 'nombre') {
         dataQuery.andWhere('( insumo.nombre LIKE :term )', {
           term: `%${value.split(' ').join('%')}%`,
         });
@@ -456,6 +526,12 @@ export class AlmacenService {
     };
   }
 
+  /**
+   * funcion que re-organiza la informacion de insumos minimos
+   * para poder verlos en funcion del departamento al que pertenencen
+   * @param almacenes @type {AlmacenEntity[]}
+   * @returns {any}
+   */
   async getAlmacenesByDepto(almacenes: AlmacenEntity[]): Promise<any> {
     const cocina: InsumoEntity[] = [];
     const barra: InsumoEntity[] = [];
