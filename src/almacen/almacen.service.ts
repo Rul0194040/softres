@@ -20,6 +20,8 @@ import * as Excel from 'exceljs';
 import * as moment from 'moment';
 import { CargaDTO } from './DTOs/carga.dto';
 import { MovType } from './enums/tiposMovimientos.enum';
+import { SolicitudEntity } from '@softres/compra/entities/solicitud.entity';
+import { MovType } from './enums/movTypes.enum';
 
 const toFloat = (num: string | number): number => parseFloat(num + '');
 const parseKilo = (gr: number): number => gr / 1000.0;
@@ -61,16 +63,24 @@ export class AlmacenService {
     }
 
     if (almacen.detalleContable) {
-      await this.createDetalle(createdAlmacen.id, almacen.detalleContable);
+      await this.createDetalle(
+        createdAlmacen.id,
+        almacen.detalleContable,
+        MovType.COMPRA,
+      );
     }
 
     if (almacen.cantidad !== 0) {
-      await this.createDetalle(createdAlmacen.id, [
-        {
-          entradas: almacen.cantidad * insumo.pesoNeto,
-          precioUnitario: insumo.precioUnitario,
-        },
-      ]);
+      await this.createDetalle(
+        createdAlmacen.id,
+        [
+          {
+            entradas: almacen.cantidad * insumo.pesoNeto,
+            precioUnitario: insumo.precioUnitario,
+          },
+        ],
+        MovType.COMPRA,
+      );
     }
 
     return createdAlmacen;
@@ -170,6 +180,7 @@ export class AlmacenService {
   async createDetalle(
     almacenId: number,
     detalles: CreateContableDetalleDTO[],
+    tipoMov: MovType,
   ): Promise<ContableDetalleEntity[]> {
     const almacen = await getRepository(AlmacenEntity).findOne(almacenId, {
       relations: ['insumo'],
@@ -187,17 +198,20 @@ export class AlmacenService {
       let entradas = 0.0,
         salidas = 0.0,
         cargo = 0,
-        abono = 0,
-        referencia: string;
+        abono = 0;
 
       const fecha: Date = detalle.fecha ? detalle.fecha : moment().toDate();
+      const referencia = detalle.referencia
+        ? detalle.referencia
+        : `${tipoMov}${almacen.depto.substr(0, 2)}-${moment(fecha).format(
+            'DDMMYY',
+          )}`;
 
       if (
         detalle.entradas !== null &&
         detalle.entradas !== undefined &&
         detalle.entradas !== 0.0
       ) {
-        referencia = `E-${moment(fecha).format('DDMMYYYY')}`;
         entradas = detalle.entradas;
         cargo = detalle.cargo
           ? detalle.cargo
@@ -205,7 +219,6 @@ export class AlmacenService {
 
         total += parseKilo(entradas);
       } else {
-        referencia = `S-${moment(fecha).format('DDMMYYYY')}`;
         salidas = detalle.salidas;
         abono = detalle.abono
           ? detalle.abono
@@ -479,11 +492,11 @@ export class AlmacenService {
     ) {
       detalle.salidas = 0.0;
       detalle.abono = 0;
-      detalle.referencia = `E-${moment(detalle.fecha).format('DDMMYYYY')}`;
+      detalle.referencia = `E-${moment(detalle.fecha).format('DDMMYY')}`;
     } else {
       detalle.entradas = 0.0;
       detalle.cargo = 0;
-      detalle.referencia = `S-${moment(detalle.fecha).format('DDMMYYYY')}`;
+      detalle.referencia = `S-${moment(detalle.fecha).format('DDMMYY')}`;
     }
     await getRepository(ContableDetalleEntity).update(detalleId, detalle);
     return await this.updateTablaContable(detalleId);
@@ -503,16 +516,26 @@ export class AlmacenService {
     const response: CreateContableDetalleDTO[] = [];
     const workbook = new Excel.Workbook();
     const data = await workbook.xlsx.readFile(file);
+    const almacen = await getRepository(AlmacenEntity).findOne(almacenId);
     data.getWorksheet('carga-masiva').eachRow((row, idx) => {
       if (idx === 1) {
         // Fila de encabezados
         return;
       } else {
+        const entradas = row.getCell('B').value
+          ? Number(row.getCell('B').value)
+          : 0.0;
+        const fecha =
+          new Date(row.getCell('A').value.toString()) ?? moment().toDate();
+        const tipoMov = entradas !== 0 ? MovType.COMPRA : MovType.VENTA;
+        const referencia = `${tipoMov}${almacen.depto.substr(0, 2)}-${moment(
+          fecha,
+        ).format('DDMMYY')}`;
+
         const record: CreateContableDetalleDTO = {
-          fecha: new Date(row.getCell('A').value.toString()) ?? null,
-          entradas: row.getCell('B').value
-            ? Number(row.getCell('B').value)
-            : 0.0,
+          fecha,
+          referencia,
+          entradas,
           salidas: row.getCell('C').value
             ? Number(row.getCell('C').value)
             : 0.0,
@@ -533,7 +556,7 @@ export class AlmacenService {
       }
     });
 
-    return this.createDetalle(almacenId, response);
+    return this.createDetalle(almacenId, response, MovType.COMPRA);
   }
 
   /**
@@ -631,9 +654,14 @@ export class AlmacenService {
         .leftJoin('detalle.solicitud', 'solicitud')
         .leftJoin('detalle.insumo', 'insumo')
         .where('solicitud.status IN (:status)', {
-          status: [SolicitudEstados.GENERADA, SolicitudEstados.BORRADOR],
+          status: [
+            SolicitudEstados.BORRADOR,
+            SolicitudEstados.GENERADA,
+            SolicitudEstados.PARA_COMPRAS,
+          ],
         })
         .where('insumo.id IN (:...ids)', { ids: minimosIds })
+        .where('detalle.abastecido = false')
         .select(['detalle.insumoId'])
         .getMany();
       const solicitadosIds = inSolicitados.map((ins) => ins.insumoId);
@@ -672,5 +700,64 @@ export class AlmacenService {
       barra,
       almacen,
     };
+  }
+
+  async abastecer(
+    solicitudId: number,
+  ): Promise<UpdateResult | PromiseLike<UpdateResult>> {
+    const solicitud = await getRepository(SolicitudEntity).findOne(
+      solicitudId,
+      { relations: ['detalle'] },
+    );
+    let cont = 0;
+    await Promise.all(
+      solicitud.detalle.map(async (detalle) => {
+        const almacen = await getRepository(AlmacenEntity).findOne({
+          where: { insumoId: detalle.insumoId, depto: Deptos.ALMACEN },
+        });
+        const almacenDepto = await getRepository(AlmacenEntity).findOne({
+          where: { insumoId: detalle.insumoId, depto: solicitud.depto },
+        });
+
+        if (
+          parseGramos(almacen.total) >= detalle.cantidad &&
+          !detalle.abastecido
+        ) {
+          await this.createDetalle(
+            almacen.id,
+            [
+              {
+                salidas: detalle.cantidad,
+                precioUnitario: 0,
+              },
+            ],
+            MovType.SALIDA_TRANS,
+          );
+          await this.createDetalle(
+            almacenDepto.id,
+            [
+              {
+                entradas: detalle.cantidad,
+                precioUnitario: 0,
+              },
+            ],
+            MovType.ENTRADA_TRANS,
+          );
+          console.log('Entra para ' + detalle.id);
+
+          await getRepository(SolicitudDetalleEntity).update(detalle.id, {
+            abastecido: true,
+          });
+          cont++;
+        } else if (detalle.abastecido) cont++;
+      }),
+    );
+
+    const status =
+      cont === solicitud.detalle.length
+        ? SolicitudEstados.COMPLETADA
+        : SolicitudEstados.PARA_COMPRAS;
+
+    return getRepository(SolicitudEntity).update(solicitud.id, { status });
   }
 }

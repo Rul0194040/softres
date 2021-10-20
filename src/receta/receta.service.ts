@@ -23,6 +23,7 @@ import { RecetaEntity } from './entities/receta.entity';
 import { RecipeValues } from './enums/recipeValues.enum';
 import { UpdateRecetaDTO } from './DTO/update-receta.dto';
 import { ContableDetalleEntity } from '@softres/almacen/entitys/contableDetalle.entity';
+import { MovType } from '@softres/almacen/enums/movTypes.enum';
 
 const parseGramos = (kg: number) => kg * 1000;
 
@@ -443,7 +444,11 @@ export class RecetaService {
           precioUnitario: 0,
           saldo: 0,
         });
-        await this.almacenService.createDetalle(almacen.id, [detalleToCreate]);
+        await this.almacenService.createDetalle(
+          almacen.id,
+          [detalleToCreate],
+          MovType.PRODUCCION,
+        );
         await getRepository(RecetaEntity).update(receta.id, {
           existencia: parseInt(receta.existencia + '') + 1,
         });

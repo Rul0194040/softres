@@ -11,6 +11,7 @@ import {
   HttpStatus,
   Param,
   ParseArrayPipe,
+  ParseEnumPipe,
   ParseIntPipe,
   Post,
   Put,
@@ -23,7 +24,7 @@ import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgR
 import { UpdateResult, DeleteResult } from 'typeorm';
 import { CreateAlmacenDTO } from './DTOs/createAlmacen.dto';
 import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { existsSync, mkdirSync } from 'fs';
@@ -33,6 +34,7 @@ import { ContableDetalleEntity } from './entitys/contableDetalle.entity';
 import { CreateContableDetalleDTO } from './DTOs/contableDetalle.dto';
 import { ContableEntity } from './entitys/contable.entity';
 import { CargaDTO } from './DTOs/carga.dto';
+import { MovType } from './enums/movTypes.enum';
 
 @Controller('almacen')
 @ApiTags('Almacén')
@@ -83,12 +85,16 @@ export class AlmacenController {
    * @returns
    */
   @Post('createDetalle/:almacenId')
+  @ApiParam({ name: 'tipoMov', enum: MovType })
+  @ApiBody({ type: [CreateContableDetalleDTO] })
+  @Post('createDetalle/:almacenId/:tipoMov')
   createDetContable(
     @Param('almacenId', ParseIntPipe) almacenId: number,
+    @Param('tipoMov', new ParseEnumPipe(MovType)) tipoMov: MovType,
     @Body(new ParseArrayPipe({ items: CreateContableDetalleDTO }))
     detalles: CreateContableDetalleDTO[],
   ): Promise<ContableDetalleEntity[]> {
-    return this.almacenService.createDetalle(almacenId, detalles);
+    return this.almacenService.createDetalle(almacenId, detalles, tipoMov);
   }
 
   /**
@@ -236,5 +242,12 @@ export class AlmacenController {
     @UploadedFile() file: FileOptions,
   ): Promise<CreateContableDetalleDTO[]> {
     return await this.almacenService.masiveAlmacen(almacenId, file.path);
+  }
+
+  @Put('abastecer/:solicitudId')
+  async abastecer(
+    @Param('solicitudId', ParseIntPipe) solicitudId: number,
+  ): Promise<UpdateResult> {
+    return this.almacenService.abastecer(solicitudId);
   }
 }
