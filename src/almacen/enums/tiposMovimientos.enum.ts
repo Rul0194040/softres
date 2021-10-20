@@ -1,7 +1,9 @@
-export enum TiposMov {
-  TRANSFERENCIA = 'ENXTRANSF',
-  COMPRA = 'ENXCOMPRA',
-  VENTA = 'SAXVENTA',
-  PRODUCCION = 'SAXPROD',
-  MERMA = 'SAXMERM',
+export enum MovType {
+  // ENTRADAS
+  TRANSFERENCIA = 'T',
+  COMPRA = 'C',
+  // SALIDAS
+  PRODUCCION = 'P',
+  VENTA = 'V',
+  MERMA = 'M',
 }

@@ -1,3 +1,4 @@
+import { RecetaService } from './../receta/receta.service';
 import { AlmacenEntity } from './entitys/almacen.entity';
 import { ContableDetalleEntity } from './entitys/contableDetalle.entity';
 import { ContableEntity } from './entitys/contable.entity';
@@ -6,7 +7,7 @@ import { CreateContableDetalleDTO } from './DTOs/contableDetalle.dto';
 import { DeleteResult, getRepository, UpdateResult } from 'typeorm';
 import { Deptos } from './enums/deptos.enum';
 import { forIn } from 'lodash';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
@@ -18,7 +19,7 @@ import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
 import * as Excel from 'exceljs';
 import * as moment from 'moment';
 import { CargaDTO } from './DTOs/carga.dto';
-import { TiposMov } from './enums/tiposMovimientos.enum';
+import { MovType } from './enums/tiposMovimientos.enum';
 
 const toFloat = (num: string | number): number => parseFloat(num + '');
 const parseKilo = (gr: number): number => gr / 1000.0;
@@ -75,30 +76,88 @@ export class AlmacenService {
     return createdAlmacen;
   }
 
+  /**
+   * esta funcion hace movimientos contables dependiendo del tipo
+   * @param origenId id del almacen de origen de la mercancia
+   * @param destinoId id de destino de la mercancia (opcional)
+   * @param ware objeto de arreglo de objetos mercancia
+   */
   async createMovimiento(
     origenId: number,
     destinoId: number,
     ware: CargaDTO,
-  ): Promise<UpdateResult> {
+  ): Promise<HttpStatus> {
     switch (ware.tipo) {
-      case TiposMov.TRANSFERENCIA:
-        this.transferencia();
+      case MovType.TRANSFERENCIA:
+        return this.transferencia(origenId, destinoId, ware);
         break;
-      case TiposMov.COMPRA:
-        this.compra();
+      case MovType.COMPRA:
+        return this.compra(origenId, ware);
         break;
-      case TiposMov.VENTA:
-        this.venta();
+      case MovType.VENTA:
+        return this.venta(origenId, ware);
         break;
-      case TiposMov.PRODUCCION:
-        this.cocinar();
+      case MovType.PRODUCCION:
+        return this.cocinar(origenId, ware);
         break;
-      case TiposMov.MERMA:
-        this.merma();
+      case MovType.MERMA:
+        return this.merma(origenId, ware);
         break;
 
       default:
         break;
+    }
+  }
+
+  async transferencia(
+    origenId: number,
+    destinoId: number,
+    ware: CargaDTO,
+  ): Promise<HttpStatus> {
+    const badMercancia: number[] = [];
+    const almacenOrg = await getRepository(AlmacenEntity).findOne(origenId);
+    const almacenDest = await getRepository(AlmacenEntity).findOne(destinoId);
+
+    for (let idx = 0; idx < ware.detalles.length; idx++) {
+      const record = ware.detalles[idx];
+      const insumo = await getRepository(InsumoEntity).findOne(record.insumoId);
+      if (
+        almacenOrg.total - record.cantidad > almacenOrg.minimo &&
+        almacenDest.total + record.cantidad < almacenOrg.maximo
+      ) {
+        await this.createDetalle(
+          almacenOrg.id,
+          [
+            {
+              salida: almacenOrg.cantidad * insumo.pesoNeto,
+              precioUnitario: insumo.precioUnitario,
+            },
+          ],
+          MovType.TRANSFERENCIA,
+        );
+
+        await this.createDetalle(
+          almacenDest.id,
+          [
+            {
+              entrada: almacenDest.cantidad * insumo.pesoNeto,
+              precioUnitario: insumo.precioUnitario,
+            },
+          ],
+          MovType.TRANSFERENCIA,
+        );
+      } else {
+        badMercancia[idx] = record.insumoId;
+      }
+    }
+
+    if (badMercancia.length) {
+      throw new HttpException(
+        'No es posible realizar la operacion',
+        HttpStatus.BAD_REQUEST,
+      );
+    } else {
+      return HttpStatus.OK;
     }
   }
 

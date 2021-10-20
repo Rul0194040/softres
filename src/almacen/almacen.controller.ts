@@ -8,6 +8,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Param,
   ParseArrayPipe,
   ParseIntPipe,
@@ -179,7 +180,7 @@ export class AlmacenController {
     @Body() ware: CargaDTO,
     @Param('origenId', ParseIntPipe) origenId: number,
     @Param('destinoId', ParseIntPipe) destinoId?: number,
-  ): Promise<UpdateResult> {
+  ): Promise<HttpStatus> {
     return this.almacenService.createMovimiento(origenId, destinoId, ware);
   }
 

@@ -1,7 +1,7 @@
-import { TiposMov } from './../enums/tiposMovimientos.enum';
+import { MovType } from './../enums/tiposMovimientos.enum';
 export class CargaDTO {
-  tipo: TiposMov;
-  detalle: CargaDetalleDTO[];
+  tipo: MovType;
+  detalles: CargaDetalleDTO[];
 }
 
 export class CargaDetalleDTO {
