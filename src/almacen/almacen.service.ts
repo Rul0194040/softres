@@ -6,7 +6,7 @@ import { CreateContableDetalleDTO } from './DTOs/contableDetalle.dto';
 import { DeleteResult, getRepository, UpdateResult } from 'typeorm';
 import { Deptos } from './enums/deptos.enum';
 import { forIn } from 'lodash';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InsumoEntity } from '@softres/insumo/insumo.entity';
 import { LoginIdentityDTO } from './../auth/DTOs/loginIdentity.dto';
 import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
@@ -17,6 +17,9 @@ import { SolicitudEstados } from '@softres/compra/enum/solicitud-estados.enum';
 import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
 import * as Excel from 'exceljs';
 import * as moment from 'moment';
+import { CargaDTO } from './DTOs/carga.dto';
+import { MovType } from './enums/tiposMovimientos.enum';
+import { SolicitudEntity } from '@softres/compra/entities/solicitud.entity';
 
 const toFloat = (num: string | number): number => parseFloat(num + '');
 const parseKilo = (gr: number): number => gr / 1000.0;
@@ -58,19 +61,117 @@ export class AlmacenService {
     }
 
     if (almacen.detalleContable) {
-      await this.createDetalle(createdAlmacen.id, almacen.detalleContable);
+      await this.createDetalle(
+        createdAlmacen.id,
+        almacen.detalleContable,
+        MovType.COMPRA,
+      );
     }
 
     if (almacen.cantidad !== 0) {
-      await this.createDetalle(createdAlmacen.id, [
-        {
-          entradas: almacen.cantidad * insumo.pesoNeto,
-          precioUnitario: insumo.precioUnitario,
-        },
-      ]);
+      await this.createDetalle(
+        createdAlmacen.id,
+        [
+          {
+            entradas: almacen.cantidad * insumo.pesoNeto,
+            precioUnitario: insumo.precioUnitario,
+          },
+        ],
+        MovType.COMPRA,
+      );
     }
 
     return createdAlmacen;
+  }
+
+  /**
+   * esta funcion hace movimientos contables dependiendo del tipo
+   * @param origenId id del almacen de origen de la mercancia
+   * @param destinoId id de destino de la mercancia (opcional)
+   * @param ware objeto de arreglo de objetos mercancia
+   */
+  async createMovimiento(
+    origenId: number,
+    destinoId: number,
+    ware: CargaDTO,
+  ): Promise<HttpStatus> {
+    //TODO hacer la funcion comprar
+    //TODO hacer la funcion venta
+    //TODO hacer la funcion cocinar (hacer que funcione)
+    //TODO hacer la funcion merma
+
+    switch (ware.tipo) {
+      case MovType.TRANSFERENCIA:
+        return this.transferencia(origenId, destinoId, ware);
+        break;
+      case MovType.COMPRA:
+        //return this.compra(origenId, ware);
+        break;
+      case MovType.VENTA:
+        //return this.venta(origenId, ware);
+        break;
+      case MovType.PRODUCCION:
+        //return this.cocinar(origenId, ware);
+        break;
+      case MovType.MERMA:
+        //return this.merma(origenId, ware);
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  async transferencia(
+    origenId: number,
+    destinoId: number,
+    ware: CargaDTO,
+  ): Promise<HttpStatus> {
+    const badMercancia: number[] = [];
+    const almacenOrg = await getRepository(AlmacenEntity).findOne(origenId);
+    const almacenDest = await getRepository(AlmacenEntity).findOne(destinoId);
+
+    for (let idx = 0; idx < ware.detalles.length; idx++) {
+      const record = ware.detalles[idx];
+      const insumo = await getRepository(InsumoEntity).findOne(record.insumoId);
+      if (
+        almacenOrg.total - record.cantidad > almacenOrg.minimo &&
+        almacenDest.total + record.cantidad < almacenOrg.maximo
+      ) {
+        await this.createDetalle(
+          almacenOrg.id,
+          [
+            {
+              salidas: almacenOrg.cantidad * insumo.pesoNeto,
+              precioUnitario: insumo.precioUnitario,
+            },
+          ],
+          MovType.TRANSFERENCIA,
+        );
+
+        await this.createDetalle(
+          almacenDest.id,
+          [
+            {
+              entradas: almacenDest.cantidad * insumo.pesoNeto,
+              precioUnitario: insumo.precioUnitario,
+            },
+          ],
+          MovType.TRANSFERENCIA,
+        );
+      } else {
+        badMercancia[idx] = record.insumoId;
+      }
+    }
+
+    if (badMercancia.length) {
+      throw new HttpException(
+        'No es posible realizar la operacion',
+        HttpStatus.BAD_REQUEST,
+      );
+    } else {
+      return HttpStatus.OK;
+    }
   }
 
   /**
@@ -82,6 +183,7 @@ export class AlmacenService {
   async createDetalle(
     almacenId: number,
     detalles: CreateContableDetalleDTO[],
+    tipoMov: MovType,
   ): Promise<ContableDetalleEntity[]> {
     const almacen = await getRepository(AlmacenEntity).findOne(almacenId, {
       relations: ['insumo'],
@@ -99,17 +201,20 @@ export class AlmacenService {
       let entradas = 0.0,
         salidas = 0.0,
         cargo = 0,
-        abono = 0,
-        referencia: string;
+        abono = 0;
 
       const fecha: Date = detalle.fecha ? detalle.fecha : moment().toDate();
+      const referencia = detalle.referencia
+        ? detalle.referencia
+        : `${tipoMov}${almacen.depto.substr(0, 2)}-${moment(fecha).format(
+            'DDMMYY',
+          )}`;
 
       if (
         detalle.entradas !== null &&
         detalle.entradas !== undefined &&
         detalle.entradas !== 0.0
       ) {
-        referencia = `E-${moment(fecha).format('DDMMYYYY')}`;
         entradas = detalle.entradas;
         cargo = detalle.cargo
           ? detalle.cargo
@@ -117,7 +222,6 @@ export class AlmacenService {
 
         total += parseKilo(entradas);
       } else {
-        referencia = `S-${moment(fecha).format('DDMMYYYY')}`;
         salidas = detalle.salidas;
         abono = detalle.abono
           ? detalle.abono
@@ -381,7 +485,7 @@ export class AlmacenService {
   async updateDetalleContable(
     detalleId: number,
     detalle: CreateContableDetalleDTO,
-  ): Promise<any> {
+  ): Promise<UpdateResult> {
     if (detalle.salidas) detalle.salidas = parseKilo(detalle.salidas);
     if (detalle.entradas) detalle.entradas = parseKilo(detalle.entradas);
     if (
@@ -391,11 +495,11 @@ export class AlmacenService {
     ) {
       detalle.salidas = 0.0;
       detalle.abono = 0;
-      detalle.referencia = `E-${moment(detalle.fecha).format('DDMMYYYY')}`;
+      detalle.referencia = `E-${moment(detalle.fecha).format('DDMMYY')}`;
     } else {
       detalle.entradas = 0.0;
       detalle.cargo = 0;
-      detalle.referencia = `S-${moment(detalle.fecha).format('DDMMYYYY')}`;
+      detalle.referencia = `S-${moment(detalle.fecha).format('DDMMYY')}`;
     }
     await getRepository(ContableDetalleEntity).update(detalleId, detalle);
     return await this.updateTablaContable(detalleId);
@@ -415,16 +519,26 @@ export class AlmacenService {
     const response: CreateContableDetalleDTO[] = [];
     const workbook = new Excel.Workbook();
     const data = await workbook.xlsx.readFile(file);
+    const almacen = await getRepository(AlmacenEntity).findOne(almacenId);
     data.getWorksheet('carga-masiva').eachRow((row, idx) => {
       if (idx === 1) {
         // Fila de encabezados
         return;
       } else {
+        const entradas = row.getCell('B').value
+          ? Number(row.getCell('B').value)
+          : 0.0;
+        const fecha =
+          new Date(row.getCell('A').value.toString()) ?? moment().toDate();
+        const tipoMov = entradas !== 0 ? MovType.COMPRA : MovType.VENTA;
+        const referencia = `${tipoMov}${almacen.depto.substr(0, 2)}-${moment(
+          fecha,
+        ).format('DDMMYY')}`;
+
         const record: CreateContableDetalleDTO = {
-          fecha: new Date(row.getCell('A').value.toString()) ?? null,
-          entradas: row.getCell('B').value
-            ? Number(row.getCell('B').value)
-            : 0.0,
+          fecha,
+          referencia,
+          entradas,
           salidas: row.getCell('C').value
             ? Number(row.getCell('C').value)
             : 0.0,
@@ -445,7 +559,7 @@ export class AlmacenService {
       }
     });
 
-    return this.createDetalle(almacenId, response);
+    return this.createDetalle(almacenId, response, MovType.COMPRA);
   }
 
   /**
@@ -543,9 +657,14 @@ export class AlmacenService {
         .leftJoin('detalle.solicitud', 'solicitud')
         .leftJoin('detalle.insumo', 'insumo')
         .where('solicitud.status IN (:status)', {
-          status: [SolicitudEstados.GENERADA, SolicitudEstados.BORRADOR],
+          status: [
+            SolicitudEstados.BORRADOR,
+            SolicitudEstados.GENERADA,
+            SolicitudEstados.PARA_COMPRAS,
+          ],
         })
         .where('insumo.id IN (:...ids)', { ids: minimosIds })
+        .where('detalle.abastecido = false')
         .select(['detalle.insumoId'])
         .getMany();
       const solicitadosIds = inSolicitados.map((ins) => ins.insumoId);
@@ -584,5 +703,64 @@ export class AlmacenService {
       barra,
       almacen,
     };
+  }
+
+  async abastecer(
+    solicitudId: number,
+  ): Promise<UpdateResult | PromiseLike<UpdateResult>> {
+    const solicitud = await getRepository(SolicitudEntity).findOne(
+      solicitudId,
+      { relations: ['detalle'] },
+    );
+    let cont = 0;
+    await Promise.all(
+      solicitud.detalle.map(async (detalle) => {
+        const almacen = await getRepository(AlmacenEntity).findOne({
+          where: { insumoId: detalle.insumoId, depto: Deptos.ALMACEN },
+        });
+        const almacenDepto = await getRepository(AlmacenEntity).findOne({
+          where: { insumoId: detalle.insumoId, depto: solicitud.depto },
+        });
+
+        if (
+          parseGramos(almacen.total) >= detalle.cantidad &&
+          !detalle.abastecido
+        ) {
+          await this.createDetalle(
+            almacen.id,
+            [
+              {
+                salidas: detalle.cantidad,
+                precioUnitario: 0,
+              },
+            ],
+            MovType.TRANSFERENCIA,
+          );
+          await this.createDetalle(
+            almacenDepto.id,
+            [
+              {
+                entradas: detalle.cantidad,
+                precioUnitario: 0,
+              },
+            ],
+            MovType.TRANSFERENCIA,
+          );
+          console.log('Entra para ' + detalle.id);
+
+          await getRepository(SolicitudDetalleEntity).update(detalle.id, {
+            abastecido: true,
+          });
+          cont++;
+        } else if (detalle.abastecido) cont++;
+      }),
+    );
+
+    const status =
+      cont === solicitud.detalle.length
+        ? SolicitudEstados.COMPLETADA
+        : SolicitudEstados.PARA_COMPRAS;
+
+    return getRepository(SolicitudEntity).update(solicitud.id, { status });
   }
 }

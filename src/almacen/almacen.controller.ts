@@ -8,8 +8,10 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Param,
   ParseArrayPipe,
+  ParseEnumPipe,
   ParseIntPipe,
   Post,
   Put,
@@ -22,7 +24,7 @@ import { PaginationPrimeNgResult } from '@softres/common/DTOs/paginationPrimeNgR
 import { UpdateResult, DeleteResult } from 'typeorm';
 import { CreateAlmacenDTO } from './DTOs/createAlmacen.dto';
 import { UpdateAlmacenDTO } from './DTOs/updateAlmacenDTO.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { existsSync, mkdirSync } from 'fs';
@@ -31,6 +33,8 @@ import { User } from '@softres/user/DTO/user.decorator';
 import { ContableDetalleEntity } from './entitys/contableDetalle.entity';
 import { CreateContableDetalleDTO } from './DTOs/contableDetalle.dto';
 import { ContableEntity } from './entitys/contable.entity';
+import { CargaDTO } from './DTOs/carga.dto';
+import { MovType } from './enums/tiposMovimientos.enum';
 
 @Controller('almacen')
 @ApiTags('Almacén')
@@ -81,12 +85,16 @@ export class AlmacenController {
    * @returns
    */
   @Post('createDetalle/:almacenId')
+  @ApiParam({ name: 'tipoMov', enum: MovType })
+  @ApiBody({ type: [CreateContableDetalleDTO] })
+  @Post('createDetalle/:almacenId/:tipoMov')
   createDetContable(
     @Param('almacenId', ParseIntPipe) almacenId: number,
+    @Param('tipoMov', ParseEnumPipe) tipoMov: MovType,
     @Body(new ParseArrayPipe({ items: CreateContableDetalleDTO }))
     detalles: CreateContableDetalleDTO[],
   ): Promise<ContableDetalleEntity[]> {
-    return this.almacenService.createDetalle(almacenId, detalles);
+    return this.almacenService.createDetalle(almacenId, detalles, tipoMov);
   }
 
   /**
@@ -161,8 +169,25 @@ export class AlmacenController {
   updateDetalleContable(
     @Param('detalleId', ParseIntPipe) detalleId: number,
     @Body() detalle: CreateContableDetalleDTO,
-  ): Promise<any> {
+  ): Promise<UpdateResult> {
     return this.almacenService.updateDetalleContable(detalleId, detalle);
+  }
+
+  /**
+   * funcion que que mueve la existencia de insumos de un origen a un destino
+   * dependiendo del tipo
+   * @param origenId id del almacen digital de donde sale la mercancia
+   * @param destinoId id del almacen digital de a donde va la mercancia
+   * @param ware el detalle de @type {CargaDTO} de la mercancia transportada
+   * @returns
+   */
+  @Put('movimiento/:origenId/:destinoId')
+  movimiento(
+    @Body() ware: CargaDTO,
+    @Param('origenId', ParseIntPipe) origenId: number,
+    @Param('destinoId', ParseIntPipe) destinoId?: number,
+  ): Promise<HttpStatus> {
+    return this.almacenService.createMovimiento(origenId, destinoId, ware);
   }
 
   /**
@@ -217,5 +242,12 @@ export class AlmacenController {
     @UploadedFile() file: FileOptions,
   ): Promise<CreateContableDetalleDTO[]> {
     return await this.almacenService.masiveAlmacen(almacenId, file.path);
+  }
+
+  @Put('abastecer/:solicitudId')
+  async abastecer(
+    @Param('solicitudId', ParseIntPipe) solicitudId: number,
+  ): Promise<UpdateResult> {
+    return this.almacenService.abastecer(solicitudId);
   }
 }
