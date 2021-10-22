@@ -1,3 +1,4 @@
+import { CotzEstados } from './../cotizacion/cotizacionEstados.enum';
 import { CompraDetalleEntity } from './entities/compraDetalles.entity';
 import { CompraEntity } from './entities/compra.entity';
 import { CotizacionDetalleEntity } from '@softres/cotizacion/entitys/cotizacionDetalle.entity';
@@ -82,6 +83,10 @@ export class CompraService {
       );
     }
 
+    await getRepository(CotizacionEntity).update(cotizacion.id, {
+      status: CotzEstados.GENERADA,
+    });
+
     const result: InformeCompra = {
       compra: createdCompra,
       detalles,
@@ -90,16 +95,48 @@ export class CompraService {
     return result;
   }
 
-  findAll(): Promise<CompraEntity[]> {
-    return getRepository(CompraEntity).find();
+  async getById(id: number): Promise<CompraEntity> {
+    return await getRepository(CompraEntity).findOne(id);
   }
 
-  findOne(id: number): Promise<CompraEntity> {
-    return getRepository(CompraEntity).findOne(id);
+  async updateCompra(
+    id: number,
+    compra: UpdateCompraDto,
+  ): Promise<UpdateResult> {
+    return await getRepository(CompraEntity).update(id, compra);
   }
 
-  update(id: number, updateCompraDto: UpdateCompraDto): Promise<UpdateResult> {
-    return getRepository(CompraEntity).update(id, updateCompraDto);
+  async paginateCompra(
+    options: PaginationOptions,
+  ): Promise<PaginationPrimeNgResult> {
+    const dataQuery =
+      getRepository(SolicitudEntity).createQueryBuilder('compra');
+
+    forIn(options.filters, (value, key) => {
+      if (key === 'status') {
+        dataQuery.andWhere('( compra.status LIKE :term )', {
+          term: `%${value.split(' ').join('%')}%`,
+        });
+      }
+    });
+
+    if (options.sort === undefined || !Object.keys(options.sort).length) {
+      options.sort = 'compra.fecha';
+    }
+
+    const count = await dataQuery.getCount();
+
+    const data = await dataQuery
+      .skip(options.skip)
+      .take(options.take)
+      .orderBy(options.sort, options.direction)
+      .getMany();
+
+    return {
+      data: data,
+      skip: options.skip,
+      totalItems: count,
+    };
   }
 
   /**

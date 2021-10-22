@@ -1,7 +1,6 @@
 export enum StatusTypes {
-  BORRADOR = 'Borrador',
-  ENVIADO = 'Enviado',
-  ACEPTADO = 'Aceptado',
-  RECHAZADO = 'Rechazado',
-  FINALIZADO = 'Finalizado',
+  EN_ESPERA = 'EN_ESPERA',
+  EN_REVISION = 'EN_REVISION',
+  RECHAZADO = 'RECHAZADA',
+  ABASTECIDA = 'ABSTECIDA',
 }

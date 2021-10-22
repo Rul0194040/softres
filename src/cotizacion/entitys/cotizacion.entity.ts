@@ -5,18 +5,11 @@ import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { UserEntity } from '@softres/user/user.entity';
 import { CotzEstados } from '../cotizacionEstados.enum';
 
+/**
+ *  Formas de pago:
+ */
 @Entity('cotizacion')
 export class CotizacionEntity extends CommonEntity {
-  @ManyToOne(() => UserEntity, { nullable: true })
-  usuarioCotiza?: UserEntity;
-  @Column({ type: 'int', nullable: false })
-  usuarioCotizaId: number;
-
-  @ManyToOne(() => UserEntity, { nullable: true })
-  usuarioAutoriza?: UserEntity;
-  @Column({ type: 'int', nullable: false })
-  usuarioAutorizaId: number;
-
   @Column({
     type: 'text',
     nullable: false,
@@ -33,7 +26,7 @@ export class CotizacionEntity extends CommonEntity {
   @Column({
     type: 'enum',
     enum: CotzEstados,
-    default: CotzEstados.EN_PROCESO,
+    default: CotzEstados.BORRADOR,
   })
   status?: CotzEstados;
 
@@ -42,73 +35,82 @@ export class CotizacionEntity extends CommonEntity {
     nullable: true,
     default: null,
   })
-  TotalP1?: number;
+  total1?: number;
 
   @Column({
     type: 'boolean',
     nullable: false,
     default: 0,
   })
-  facturaP1?: boolean;
+  factura1?: boolean;
 
   @Column({
     type: 'boolean',
     nullable: false,
     default: 0,
   })
-  formaPagoP1?: boolean;
+  formaPago1?: boolean;
 
   @Column({
     type: 'decimal',
     nullable: true,
     default: null,
   })
-  TotalP2?: number;
+  total2?: number;
 
   @Column({
     type: 'boolean',
     nullable: false,
     default: 0,
   })
-  facturaP2?: boolean;
+  factura2?: boolean;
 
   @Column({
     type: 'boolean',
     nullable: false,
     default: 0,
   })
-  formaPagoP2?: boolean;
+  formaPago2?: boolean;
 
   @Column({
     type: 'decimal',
     nullable: true,
     default: null,
   })
-  totalP3?: number;
+  total3?: number;
 
   @Column({
     type: 'boolean',
     nullable: false,
     default: 0,
   })
-  facturaP3?: boolean;
+  factura3?: boolean;
 
   @Column({
     type: 'boolean',
     nullable: false,
     default: 0,
   })
-  formaPagoP3?: boolean;
-
-  @OneToMany(
-    () => CotizacionDetalleEntity,
-    (cotizacionDetalle) => cotizacionDetalle.cotizacion,
-  )
-  cotizacionDetalle?: CotizacionDetalleEntity;
+  formaPago3?: boolean;
 
   @ManyToOne(() => SolicitudEntity, { nullable: true })
   solicitud?: SolicitudEntity;
 
   @Column({ type: 'int', nullable: false })
   solicitudId: number;
+
+  @ManyToOne(() => UserEntity, { nullable: true })
+  cotiza?: UserEntity;
+
+  @Column({ type: 'int', nullable: false })
+  cotizaId: number;
+
+  @ManyToOne(() => UserEntity, { nullable: true })
+  autoriza?: UserEntity;
+
+  @Column({ type: 'int', nullable: false })
+  autorizaId: number;
+
+  @OneToMany(() => CotizacionDetalleEntity, (detalle) => detalle.cotizacion)
+  detalle?: CotizacionDetalleEntity;
 }

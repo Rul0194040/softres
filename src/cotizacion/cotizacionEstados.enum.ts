@@ -1,4 +1,4 @@
 export enum CotzEstados {
-  EN_PROCESO = 'en proceso',
-  APROBADA = 'aprobada',
+  BORRADOR = 'borrador',
+  GENERADA = 'generada',
 }

@@ -23,7 +23,7 @@ export class CompraEntity extends CommonEntity {
     type: 'enum',
     enum: StatusTypes,
     nullable: false,
-    default: StatusTypes.BORRADOR,
+    default: StatusTypes.EN_ESPERA,
   })
   status: StatusTypes;
 

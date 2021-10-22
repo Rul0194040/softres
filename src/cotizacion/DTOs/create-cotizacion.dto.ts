@@ -1,46 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CotzEstados } from '../cotizacionEstados.enum';
 
-export class CreateCotizacionDTO {
-  @ApiProperty({ nullable: false })
-  usuarioCotizaId: number;
-  @ApiProperty({ nullable: false })
-  usuarioAutorizaId: number;
-  @ApiProperty({ nullable: false })
-  solicitudId: number;
-  @ApiProperty({ nullable: false })
-  folio: string;
-  @ApiProperty({ nullable: true })
-  fecha?: Date;
-  @ApiProperty({ nullable: true })
-  status?: CotzEstados;
-  @ApiProperty({ nullable: true })
-  TotalP1?: number;
-  @ApiProperty({ nullable: true })
-  facturaP1?: boolean;
-  @ApiProperty({ nullable: true })
-  formaPagoP1?: boolean;
-  @ApiProperty({ nullable: true })
-  TotalP2?: number;
-  @ApiProperty({ nullable: true })
-  facturaP2?: boolean;
-  @ApiProperty({ nullable: true })
-  formaPagoP2?: boolean;
-  @ApiProperty({ nullable: true })
-  totalP3?: number;
-  @ApiProperty({ nullable: true })
-  facturaP3?: boolean;
-  @ApiProperty({ nullable: true })
-  formaPagoP3?: boolean;
-  @ApiProperty({ nullable: true, isArray: true })
-  detalles?: DetallesCotizacionDTO[];
-}
-
 export class DetallesCotizacionDTO {
   @ApiProperty({ nullable: false })
   cotizacionId: number;
   @ApiProperty({ nullable: false })
   insumoId: number;
+  @ApiProperty({ nullable: false })
+  cantidad: number;
   @ApiProperty({ nullable: false })
   proveedor1Id: number;
   @ApiProperty({ nullable: false })
@@ -63,4 +30,41 @@ export class DetallesCotizacionDTO {
   proveedorSeleccionadoId: number;
   @ApiProperty({ nullable: false })
   precioSeleccionado: number;
+}
+
+export class CreateCotizacionDTO {
+  @ApiProperty({ nullable: true })
+  fecha?: Date;
+  @ApiProperty({
+    nullable: true,
+    enum: CotzEstados,
+    default: CotzEstados.BORRADOR,
+  })
+  status?: CotzEstados;
+  @ApiProperty({ nullable: true })
+  total1?: number;
+  @ApiProperty({ nullable: true })
+  factura1?: boolean;
+  @ApiProperty({ nullable: true })
+  formaPago1?: boolean;
+  @ApiProperty({ nullable: true })
+  total2?: number;
+  @ApiProperty({ nullable: true })
+  factura2?: boolean;
+  @ApiProperty({ nullable: true })
+  formaPago2?: boolean;
+  @ApiProperty({ nullable: true })
+  total3?: number;
+  @ApiProperty({ nullable: true })
+  factura3?: boolean;
+  @ApiProperty({ nullable: true })
+  formaPago3?: boolean;
+  @ApiProperty({ nullable: false })
+  cotizaId: number;
+  @ApiProperty({ nullable: true })
+  autorizaId: number;
+  @ApiProperty({ nullable: false })
+  solicitudId: number;
+  @ApiProperty({ nullable: true, type: [DetallesCotizacionDTO] })
+  detalle?: DetallesCotizacionDTO[];
 }
