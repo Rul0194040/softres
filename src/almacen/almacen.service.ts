@@ -664,7 +664,6 @@ export class AlmacenService {
           ],
         })
         .where('insumo.id IN (:...ids)', { ids: minimosIds })
-        .where('detalle.abastecido = false')
         .select(['detalle.insumoId'])
         .getMany();
       const solicitadosIds = inSolicitados.map((ins) => ins.insumoId);
