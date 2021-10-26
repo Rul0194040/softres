@@ -1,4 +1,5 @@
 export enum StatusTypes {
+  BORRADOR = 'BORRADOR',
   EN_ESPERA = 'EN_ESPERA',
   EN_REVISION = 'EN_REVISION',
   RECHAZADO = 'RECHAZADA',

@@ -84,13 +84,12 @@ export class AlmacenController {
    * @param detalles @type {CreateContableDetalleDTO} detalles contables
    * @returns
    */
-  @Post('createDetalle/:almacenId')
   @ApiParam({ name: 'tipoMov', enum: MovType })
   @ApiBody({ type: [CreateContableDetalleDTO] })
   @Post('createDetalle/:almacenId/:tipoMov')
   createDetContable(
     @Param('almacenId', ParseIntPipe) almacenId: number,
-    @Param('tipoMov', ParseEnumPipe) tipoMov: MovType,
+    @Param('tipoMov', new ParseEnumPipe(MovType)) tipoMov: MovType,
     @Body(new ParseArrayPipe({ items: CreateContableDetalleDTO }))
     detalles: CreateContableDetalleDTO[],
   ): Promise<ContableDetalleEntity[]> {
