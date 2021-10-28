@@ -13,7 +13,7 @@ export class CreateCompraDTO {
 
   @ApiProperty({
     enum: StatusTypes,
-    default: StatusTypes.BORRADOR,
+    default: StatusTypes.EN_ESPERA,
   })
   @IsOptional()
   status?: StatusTypes;

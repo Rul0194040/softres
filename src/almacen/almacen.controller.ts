@@ -11,7 +11,6 @@ import {
   HttpStatus,
   Param,
   ParseArrayPipe,
-  ParseEnumPipe,
   ParseIntPipe,
   Post,
   Put,
@@ -89,7 +88,7 @@ export class AlmacenController {
   @Post('createDetalle/:almacenId/:tipoMov')
   createDetContable(
     @Param('almacenId', ParseIntPipe) almacenId: number,
-    @Param('tipoMov', new ParseEnumPipe(MovType)) tipoMov: MovType,
+    @Param('tipoMov') tipoMov: MovType,
     @Body(new ParseArrayPipe({ items: CreateContableDetalleDTO }))
     detalles: CreateContableDetalleDTO[],
   ): Promise<ContableDetalleEntity[]> {
