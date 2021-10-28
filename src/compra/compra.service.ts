@@ -6,7 +6,7 @@ import { CotizacionEntity } from '@softres/cotizacion/entitys/cotizacion.entity'
 import { CreateCompraDTO } from './dto/create-compra.dto';
 import { CreateSolicitudDTO } from './dto/create-solicitud.dto';
 import { forIn } from 'lodash';
-import { getRepository, UpdateResult } from 'typeorm';
+import { DeleteResult, getRepository, UpdateResult } from 'typeorm';
 import { InformeCompra } from './dto/informe-compra.dto';
 import { InformeSolicitud } from './dto/solicitud-informe.dto';
 import { Injectable } from '@nestjs/common';
@@ -20,6 +20,8 @@ import { LoginIdentityDTO } from '@softres/auth/DTOs/loginIdentity.dto';
 import { ProfileTypes } from '@softres/user/profileTypes.enum';
 import { Deptos } from '@softres/almacen/enums/deptos.enum';
 import { AlmacenService } from '@softres/almacen/almacen.service';
+import { UpdateSolicitudDto } from './dto/update-solicitud.dto';
+import { SolicitudEstados } from './enum/solicitud-estados.enum';
 
 @Injectable()
 export class CompraService {
@@ -166,7 +168,7 @@ export class CompraService {
     const solicitudToCreate: SolicitudEntity = {
       usuarioId: user.id,
       fecha: solicitud.fecha ? new Date(solicitud.fecha) : moment().toDate(),
-      folio: `${moment().format('DDMMYYYY')}${solicitud.depto.substr(0, 2)}`,
+      folio: `${moment().format('DDMMYYHH')}${solicitud.depto.substr(0, 2)}`,
       depto: solicitud.depto,
     };
 
@@ -219,6 +221,36 @@ export class CompraService {
       .getOne();
   }
 
+  async updateSolicitud(
+    id: number,
+    solicitud: UpdateSolicitudDto,
+  ): Promise<UpdateResult> {
+    if (solicitud.detalle.length !== 0) {
+      await getRepository(SolicitudDetalleEntity).delete({ solicitudId: id });
+
+      for (let i = 0; i < solicitud.detalle.length; i++) {
+        const registro = solicitud.detalle[i];
+
+        const solicitudDetalle: SolicitudDetalleEntity = {
+          cantidad: registro.cantidad,
+          insumoId: registro.insumoId,
+          solicitudId: id,
+          abastecido: false,
+        };
+
+        await getRepository(SolicitudDetalleEntity).save(solicitudDetalle);
+      }
+    }
+    return getRepository(SolicitudEntity).update(id, {
+      status: SolicitudEstados.GENERADA,
+    });
+  }
+
+  async deleteSolicitud(id: number): Promise<DeleteResult> {
+    await getRepository(SolicitudDetalleEntity).delete({ solicitudId: id });
+    return getRepository(SolicitudEntity).delete(id);
+  }
+
   async paginate(
     options: PaginationOptions,
     user: LoginIdentityDTO,
@@ -227,6 +259,8 @@ export class CompraService {
       options.filters.depto = Deptos.COCINA;
     } else if (user.profile === ProfileTypes.BARRA) {
       options.filters.depto = Deptos.BARRA;
+    } else if (user.profile === ProfileTypes.COMPRAS) {
+      options.filters.status = SolicitudEstados.PARA_COMPRAS;
     }
 
     const dataQuery = getRepository(SolicitudEntity)
@@ -252,6 +286,12 @@ export class CompraService {
       if (key === 'depto') {
         dataQuery.andWhere('( solicitud.depto = :term2 )', {
           term2: value,
+        });
+      }
+
+      if (key === 'status') {
+        dataQuery.andWhere('( solicitud.status = :term3 )', {
+          term3: value,
         });
       }
     });

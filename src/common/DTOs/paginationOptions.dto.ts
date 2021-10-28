@@ -37,9 +37,5 @@ export class PaginationOptions {
    * @ignore
    */
   @ApiProperty()
-  filters: {
-    buscar?: string;
-    depto?: Deptos;
-    type?: AlmacenType;
-  };
+  filters: any;
 }

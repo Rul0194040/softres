@@ -385,7 +385,7 @@ export class AlmacenService {
         });
       }
 
-      if (key === 'categoria') {
+      if (key === 'categoria' && value !== null) {
         dataQuery.andWhere('( insumo.categoriaId = :term2 )', {
           term2: value,
         });

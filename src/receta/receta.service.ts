@@ -224,7 +224,7 @@ export class RecetaService {
           term: `%${value.split(' ').join('%')}%`,
         });
       }
-      if (key === 'grupo') {
+      if (key === 'grupo' && value != null) {
         dataQuery.andWhere('( receta.grupo = :term )', {
           term: value,
         });

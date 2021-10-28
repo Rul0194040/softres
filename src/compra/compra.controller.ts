@@ -1,12 +1,22 @@
-import { Controller, Get, Post, Body, Param, Put } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { CompraService } from './compra.service';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { CreateCompraDTO } from './dto/create-compra.dto';
+import { JwtAuthGuard } from '@softres/auth/guards/jwt.guard';
+import { PaginationOptions } from '@softres/common/DTOs/paginationOptions.dto';
 import { UpdateCompraDto } from './dto/update-compra.dto';
 
 @Controller('compra')
 @ApiTags('Compra')
+@UseGuards(JwtAuthGuard)
 export class CompraController {
   constructor(private readonly compraService: CompraService) {}
 
